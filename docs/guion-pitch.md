@@ -10,9 +10,11 @@ Guion cronometrado para el pitch de Ventana Cero. Dos roles: **quien habla** (H)
 ---
 
 ## 0:00 – 0:25 · Gancho (slide: cover → ventana)
-**H:** "Cuando sale una vulnerabilidad crítica —como la reciente de PHP—, los
-atacantes con IA arman el exploit en **horas**. Los defensores tardan **días** en
-parchear. En esa ventana ocurre casi todo el daño."
+**H:** "Cuando sale una vulnerabilidad crítica, los atacantes con IA arman el
+exploit en **horas**. Los defensores tardan **días** en parchear su código. Con
+PHP2Shell, Cloudflare puso una regla antes del parche porque le avisaron antes.
+¿Quién hace eso por la librería de *tu* app? Nadie. En esa ventana ocurre casi todo
+el daño."
 *(pasa a `ventana`, señala la franja)*
 "Esto es la ventana del n-day. Ventana Cero la cierra en **minutos**, y lo prueba."
 
@@ -51,8 +53,9 @@ cuando el **PoC se dispara**. El modelo propone; el sandbox confirma."
 sobre la sospecha. Cero falsos positivos accionados."
 
 ## 2:30 – 2:45 · Resultados + carril (slide: resultados → carril)
-**H:** "No lo contamos, lo medimos: 5 casos, 2 clases de vulnerabilidad, 100% de
-precisión, cero falsos positivos accionados. Repo público con CI."
+**H:** "No lo contamos, lo medimos: 8 escenarios controlados, uno por cada peldaño
+de la escalera, incluido el sanitizador y la versión ya parcheada. Las 2 explotables
+se mitigan, cero acciones sin PoC confirmado. Repo público con CI."
 *(pasa a `carril`)*
 "Y elegimos el carril que nadie toca: **IA para defender**, no otro firewall."
 
@@ -66,6 +69,19 @@ abierto más nube."
 
 ## Preguntas probables (y respuestas)
 
+- **"Cloudflare ya bloqueó PHP2Shell antes del parche de PHP: los WAF ya cierran
+  la ventana."** → Es cierto, y nos da la razón: un parche virtual antes del parche
+  funciona. Pero fue la excepción: un CVE del runtime, con divulgación coordinada,
+  donde Cloudflare tuvo aviso previo y escribió una regla genérica. Solo protege el
+  tráfico que pasa por Cloudflare, los atacantes mutaron payloads para esquivarla y
+  el propio Cloudflare pide parchear igual. Las librerías de *tu* app no reciben
+  regla de nadie, y un WAF conoce el CVE pero no tu código. Ventana Cero hace la
+  regla para tu app: acotada a la ruta y el parámetro alcanzables, confirmada por un
+  PoC y verificando que el tráfico legítimo pasa. Esa regla se puede cargar en un WAF:
+  no competimos con el WAF, le damos reglas. *(Hoy la regla la aplica la app de la
+  demo; exportarla a un WAF es roadmap.)*
+  **En una línea:** "Cloudflare cerró PHP2Shell porque le avisaron. Nosotros
+  cerramos la ventana de lo que nadie avisa."
 - **"¿Esto no es AIxCC / un auto-patcher?"** → "AIxCC descubre y parchea en un
   repo dado. Nosotros hacemos el lazo autónomo de respuesta al n-day: alcanzabilidad
   + PoC + mitigación instantánea, gated por prueba. Ese lazo pegado casi no existe."
@@ -78,10 +94,18 @@ abierto más nube."
   alcanzable' significa despriorizar, no 'seguro'. Somos honestos: es priorización
   y prueba, no una garantía formal."
 - **"¿El LLM es confiable?"** → "No dependemos de él para decidir: propone; el
-  sandbox decide. Corre incluso sin LLM, con heurísticas."
+  sandbox decide. En el panel se ve: 'símbolo propuesto por el LLM', y después el
+  taint y el PoC lo confirman o lo descartan. Corre incluso sin LLM, con heurísticas."
+- **"¿Dónde corre el PoC?"** → "En la demo, en un subproceso local contra nuestra
+  propia app. En producción, en un contenedor aislado sin red y con límites. Y los
+  PoC son canarios benignos (7*6=42), nunca un exploit con daño."
 
 ## Checklist antes de subir al escenario
-- [ ] `python -m ventana_cero` corrido; `ui/public` servido y abierto.
+- [ ] `python -m ventana_cero.demo --sin-pausa` termina en "Ventana cerrada."
+  (ensayo general: 200 → 403 → 200).
+- [ ] `python -m ventana_cero` corrido; `ui/public` servido y abierto (puerto 8000).
+- [ ] En el escenario, `python -m ventana_cero.demo` (app en el 8001, pausa en cada
+  paso para narrar).
 - [ ] Video de respaldo de la demo, cargado y listo.
 - [ ] Modo guion / temperatura 0; sin dependencia de red.
 - [ ] Repo abierto en otra pestaña (la prueba de que funciona).

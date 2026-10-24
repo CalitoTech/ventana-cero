@@ -65,13 +65,15 @@ el análisis estático *recorta* y el **sandbox *confirma***. Nunca decimos
 
 ## 5. Qué ya está hecho (el esqueleto camina)
 
-El lazo corre de punta a punta sobre 5 casos de demo. No inventamos nada en el
+El lazo corre de punta a punta sobre 8 casos de demo. No inventamos nada en el
 pitch: esto ya funciona y está medido.
 
 - 2 clases llegan a **nivel 4 → ACTUAR** con parche virtual verificado (SSTI y path traversal).
 - 1 caso demuestra el **proof-gating**: hay taint pero el PoC no confirma → **REVISAR** (no auto-actuamos).
 - 2 casos son **ruido filtrado** (presente-no-alcanzable, y solo-referenciado).
-- Eval: 100% precisión/recall, 60% de ruido descartado, sobre los fixtures actuales.
+- 2 casos quedan en **nivel 2 → PREPARAR**: el símbolo se llama solo con una constante, o la entrada pasa por un sanitizador (`os.path.basename`) antes del sink.
+- 1 aviso se descarta en la detección: la versión instalada ya trae el fix.
+- Eval: 100% precisión/recall, 75% de ruido descartado, sobre los 8 fixtures actuales (son escenarios controlados, no una muestra real).
 
 ## 6. Córrelo ahora (2 minutos)
 
@@ -112,7 +114,7 @@ créditos). Con la clave, los avisos nuevos se consultan una vez y quedan en cac
 
 ## 8. Tu primer aporte
 
-1. Corre el proyecto y abre el panel; entiende los 5 casos.
+1. Corre el proyecto y abre el panel; entiende los 8 casos.
 2. Lee tu bloque en `docs/roadmap.md` (reparto) y `docs/TASKS.md`.
 3. Toma un [issue](https://github.com/CalitoTech/ventana-cero/issues), haz una rama, abre un PR. La CI corre tests + eval.
 
