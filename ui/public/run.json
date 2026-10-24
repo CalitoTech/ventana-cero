@@ -1,8 +1,19 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 06:23:01",
-  "segundos_totales": 1.46,
+  "generado": "2026-10-24 06:36:02",
+  "segundos_totales": 3.44,
   "atacante_seg_supuesto": 14400,
+  "resumen": {
+    "total": 5,
+    "accionables": 2,
+    "ruido_descartado": 3,
+    "por_decision": {
+      "actuar": 2,
+      "revisar": 1,
+      "ignorar": 1,
+      "vigilar": 1
+    }
+  },
   "hallazgos": [
     {
       "advisory_id": "VC-2026-0001",
@@ -46,10 +57,168 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpwfod6osk\\VC-2026-0001.patch",
+      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpmxokpakz\\VC-2026-0001.patch",
+      "epss": 0.94,
+      "kev": true,
+      "prioridad": "crítica",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
-      "segundos_hasta_mitigar": 1.44
+      "clase": "SSTI",
+      "segundos_hasta_mitigar": 1.424,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.001
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.025
+        },
+        {
+          "etapa": "PoC: disparo",
+          "t": 0.788
+        },
+        {
+          "etapa": "parche virtual verificado",
+          "t": 1.422
+        }
+      ]
+    },
+    {
+      "advisory_id": "VC-2026-0003",
+      "paquete": "safefs",
+      "version": "1.0.0",
+      "commit_fix": "f1x0003",
+      "resumen": "Path traversal en safefs.read() vía nombre de archivo no confiable",
+      "simbolo_vulnerable": "safefs.read",
+      "parametro_peligroso": "nombre",
+      "nivel": 4,
+      "camino_taint": [
+        "fuente: params.get('name', ['index.txt'])[0]",
+        "var: name",
+        "sink: read(...) en do_GET()"
+      ],
+      "evidencia": [
+        "safefs==1.0.0 cae en el rango afectado de VC-2026-0003",
+        "símbolo vulnerable derivado: safefs.read (param: nombre)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso",
+        "PoC confirmado en el sandbox: ejecución reproducida",
+        "parche virtual verificado: el PoC ya no se dispara"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/file",
+        "param": "name",
+        "valor": "../secret.txt",
+        "espera_contiene": "VC_SECRETO_1337",
+        "descr": "lee un archivo fuera del directorio público con ../",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "VC_SECRETO_1337 (este archivo no deberia ser legible por la ruta /file)\n"
+      },
+      "resultado_poc": "disparo",
+      "parche_virtual": {
+        "id": "vp-vc-2026-0003",
+        "tipo": "regla_borde",
+        "ruta": "/file",
+        "param": "name",
+        "patron": "\\.\\.[\\/]",
+        "descr": "bloquea name que coincide con \\.\\.[\\/] en /file",
+        "reversible": true
+      },
+      "parche_virtual_verificado": true,
+      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpmxokpakz\\VC-2026-0003.patch",
+      "epss": 0.71,
+      "kev": true,
+      "prioridad": "crítica",
+      "decision": "actuar",
+      "nivel_texto": "PoC confirmado",
+      "clase": "path-traversal",
+      "segundos_hasta_mitigar": 1.31,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.0
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.02
+        },
+        {
+          "etapa": "PoC: disparo",
+          "t": 0.687
+        },
+        {
+          "etapa": "parche virtual verificado",
+          "t": 1.308
+        }
+      ]
+    },
+    {
+      "advisory_id": "VC-2026-0004",
+      "paquete": "jsonx",
+      "version": "1.2.0",
+      "commit_fix": "f1x0004",
+      "resumen": "Deserialización insegura en jsonx.loads() (el PoC NO lo confirma en esta versión)",
+      "simbolo_vulnerable": "jsonx.loads",
+      "parametro_peligroso": "data",
+      "nivel": 3,
+      "camino_taint": [
+        "fuente: params.get('data', ['{}'])[0]",
+        "var: data",
+        "sink: loads(...) en do_GET()"
+      ],
+      "evidencia": [
+        "jsonx==1.2.0 cae en el rango afectado de VC-2026-0004",
+        "símbolo vulnerable derivado: jsonx.loads (param: data)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/parse",
+        "param": "data",
+        "valor": "{\"__eval__\": \"6*7\"}",
+        "espera_contiene": "42",
+        "descr": "clave mágica __eval__: solo se dispara si hay eval inseguro",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "{'__eval__': '6*7'}"
+      },
+      "resultado_poc": "no_disparo",
+      "parche_virtual": null,
+      "parche_virtual_verificado": false,
+      "pr_parche_codigo": null,
+      "epss": 0.62,
+      "kev": false,
+      "prioridad": "alta",
+      "decision": "revisar",
+      "nivel_texto": "con taint (fuente → sink)",
+      "clase": "deserializacion",
+      "segundos_hasta_mitigar": null,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.001
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.023
+        },
+        {
+          "etapa": "PoC: no_disparo",
+          "t": 0.652
+        }
+      ]
     },
     {
       "advisory_id": "VC-2026-0002",
@@ -71,9 +240,69 @@
       "parche_virtual": null,
       "parche_virtual_verificado": false,
       "pr_parche_codigo": null,
+      "epss": 0.33,
+      "kev": false,
+      "prioridad": "media",
       "decision": "ignorar",
       "nivel_texto": "dependencia presente",
-      "segundos_hasta_mitigar": null
+      "clase": "deserializacion",
+      "segundos_hasta_mitigar": null,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.0
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 0",
+          "t": 0.02
+        }
+      ]
+    },
+    {
+      "advisory_id": "VC-2026-0005",
+      "paquete": "oldhash",
+      "version": "0.9.0",
+      "commit_fix": "f1x0005",
+      "resumen": "Hash débil en oldhash.md5() (símbolo referenciado pero no invocado)",
+      "simbolo_vulnerable": "oldhash.md5",
+      "parametro_peligroso": "x",
+      "nivel": 1,
+      "camino_taint": [],
+      "evidencia": [
+        "oldhash==0.9.0 cae en el rango afectado de VC-2026-0005",
+        "símbolo vulnerable derivado: oldhash.md5 (param: x)",
+        "el símbolo aparece referenciado, sin llamada alcanzable"
+      ],
+      "poc": null,
+      "resultado_poc": null,
+      "parche_virtual": null,
+      "parche_virtual_verificado": false,
+      "pr_parche_codigo": null,
+      "epss": 0.08,
+      "kev": false,
+      "prioridad": "baja",
+      "decision": "vigilar",
+      "nivel_texto": "símbolo referenciado",
+      "clase": "hash-debil",
+      "segundos_hasta_mitigar": null,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.0
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 1",
+          "t": 0.02
+        }
+      ]
     }
   ]
 }

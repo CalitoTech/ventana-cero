@@ -1,0 +1,17 @@
+{
+  "id": "VC-2026-0003",
+  "summary": "Path traversal en safefs.read() vía nombre de archivo no confiable",
+  "details": "read() concatena el nombre al directorio base sin normalizar; '../' escapa del directorio público.",
+  "severity": "high",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "safefs"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "1.1.0"}]}]}
+  ],
+  "commit_fix": "f1x0003",
+  "fix_diff": "--- a/safefs/__init__.py\n+++ b/safefs/__init__.py\n@@\n def read(nombre: str) -> str:\n-    ruta = os.path.join(_BASE, nombre)\n+    ruta = os.path.normpath(os.path.join(_BASE, nombre))\n+    if not ruta.startswith(_BASE):\n+        raise ValueError(\"ruta fuera del directorio base\")\n     with open(ruta, encoding=\"utf-8\") as f:\n         return f.read()\n",
+  "ground_truth_symbol": "safefs.read",
+  "ground_truth_param": "nombre",
+  "clase": "path-traversal",
+  "epss": 0.71,
+  "kev": true
+}

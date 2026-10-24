@@ -1,0 +1,17 @@
+{
+  "id": "VC-2026-0004",
+  "summary": "Deserialización insegura en jsonx.loads() (el PoC NO lo confirma en esta versión)",
+  "details": "El aviso marca loads() como afectada por evaluar claves mágicas. La versión instalada delega en json estándar; el PoC no se dispara, así que queda para revisión humana en vez de auto-mitigar.",
+  "severity": "critical",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "jsonx"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "2.0.0"}]}]}
+  ],
+  "commit_fix": "f1x0004",
+  "fix_diff": "--- a/jsonx/__init__.py\n+++ b/jsonx/__init__.py\n@@\n def loads(data: str):\n-    return _eval_magic(data)\n+    return json.loads(data)\n",
+  "ground_truth_symbol": "jsonx.loads",
+  "ground_truth_param": "data",
+  "clase": "deserializacion",
+  "epss": 0.62,
+  "kev": false
+}

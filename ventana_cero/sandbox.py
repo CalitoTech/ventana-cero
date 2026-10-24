@@ -27,6 +27,12 @@ POCS_POR_CLASE = {
     "SSTI": {"metodo": "GET", "ruta": "/preview", "param": "tpl",
              "valor": "{{7*6}}", "espera_contiene": "42",
              "descr": "canario aritmético: si la plantilla se evalúa, responde 42"},
+    "path-traversal": {"metodo": "GET", "ruta": "/file", "param": "name",
+                       "valor": "../secret.txt", "espera_contiene": "VC_SECRETO_1337",
+                       "descr": "lee un archivo fuera del directorio público con ../"},
+    "deserializacion": {"metodo": "GET", "ruta": "/parse", "param": "data",
+                        "valor": '{"__eval__": "6*7"}', "espera_contiene": "42",
+                        "descr": "clave mágica __eval__: solo se dispara si hay eval inseguro"},
 }
 
 

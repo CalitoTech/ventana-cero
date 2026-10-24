@@ -17,8 +17,11 @@ from ventana_cero import orchestrator  # noqa: E402
 
 # etiqueta esperada por aviso: ¿debería terminar mitigado (alcanzable+explotable)?
 GROUND_TRUTH = {
-    "VC-2026-0001": {"debe_mitigar": True},   # SSTI realmente alcanzable
+    "VC-2026-0001": {"debe_mitigar": True},   # SSTI realmente alcanzable y explotable
+    "VC-2026-0003": {"debe_mitigar": True},   # path traversal alcanzable y explotable
+    "VC-2026-0004": {"debe_mitigar": False},  # taint, pero el PoC no confirma -> revisar
     "VC-2026-0002": {"debe_mitigar": False},  # presente pero no alcanzable (ruido)
+    "VC-2026-0005": {"debe_mitigar": False},  # solo referenciado (ruido)
 }
 
 

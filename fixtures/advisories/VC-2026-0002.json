@@ -5,12 +5,29 @@
   "severity": "high",
   "affected": [
     {
-      "package": {"ecosystem": "PyPI", "name": "fastjson"},
-      "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "2.0.0"}]}]
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "fastjson"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "2.0.0"
+            }
+          ]
+        }
+      ]
     }
   ],
   "commit_fix": "def5678",
   "ground_truth_symbol": "fastjson.parse",
   "ground_truth_param": "data",
-  "clase": "deserializacion"
+  "clase": "deserializacion",
+  "epss": 0.33,
+  "kev": false
 }

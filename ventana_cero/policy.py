@@ -20,8 +20,27 @@ _MAPA = {
 
 
 def decidir(h: Hallazgo) -> str:
-    h.decision = _MAPA.get(h.nivel, "ignorar")
+    # El PoC manda: si hay taint estático (nivel 3) pero el PoC no se disparó, no
+    # afirmamos explotabilidad; queda para revisión humana en vez de mitigar.
+    if h.nivel == 3 and h.resultado_poc == "no_disparo":
+        h.decision = "revisar"
+    else:
+        h.decision = _MAPA.get(h.nivel, "ignorar")
     return h.decision
+
+
+def prioridad(h: Hallazgo) -> str:
+    """Prioriza con la señal de la detección: KEV (explotada activa) y EPSS."""
+    if h.kev or (h.epss is not None and h.epss >= 0.7):
+        p = "crítica"
+    elif h.epss is not None and h.epss >= 0.4:
+        p = "alta"
+    elif h.epss is not None and h.epss >= 0.1:
+        p = "media"
+    else:
+        p = "baja"
+    h.prioridad = p
+    return p
 
 
 def puede_auto_mitigar(h: Hallazgo) -> bool:

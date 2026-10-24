@@ -1,14 +1,17 @@
 """App víctima para la demo de Ventana Cero. Solo stdlib, corre en cualquier lado.
 
-Rutas:
-  GET /preview?tpl=...   -> tinytpl.render(tpl)       VULNERABLE: entrada no confiable → sink
-  GET /banner            -> tinytpl.render(CONSTANTE) usa el sink, pero SIN taint (negativo)
-  GET /welcome?name=...  -> saludo literal             no usa el sink (negativo)
+Rutas (cada una ejercita un caso distinto de la escalera de confianza):
+  GET /preview?tpl=...   -> tinytpl.render(tpl)   SSTI: entrada no confiable → sink (nivel 4)
+  GET /file?name=...     -> safefs.read(name)      path traversal: tainted → sink (nivel 4)
+  GET /parse?data=...    -> jsonx.loads(data)      tainted → sink, pero impl segura (PoC falla → revisar)
+  GET /banner            -> tinytpl.render(const)  sink con constante (sin taint)
+  GET /welcome?name=...  -> saludo literal          no usa ningún sink
   GET /health            -> ok
 
-Parche virtual: si la variable de entorno VC_GUARD apunta a un JSON de reglas, se
-bloquean (403) las peticiones cuyo parámetro coincide con el patrón de la regla.
-Así el mitigador puede "aplicar" una mitigación sin tocar el código vulnerable.
+Además referencia (sin llamar) oldhash.md5 -> demuestra "símbolo referenciado" (nivel 1).
+
+Parche virtual: si VC_GUARD apunta a un JSON de reglas, se bloquean (403) las
+peticiones cuyo parámetro coincide con el patrón de la regla.
 """
 import json
 import os
@@ -18,7 +21,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "vendor"))
-import tinytpl  # noqa: E402  (librería vendored, ficticia y vulnerable)
+import tinytpl   # noqa: E402  (vendored, vulnerable: SSTI)
+import safefs    # noqa: E402  (vendored, vulnerable: path traversal)
+import jsonx     # noqa: E402  (vendored, impl segura)
+import oldhash   # noqa: E402  (vendored, md5 débil)
+
+# Referencia al símbolo débil SIN llamarlo: la escalera debe quedarse en nivel 1.
+HASHER = oldhash.md5  # referenciado, nunca invocado
 
 
 def _cargar_guard():
@@ -35,24 +44,22 @@ def _cargar_guard():
 GUARD = _cargar_guard()
 
 
-def _bloqueado(ruta: str, params: dict) -> dict | None:
+def _bloqueado(ruta: str, params: dict):
     for regla in GUARD:
         if regla.get("ruta") and regla["ruta"] != ruta:
             continue
-        param = regla.get("param")
-        patron = regla.get("patron")
-        valores = params.get(param, []) if param else []
+        valores = params.get(regla.get("param"), []) if regla.get("param") else []
         for v in valores:
-            if patron and re.search(patron, v):
+            if regla.get("patron") and re.search(regla["patron"], v):
                 return regla
     return None
 
 
 class Handler(BaseHTTPRequestHandler):
-    def log_message(self, *a):  # silencio
+    def log_message(self, *a):
         pass
 
-    def _responder(self, codigo: int, cuerpo: str):
+    def _responder(self, codigo, cuerpo):
         self.send_response(codigo)
         self.send_header("content-type", "text/plain; charset=utf-8")
         self.end_headers()
@@ -64,19 +71,25 @@ class Handler(BaseHTTPRequestHandler):
 
         regla = _bloqueado(u.path, params)
         if regla:
-            self._responder(403, f"bloqueado por Ventana Cero (regla {regla.get('id','?')})")
+            self._responder(403, f"bloqueado por Ventana Cero (regla {regla.get('id', '?')})")
             return
 
         if u.path == "/health":
             self._responder(200, "ok")
         elif u.path == "/preview":
-            tpl = params.get("tpl", [""])[0]      # fuente: entrada no confiable
-            self._responder(200, tinytpl.render(tpl))  # sink: símbolo vulnerable
+            tpl = params.get("tpl", [""])[0]          # fuente no confiable
+            self._responder(200, tinytpl.render(tpl))  # sink SSTI
+        elif u.path == "/file":
+            name = params.get("name", ["index.txt"])[0]  # fuente no confiable
+            self._responder(200, safefs.read(name))       # sink path traversal
+        elif u.path == "/parse":
+            data = params.get("data", ["{}"])[0]       # fuente no confiable
+            self._responder(200, str(jsonx.loads(data)))  # sink deserialización (impl segura)
         elif u.path == "/banner":
-            self._responder(200, tinytpl.render("Banner {{1}}"))  # sink con constante (sin taint)
+            self._responder(200, tinytpl.render("Banner {{1}}"))  # sink con constante
         elif u.path == "/welcome":
             name = params.get("name", ["amigo"])[0]
-            self._responder(200, f"Hola {name}")  # tainted, pero NO llega al sink
+            self._responder(200, f"Hola {name}")       # tainted, no llega a un sink
         else:
             self._responder(404, "no encontrado")
 
@@ -84,7 +97,7 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     puerto = int(os.environ.get("VC_PORT", sys.argv[1] if len(sys.argv) > 1 else "8000"))
     srv = ThreadingHTTPServer(("127.0.0.1", puerto), Handler)
-    print(f"target-app escuchando en 127.0.0.1:{puerto} (guard: {len(GUARD)} reglas)", flush=True)
+    print(f"target-app en 127.0.0.1:{puerto} (guard: {len(GUARD)} reglas)", flush=True)
     srv.serve_forever()
 
 

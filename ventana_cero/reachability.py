@@ -1,11 +1,10 @@
 """Etapas 2-3 · Alcanzabilidad. Sube el Hallazgo por la escalera de confianza.
 
-Dos sub-pasos:
-  A) derivar_simbolo: del diff del fix saca el símbolo vulnerable y el parámetro
-     peligroso. Usa el LLM si hay clave; si no, heurística sobre el diff; y como
-     último recurso, el ground_truth del aviso.
-  B) analizar: con AST busca el símbolo en el repo víctima y hace un taint
-     intra-procedural simple (fuente no confiable → argumento del sink).
+A) derivar_simbolo: del diff del fix saca el símbolo vulnerable y el parámetro
+   peligroso (LLM si hay clave; heurística sobre el diff; ground_truth como último
+   recurso).
+B) analizar: con AST busca el símbolo en el repo víctima y hace taint
+   intra-procedural con punto fijo y detección de sanitizadores.
 
 Honestidad: el taint es intra-procedural y heurístico. "No alcanzable" significa
 despriorizar, no "seguro". La certeza la da el PoC (etapa sandbox), no esto.
@@ -22,12 +21,16 @@ from .hallazgo import Hallazgo
 
 # identificadores que consideramos "fuente de entrada no confiable"
 FUENTES = {"params", "query", "args", "form", "body", "request", "payload",
-           "parse_qs", "GET", "POST", "tpl", "input"}
+           "parse_qs", "GET", "POST", "tpl", "name", "data", "input", "cmd"}
+
+# si el valor pasa por una de estas llamadas, lo consideramos saneado
+SANITIZADORES = {"replace", "escape", "quote", "sanitize", "sanitizar", "clean",
+                 "limpiar", "validate", "validar", "int", "float", "sub",
+                 "secure_filename", "normpath", "basename", "strip"}
 
 
 # ---------- A) derivar símbolo del diff del fix -------------------------------
 def _heuristica_simbolo(fix_diff: str) -> tuple[str | None, str | None]:
-    """Busca la primera `def X(...)` que aparece en el diff. El 1er arg es el param."""
     for linea in fix_diff.splitlines():
         cuerpo = linea[1:] if linea[:1] in "+- " else linea
         m = re.match(r"\s*def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)", cuerpo)
@@ -43,7 +46,6 @@ def derivar_simbolo(h: Hallazgo, aviso: dict) -> Hallazgo:
     fix_diff = aviso.get("fix_diff", "")
     func = param = None
 
-    # 1) LLM, si está disponible
     if llm.disponible() and fix_diff:
         prompt = (
             "Dado este diff que corrige una vulnerabilidad, responde SOLO un JSON "
@@ -58,11 +60,9 @@ def derivar_simbolo(h: Hallazgo, aviso: dict) -> Hallazgo:
             except Exception:
                 func = param = None
 
-    # 2) heurística sobre el diff
     if not func and fix_diff:
         func, param = _heuristica_simbolo(fix_diff)
 
-    # 3) ground_truth del aviso (último recurso / oráculo para eval)
     if not func:
         gt = aviso.get("ground_truth_symbol", "")
         func = gt.split(".")[-1] if gt else None
@@ -76,55 +76,75 @@ def derivar_simbolo(h: Hallazgo, aviso: dict) -> Hallazgo:
 
 
 # ---------- B) análisis estático + taint sobre el repo víctima ----------------
+def _nombres(node) -> set[str]:
+    return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+
+
+def _menciona_fuente(node) -> bool:
+    for s in ast.walk(node):
+        if isinstance(s, ast.Name) and s.id in FUENTES:
+            return True
+        if isinstance(s, ast.Attribute) and s.attr in FUENTES:
+            return True
+    return False
+
+
+def _es_sanitizador(value) -> bool:
+    for s in ast.walk(value):
+        if isinstance(s, ast.Call):
+            f = s.func
+            nombre = f.attr if isinstance(f, ast.Attribute) else (f.id if isinstance(f, ast.Name) else "")
+            if nombre in SANITIZADORES:
+                return True
+    return False
+
+
+def _nombre_llamado(call) -> str | None:
+    f = call.func
+    if isinstance(f, ast.Attribute):
+        return f.attr
+    if isinstance(f, ast.Name):
+        return f.id
+    return None
+
+
 class _Taint(ast.NodeVisitor):
+    """Taint intra-procedural con punto fijo y detección de sanitizadores."""
+
     def __init__(self, func_vuln: str):
         self.func_vuln = func_vuln
-        self.symbol_referenciado = False
         self.llamado = False
-        self.llamado_con_taint = False
+        self.taint = False
         self.caminos: list[list[str]] = []
 
-    def _es_fuente(self, node) -> bool:
-        """¿La expresión lee de una fuente no confiable?"""
-        for sub in ast.walk(node):
-            if isinstance(sub, ast.Name) and sub.id in FUENTES:
-                return True
-            if isinstance(sub, ast.Attribute) and sub.attr in FUENTES:
-                return True
-        return False
-
-    def _nombre_llamado(self, call) -> str | None:
-        f = call.func
-        if isinstance(f, ast.Attribute):
-            return f.attr
-        if isinstance(f, ast.Name):
-            return f.id
-        return None
-
     def visit_FunctionDef(self, node):
-        tainted: set[str] = set()
-        origen: dict[str, str] = {}
-        # 1a pasada: variables que reciben datos de una fuente no confiable
-        for stmt in ast.walk(node):
-            if isinstance(stmt, ast.Assign) and self._es_fuente(stmt.value):
-                for t in stmt.targets:
-                    if isinstance(t, ast.Name):
-                        tainted.add(t.id)
-                        origen[t.id] = ast.unparse(stmt.value)
-        # 2a pasada: llamadas al símbolo vulnerable
+        tainted: dict[str, str] = {}
+        asignaciones = [s for s in ast.walk(node) if isinstance(s, ast.Assign)]
+        # punto fijo: propaga taint a través de asignaciones encadenadas
+        cambio = True
+        while cambio:
+            cambio = False
+            for a in asignaciones:
+                if _es_sanitizador(a.value):
+                    continue  # el dato se limpia aquí
+                if _menciona_fuente(a.value) or (_nombres(a.value) & set(tainted)):
+                    for t in a.targets:
+                        if isinstance(t, ast.Name) and t.id not in tainted:
+                            tainted[t.id] = ast.unparse(a.value)
+                            cambio = True
+        # llamadas al símbolo vulnerable
         for call in [n for n in ast.walk(node) if isinstance(n, ast.Call)]:
-            if self._nombre_llamado(call) != self.func_vuln:
+            if _nombre_llamado(call) != self.func_vuln:
                 continue
-            self.symbol_referenciado = True
             self.llamado = True
             for arg in call.args:
-                nombres = {n.id for n in ast.walk(arg) if isinstance(n, ast.Name)}
-                if self._es_fuente(arg) or (nombres & tainted):
-                    self.llamado_con_taint = True
-                    var = next(iter(nombres & tainted), None)
-                    fuente = origen.get(var, "entrada no confiable")
+                nn = _nombres(arg)
+                if _menciona_fuente(arg) or (nn & set(tainted)):
+                    self.taint = True
+                    var = next(iter(nn & set(tainted)), None)
+                    origen = tainted.get(var, "entrada no confiable") if var else "entrada no confiable"
                     self.caminos.append([
-                        f"fuente: {fuente}",
+                        f"fuente: {origen}",
                         f"var: {var}" if var else "arg directo",
                         f"sink: {self.func_vuln}(...) en {node.name}()",
                     ])
@@ -144,9 +164,7 @@ def analizar(h: Hallazgo, dir_repo: str) -> Hallazgo:
             arbol = ast.parse(py.read_text(encoding="utf-8"))
         except Exception:
             continue
-        # referencia por AST (Name o Attribute), no por subcadena, para evitar
-        # falsos positivos como "parse" dentro de "parse_qs"
-        for nodo in ast.walk(arbol):
+        for nodo in ast.walk(arbol):   # referencia por AST (Name o Attribute)
             if isinstance(nodo, ast.Attribute) and nodo.attr == func_vuln:
                 ref = True
             elif isinstance(nodo, ast.Name) and nodo.id == func_vuln:
@@ -154,10 +172,9 @@ def analizar(h: Hallazgo, dir_repo: str) -> Hallazgo:
         v = _Taint(func_vuln)
         v.visit(arbol)
         llamado = llamado or v.llamado
-        taint = taint or v.llamado_con_taint
+        taint = taint or v.taint
         caminos.extend(v.caminos)
 
-    # asignar nivel de la escalera
     if taint:
         h.nivel = 3
         h.camino_taint = caminos[0] if caminos else []

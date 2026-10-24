@@ -18,6 +18,8 @@ from .hallazgo import Hallazgo
 # patrón de bloqueo por clase de vulnerabilidad
 PATRON_POR_CLASE = {
     "SSTI": r"\{\{.*\}\}",
+    "path-traversal": r"\.\.[\/]",
+    "deserializacion": r"__(eval|reduce|class|import)__",
 }
 
 

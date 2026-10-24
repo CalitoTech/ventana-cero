@@ -71,6 +71,8 @@ def detectar(manifiesto: str, dir_avisos: str) -> list[Hallazgo]:
                     resumen=aviso.get("summary", ""),
                     nivel=0,  # peldaño 0: dependencia presente
                     evidencia=[f"{nombre}=={deps[nombre]} cae en el rango afectado de {aviso['id']}"],
+                    epss=aviso.get("epss"),
+                    kev=bool(aviso.get("kev", False)),
                 ))
     return hallazgos
 

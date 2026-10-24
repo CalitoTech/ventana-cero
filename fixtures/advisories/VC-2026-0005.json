@@ -1,0 +1,16 @@
+{
+  "id": "VC-2026-0005",
+  "summary": "Hash débil en oldhash.md5() (símbolo referenciado pero no invocado)",
+  "details": "md5 es débil. En el repo víctima el símbolo se referencia pero nunca se llama, así que la escalera queda en nivel 1 (vigilar).",
+  "severity": "medium",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "oldhash"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "1.0.0"}]}]}
+  ],
+  "commit_fix": "f1x0005",
+  "ground_truth_symbol": "oldhash.md5",
+  "ground_truth_param": "x",
+  "clase": "hash-debil",
+  "epss": 0.08,
+  "kev": false
+}
