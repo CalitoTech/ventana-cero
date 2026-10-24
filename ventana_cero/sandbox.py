@@ -40,6 +40,10 @@ POCS_POR_CLASE = {
     "deserializacion": {"metodo": "GET", "ruta": "/parse", "param": "data",
                         "valor": '{"__eval__": "6*7"}', "espera_contiene": "42",
                         "descr": "clave mágica __eval__: solo se dispara si hay eval inseguro"},
+    "deserializacion-yaml": {"metodo": "GET", "ruta": "/config", "param": "doc",
+                             "valor": "!!python/object/apply:builtins.eval ['6*7']",
+                             "espera_contiene": "42",
+                             "descr": "etiqueta !!python/object/apply: si el loader la honra, responde 42"},
 }
 
 

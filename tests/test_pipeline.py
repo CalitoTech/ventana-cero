@@ -22,9 +22,9 @@ class TestLazo(unittest.TestCase):
             )
         cls.por_id = {h["advisory_id"]: h for h in cls.rep["hallazgos"]}
 
-    def test_detecta_siete(self):
-        # 8 avisos; minicache ya está en una versión con el fix y no se reporta
-        self.assertEqual(len(self.rep["hallazgos"]), 7)
+    def test_detecta_ocho(self):
+        # 9 avisos; minicache ya está en una versión con el fix y no se reporta
+        self.assertEqual(len(self.rep["hallazgos"]), 8)
 
     def test_version_ya_parcheada_no_es_hallazgo(self):
         self.assertNotIn("VC-2026-0008", self.por_id)
@@ -82,7 +82,15 @@ class TestLazo(unittest.TestCase):
 
     def test_no_hay_falsos_positivos(self):
         accionables = [h for h in self.rep["hallazgos"] if h["decision"] in ("mitigar", "actuar")]
-        self.assertEqual(len(accionables), 2)
+        self.assertEqual(len(accionables), 3)
+
+    def test_cve_real_de_pypi_se_confirma_y_mitiga(self):
+        # CVE-2017-18342: yaml.load() de PyYAML < 5.1 construye objetos Python arbitrarios
+        h = self.por_id["CVE-2017-18342"]
+        self.assertEqual(h["paquete"], "pyyaml")
+        self.assertEqual(h["nivel"], 4)
+        self.assertEqual(h["resultado_poc"], "disparo")
+        self.assertTrue(h["parche_virtual_verificado"])
 
     def test_parche_codigo_sin_ruta_absoluta(self):
         # el reporte se publica en la UI: no debe filtrar rutas de la máquina

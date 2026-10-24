@@ -1,14 +1,14 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 08:18:24",
-  "segundos_totales": 3.31,
+  "generado": "2026-10-24 08:42:23",
+  "segundos_totales": 4.63,
   "atacante_seg_supuesto": 14400,
   "resumen": {
-    "total": 7,
-    "accionables": 2,
+    "total": 8,
+    "accionables": 3,
     "ruido_descartado": 5,
     "por_decision": {
-      "actuar": 2,
+      "actuar": 3,
       "revisar": 1,
       "preparar": 2,
       "ignorar": 1,
@@ -65,7 +65,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.332,
+      "segundos_hasta_mitigar": 1.313,
       "etapas": [
         {
           "etapa": "detectado",
@@ -77,15 +77,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.01
+          "t": 0.007
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.668
+          "t": 0.664
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.331
+          "t": 1.312
         }
       ]
     },
@@ -138,7 +138,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.295,
+      "segundos_hasta_mitigar": 1.319,
       "etapas": [
         {
           "etapa": "detectado",
@@ -150,15 +150,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.007
+          "t": 0.009
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.644
+          "t": 0.657
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.294
+          "t": 1.318
         }
       ]
     },
@@ -213,11 +213,11 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.007
+          "t": 0.009
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.65
+          "t": 0.624
         }
       ]
     },
@@ -259,7 +259,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.007
+          "t": 0.009
         }
       ]
     },
@@ -301,7 +301,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.007
+          "t": 0.009
         }
       ]
     },
@@ -339,11 +339,84 @@
         },
         {
           "etapa": "símbolo derivado",
-          "t": 0.0
+          "t": 0.001
         },
         {
           "etapa": "alcanzabilidad: nivel 0",
-          "t": 0.007
+          "t": 0.008
+        }
+      ]
+    },
+    {
+      "advisory_id": "CVE-2017-18342",
+      "paquete": "pyyaml",
+      "version": "3.13",
+      "commit_fix": null,
+      "resumen": "Ejecución de código en PyYAML yaml.load() con documento no confiable (CVE real)",
+      "simbolo_vulnerable": "pyyaml.load",
+      "parametro_peligroso": "stream",
+      "nivel": 4,
+      "camino_taint": [
+        "fuente: params.get('doc', ['modo: demo'])[0]",
+        "var: doc",
+        "sink: load(...) en do_GET()"
+      ],
+      "evidencia": [
+        "pyyaml==3.13 cae en el rango afectado de CVE-2017-18342",
+        "símbolo vulnerable derivado: pyyaml.load (param: stream; heurística sobre el diff)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso",
+        "PoC confirmado en el sandbox: ejecución reproducida",
+        "parche virtual verificado: el PoC ya no se dispara"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/config",
+        "param": "doc",
+        "valor": "!!python/object/apply:builtins.eval ['6*7']",
+        "espera_contiene": "42",
+        "descr": "etiqueta !!python/object/apply: si el loader la honra, responde 42",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "42"
+      },
+      "resultado_poc": "disparo",
+      "parche_virtual": {
+        "id": "vp-cve-2017-18342",
+        "tipo": "regla_borde",
+        "ruta": "/config",
+        "param": "doc",
+        "patron": "!!python/",
+        "descr": "bloquea doc que coincide con !!python/ en /config",
+        "reversible": true
+      },
+      "parche_virtual_verificado": true,
+      "pr_parche_codigo": "CVE-2017-18342.patch",
+      "epss": null,
+      "kev": false,
+      "prioridad": "baja",
+      "decision": "actuar",
+      "nivel_texto": "PoC confirmado",
+      "clase": "deserializacion-yaml",
+      "segundos_hasta_mitigar": 1.338,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.001
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.013
+        },
+        {
+          "etapa": "PoC: disparo",
+          "t": 0.675
+        },
+        {
+          "etapa": "parche virtual verificado",
+          "t": 1.337
         }
       ]
     },
@@ -385,7 +458,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.007
+          "t": 0.008
         }
       ]
     }

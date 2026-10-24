@@ -29,5 +29,5 @@ de la [hoja de ruta](roadmap.md). Marca con [x] al cerrar.
 - [ ] Guion de 3 min + video de respaldo + slides.
 
 ## Transversal
-- [ ] Un caso con un CVE real de PyPI (no ficticio) para el pitch.
+- [x] Un caso con un CVE real de PyPI (CVE-2017-18342, PyYAML `yaml.load`).
 - [ ] Medir y publicar la latencia que agrega la atribución.

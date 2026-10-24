@@ -7,6 +7,7 @@ Rutas (cada una ejercita un caso distinto de la escalera de confianza):
   GET /banner            -> tinytpl.render(const)  sink con constante (sin taint)
   GET /status            -> logfmt.render_line(const)  sink con constante (nivel 2)
   GET /doc?name=...      -> zipkit.open_member(basename(name))  saneado antes del sink (nivel 2)
+  GET /config?doc=...   -> yaml.load(doc)       CVE-2017-18342 real (PyYAML 3.13): nivel 4
   GET /welcome?name=...  -> saludo literal          no usa ningún sink
   GET /health            -> ok
 
@@ -29,6 +30,7 @@ import jsonx     # noqa: E402  (vendored, impl segura)
 import oldhash   # noqa: E402  (vendored, md5 débil)
 import logfmt    # noqa: E402  (vendored, vulnerable: inyección de formato)
 import zipkit    # noqa: E402  (vendored, vulnerable: path traversal)
+import yaml      # noqa: E402  (reproducción de PyYAML 3.13: CVE-2017-18342)
 
 # Referencia al símbolo débil SIN llamarlo: la escalera debe quedarse en nivel 1.
 HASHER = oldhash.md5  # referenciado, nunca invocado
@@ -97,6 +99,9 @@ class Handler(BaseHTTPRequestHandler):
             name = params.get("name", ["manual.txt"])[0]   # fuente no confiable
             limpio = os.path.basename(name)                 # sanitizador: corta el taint
             self._responder(200, zipkit.open_member(limpio))
+        elif u.path == "/config":
+            doc = params.get("doc", ["modo: demo"])[0]  # fuente no confiable
+            self._responder(200, str(yaml.load(doc)))     # sink CVE-2017-18342
         elif u.path == "/welcome":
             name = params.get("name", ["amigo"])[0]
             self._responder(200, f"Hola {name}")       # tainted, no llega a un sink

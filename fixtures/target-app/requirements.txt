@@ -7,3 +7,4 @@ fastjson==1.5.0
 logfmt==2.1.0
 zipkit==0.4.0
 minicache==1.4.2
+PyYAML==3.13

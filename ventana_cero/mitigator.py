@@ -20,6 +20,7 @@ PATRON_POR_CLASE = {
     "SSTI": r"\{\{.*\}\}",
     "path-traversal": r"\.\.[\/]",
     "deserializacion": r"__(eval|reduce|class|import)__",
+    "deserializacion-yaml": r"!!python/",
 }
 
 
