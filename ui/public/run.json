@@ -1,7 +1,7 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 08:42:23",
-  "segundos_totales": 4.63,
+  "generado": "2026-10-24 08:59:01",
+  "segundos_totales": 4.61,
   "atacante_seg_supuesto": 14400,
   "resumen": {
     "total": 8,
@@ -65,7 +65,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.313,
+      "segundos_hasta_mitigar": 1.284,
       "etapas": [
         {
           "etapa": "detectado",
@@ -77,15 +77,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.007
+          "t": 0.008
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.664
+          "t": 0.645
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.312
+          "t": 1.282
         }
       ]
     },
@@ -138,7 +138,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.319,
+      "segundos_hasta_mitigar": 1.326,
       "etapas": [
         {
           "etapa": "detectado",
@@ -150,15 +150,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.009
+          "t": 0.008
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.657
+          "t": 0.661
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.318
+          "t": 1.324
         }
       ]
     },
@@ -213,11 +213,11 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.009
+          "t": 0.007
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.624
+          "t": 0.645
         }
       ]
     },
@@ -259,7 +259,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.009
+          "t": 0.008
         }
       ]
     },
@@ -301,7 +301,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.009
+          "t": 0.008
         }
       ]
     },
@@ -396,7 +396,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "deserializacion-yaml",
-      "segundos_hasta_mitigar": 1.338,
+      "segundos_hasta_mitigar": 1.314,
       "etapas": [
         {
           "etapa": "detectado",
@@ -408,15 +408,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.013
+          "t": 0.012
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.675
+          "t": 0.666
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.337
+          "t": 1.313
         }
       ]
     },

@@ -142,11 +142,10 @@ code{font-family:var(--f-m);color:var(--ink)}
   <div class="top">
     <span class="brand">VENTANA<i></i><br>CERO</span>
     <span class="run" id="run">cargando corrida…</span>
-    <span><span class="mode" id="mode"></span> &nbsp; <span class="key">espacio</span> &nbsp; <button id="play">Reproducir</button></span>
+    <span><span class="mode" id="mode"></span> &nbsp; <button id="play">Reproducir</button></span>
   </div>
   <div id="app"></div>
-  <p class="foot">Panel estático: lee <code>run.json</code> generado por <code>python -m ventana_cero</code>. En vivo con <code>python -m ventana_cero.server</code>.</p>
-</div>
+  </div>
 <script>
 const NIV = ["dependencia presente","símbolo referenciado","alcanzable","con taint","PoC confirmado"];
 const $ = s => document.querySelector(s);
@@ -189,12 +188,14 @@ function taint(h){
   }).join("") + `</div>`;
 }
 
+// drop "(caso: …)" asides from advisory titles
+const corto = s => String(s||"").replace(/\s*\([^)]*\)\s*$/, "");
+
 function termLines(h){
   const p = h.poc, url = `${p.ruta}?${p.param}=${p.valor||""}`;
   const L = [
     [`<span class="p">$</span> `, `curl "${url}"`, ""],
     ["", `${p.respuesta_muestra||""} ${p.respuesta_codigo||200}`, "bad"],
-    ["", `# ${p.descr||"PoC reproducido"}`, "p"],
   ];
   if(h.parche_virtual_verificado){
     L.push(["", `[ventana-cero] parche virtual ${h.parche_virtual.id} activo`, "sys"]);
@@ -210,7 +211,7 @@ function triage(d){
     d.hallazgos.map(h=>{
       const noise = !["actuar","revisar"].includes(h.decision);
       const lv = NIV.map((_,i)=>`<i class="${i<=h.nivel?"on":""} ${i===h.nivel&&h.nivel===4?"top":""}"></i>`).join("");
-      return `<tr class="${noise?"noise":""}"><td>${esc(h.advisory_id)}<span class="sum">${esc(h.resumen)}</span></td>
+      return `<tr class="${noise?"noise":""}"><td>${esc(h.advisory_id)}<span class="sum">${esc(corto(h.resumen))}</span></td>
         <td class="hide-s">${esc(h.paquete)}==${esc(h.version)}</td>
         <td><span class="lv">${lv}</span> ${h.nivel}</td>
         <td class="hide-s pri ${norm(h.prioridad)}">${esc(h.prioridad)}</td>
@@ -223,7 +224,7 @@ function render(d){
   HERO = d.hallazgos.find(h=>h.poc && h.parche_virtual_verificado) || d.hallazgos[0];
   const def = HERO.segundos_hasta_mitigar;
   const x = def ? Math.round(d.atacante_seg_supuesto/def) : null;
-  $("#run").innerHTML = `<span>corrida ${esc(d.generado)}</span><span>${d.segundos_totales} s total</span><span>${r.total||d.hallazgos.length} avisos</span>`;
+  $("#run").innerHTML = `<span>corrida ${esc(d.generado)}</span><span>${d.segundos_totales} s total</span>`;
   $("#app").innerHTML = `
   <section class="hero">
     <div class="side atk"><div class="lbl">Atacante con IA · supuesto</div>
@@ -236,7 +237,7 @@ function render(d){
   <div class="ratio"><div class="big">${x?`<em>${x.toLocaleString("es")}×</em> antes que el atacante`:""}</div>
     <span>${r.accionables||0} accionables · ${r.ruido_descartado||0} descartados como ruido</span></div>
 
-  <div class="sec"><b>01</b> La carrera · ${esc(HERO.advisory_id)}</div>
+  <div class="sec"><b>01</b> La carrera</div>
   ${timeline(HERO)}
 
   <div class="sec"><b>02</b> La prueba</div>
@@ -245,7 +246,7 @@ function render(d){
       <div class="cell">
         <div class="tags"><span>${esc(HERO.advisory_id)}</span><span>${esc(HERO.paquete)}==${esc(HERO.version)}</span></div>
         <div class="ctitle">${esc(HERO.resumen)}</div>
-        <div class="tags"><span>clase <b>${esc(HERO.clase||"—")}</b></span><span>EPSS <b>${HERO.epss??"—"}</b></span>${HERO.kev?`<span class="hot">en KEV</span>`:""}<span>prioridad <b class="${norm(HERO.prioridad)==="critica"?"hot":""}">${esc(HERO.prioridad)}</b></span></div>
+        <div class="tags"><span>EPSS <b>${HERO.epss??"—"}</b></span>${HERO.kev?`<span class="hot">en KEV</span>`:""}<span>prioridad <b class="${norm(HERO.prioridad)==="critica"?"hot":""}">${esc(HERO.prioridad)}</b></span></div>
       </div>
       <div class="cell"><h3>Camino de taint</h3><div id="taint">${taint(HERO)}</div></div>
       <div class="cell"><h3>Escalera de confianza</h3><div id="ladder">${ladder(HERO.nivel)}</div></div>
@@ -253,9 +254,9 @@ function render(d){
     <div class="col">
       <div class="cell"><h3>Parche virtual</h3>
         <div class="tags" style="flex-direction:column;gap:6px">
-          <span>regla <b>${esc(HERO.parche_virtual?.descr||"—")}</b></span>
-          <span>estado ${HERO.parche_virtual_verificado?`<b style="color:var(--sig)">verificado: el PoC ya no se dispara</b>`:`<b class="hot">sin verificar</b>`}</span>
-          ${HERO.pr_parche_codigo?`<span>parche de código <b>${esc(HERO.pr_parche_codigo)}</b> · requiere revisión humana</span>`:""}
+          <span>bloquea <b>${esc(HERO.parche_virtual?.patron||"—")}</b> en <b>${esc(HERO.parche_virtual?.ruta||"—")}</b></span>
+          <span>estado ${HERO.parche_virtual_verificado?`<b style="color:var(--sig)">verificado</b>`:`<b class="hot">sin verificar</b>`}</span>
+          ${HERO.pr_parche_codigo?`<span>parche de código <b>${esc(HERO.pr_parche_codigo)}</b></span>`:""}
         </div></div>
       <div class="term" id="term">${HERO.poc?termStatic(HERO):""}</div>
     </div>
@@ -298,7 +299,7 @@ async function run(){
     const r=await fetch("api/run",{method:"POST"});
     const d=await r.json();
     if(!r.ok) throw new Error(d.error||r.status);
-    DATA=d; render(d); setMode("live","en vivo · corrida recién hecha");
+    DATA=d; render(d); setMode("live","en vivo");
   }catch(e){
     setMode("busy","falló la corrida: "+e.message); playing=false; $("#play").disabled=false; return;
   }
