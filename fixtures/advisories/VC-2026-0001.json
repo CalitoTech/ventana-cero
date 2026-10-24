@@ -1,0 +1,20 @@
+{
+  "id": "VC-2026-0001",
+  "summary": "Ejecución de código en tinytpl.render() vía plantilla no confiable",
+  "details": "render() evalúa las expresiones {{ ... }} de la plantilla con eval(). Una plantilla controlada por el atacante permite ejecución de código.",
+  "severity": "critical",
+  "affected": [
+    {
+      "package": {"ecosystem": "PyPI", "name": "tinytpl"},
+      "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "1.1.0"}]}]
+    }
+  ],
+  "references": [
+    {"type": "FIX", "url": "https://example.invalid/tinytpl/commit/abc1234"}
+  ],
+  "commit_fix": "abc1234",
+  "fix_diff": "--- a/tinytpl/__init__.py\n+++ b/tinytpl/__init__.py\n@@ -8,6 +8,6 @@\n def render(plantilla: str, **contexto) -> str:\n     def _sub(m):\n-        expr = m.group(1).strip()\n-        return str(eval(expr, {\"__builtins__\": {}}, contexto))\n+        nombre = m.group(1).strip()\n+        return str(contexto.get(nombre, \"\"))\n     return _EXPR.sub(_sub, plantilla)\n",
+  "ground_truth_symbol": "tinytpl.render",
+  "ground_truth_param": "plantilla",
+  "clase": "SSTI"
+}

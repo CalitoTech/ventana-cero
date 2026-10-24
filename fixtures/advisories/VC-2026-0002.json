@@ -1,0 +1,14 @@
+{
+  "id": "VC-2026-0002",
+  "summary": "Fuga de datos en fastjson.parse() (ejemplo que NO afecta: versión ya corregida)",
+  "severity": "high",
+  "affected": [
+    {
+      "package": {"ecosystem": "PyPI", "name": "fastjson"},
+      "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "2.0.0"}]}]
+    }
+  ],
+  "commit_fix": "def5678",
+  "ground_truth_symbol": "fastjson.parse",
+  "clase": "deserializacion"
+}
