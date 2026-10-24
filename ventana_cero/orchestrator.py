@@ -33,7 +33,7 @@ def _indexar_avisos(dir_avisos: str) -> dict[str, dict]:
 
 
 def correr(manifiesto: str, dir_avisos: str, dir_repo: str,
-           dir_salida: str = "out") -> dict:
+           dir_salida: str = "out", dir_ui: str | None = None) -> dict:
     t0 = time.time()
     avisos = _indexar_avisos(dir_avisos)
     hallazgos = detector.detectar(manifiesto, dir_avisos)
@@ -83,8 +83,10 @@ def correr(manifiesto: str, dir_avisos: str, dir_repo: str,
                 if h.parche_virtual_verificado else
                 "ATENCIÓN: el parche virtual no bloqueó el PoC")
             etapas.append(("parche virtual verificado", round(time.time() - t_h, 3)))
-            h.pr_parche_codigo = mitigator.generar_parche_codigo(
-                h, aviso, str(salida / f"{h.advisory_id}.patch"))
+            # relativo a la salida (junto a run.json): no filtra rutas de la máquina
+            if mitigator.generar_parche_codigo(
+                    h, aviso, str(salida / f"{h.advisory_id}.patch")):
+                h.pr_parche_codigo = f"{h.advisory_id}.patch"
             seg_mitigacion = round(time.time() - t_h, 3)
 
         item = h.dict()
@@ -107,9 +109,9 @@ def correr(manifiesto: str, dir_avisos: str, dir_repo: str,
     }
     (salida / "run.json").write_text(
         json.dumps(reporte, ensure_ascii=False, indent=2), encoding="utf-8")
-    ui_pub = Path("ui/public")
-    if ui_pub.exists():
-        (ui_pub / "run.json").write_text(
+    # solo el CLI publica en la UI; tests y eval no deben ensuciar el repo
+    if dir_ui and Path(dir_ui).exists():
+        (Path(dir_ui) / "run.json").write_text(
             json.dumps(reporte, ensure_ascii=False, indent=2), encoding="utf-8")
     _escribir_informe(reporte, salida / "report.md")
     return reporte
@@ -197,7 +199,7 @@ def main(argv=None):
     ap.add_argument("--salida", default="out")
     ap.add_argument("--json", action="store_true", help="imprime el run.json en crudo")
     args = ap.parse_args(argv)
-    rep = correr(args.manifiesto, args.avisos, args.repo, args.salida)
+    rep = correr(args.manifiesto, args.avisos, args.repo, args.salida, dir_ui="ui/public")
     if args.json:
         _utf8_stdout()
         print(json.dumps(rep, ensure_ascii=False, indent=2))

@@ -2,8 +2,10 @@
 
 Ejecutar:  python -m unittest discover -s tests
 """
+import json
 import tempfile
 import unittest
+from pathlib import Path
 
 from ventana_cero import orchestrator
 
@@ -64,6 +66,33 @@ class TestLazo(unittest.TestCase):
     def test_no_hay_falsos_positivos(self):
         accionables = [h for h in self.rep["hallazgos"] if h["decision"] in ("mitigar", "actuar")]
         self.assertEqual(len(accionables), 2)
+
+    def test_parche_codigo_sin_ruta_absoluta(self):
+        # el reporte se publica en la UI: no debe filtrar rutas de la máquina
+        for aid in ("VC-2026-0001", "VC-2026-0003"):
+            self.assertEqual(self.por_id[aid]["pr_parche_codigo"], f"{aid}.patch")
+
+
+class TestPublicacionUI(unittest.TestCase):
+    def _correr(self, salida, **kw):
+        return orchestrator.correr(
+            manifiesto="fixtures/target-app/requirements.txt",
+            dir_avisos="fixtures/advisories",
+            dir_repo="fixtures/target-app",
+            dir_salida=salida, **kw)
+
+    def test_correr_no_toca_la_ui_por_defecto(self):
+        ui = Path("ui/public/run.json")
+        antes = ui.read_bytes()
+        with tempfile.TemporaryDirectory() as d:
+            self._correr(d)
+        self.assertEqual(ui.read_bytes(), antes)
+
+    def test_correr_publica_en_la_ui_pedida(self):
+        with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as ui:
+            rep = self._correr(d, dir_ui=ui)
+            publicado = json.loads((Path(ui) / "run.json").read_text(encoding="utf-8"))
+        self.assertEqual(publicado["resumen"], rep["resumen"])
 
 
 if __name__ == "__main__":
