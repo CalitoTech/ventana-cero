@@ -18,7 +18,7 @@ import json
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-from . import orchestrator
+from . import orchestrator, demo_live
 
 _lock = threading.Lock()  # una corrida a la vez: el sandbox usa puertos fijos
 
@@ -40,9 +40,23 @@ class _Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/status":
             return self._json(200, {"en_vivo": True})
+        if self.path == "/api/demo/estado":
+            return self._json(200, demo_live.estado())
         return super().do_GET()
 
     def do_POST(self):
+        # Demo interactiva: ataque real -> proteger -> ataque bloqueado.
+        demo = {
+            "/api/demo/atacar": demo_live.atacar,
+            "/api/demo/proteger": demo_live.proteger,
+            "/api/demo/reset": demo_live.reset,
+        }.get(self.path)
+        if demo:
+            try:
+                return self._json(200, demo())
+            except Exception as e:  # noqa: BLE001
+                return self._json(500, {"error": f"{type(e).__name__}: {e}"})
+
         if self.path != "/api/run":
             return self._json(404, {"error": "no existe"})
         if not _lock.acquire(blocking=False):
@@ -83,6 +97,7 @@ def main(argv=None):
     except KeyboardInterrupt:
         pass
     finally:
+        demo_live.apagar()
         srv.server_close()
 
 

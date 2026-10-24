@@ -3,417 +3,344 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ventana Cero — panel</title>
+<title>Ventana Cero — consola</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400&family=Silkscreen&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
 :root{
-  --bg:#0C0C0C; --panel:#111; --ink:#EDEDED; --muted:#9A9A9A; --faint:#4A4A4A; --line:#232323;
-  --sig:#FFD60A; --atk:#E8409E; --mid:#FFD60A;
-  --f-d:"Lexend","Helvetica Neue",Arial,sans-serif;
-  --f-m:"Space Mono",ui-monospace,Consolas,monospace;
-  --f-px:"Silkscreen","Space Mono",monospace;
+  --bg:#070B0A; --panel:#0D1412; --panel2:#111C18; --sunk:#0A110F;
+  --line:#1F2D27; --line2:#2A3B34; --ink:#E9F1ED; --muted:#7B9289;
+  --teal:#4FD6B6; --teal-dim:#113029; --teal-ink:#A6F0DF;
+  --red:#FF6B4A; --red-dim:#361510; --red-ink:#FFB4A2;
+  --amber:#EEB54A;
+  --f-d:"Chakra Petch",system-ui,sans-serif; --f-m:"JetBrains Mono",ui-monospace,monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:var(--f-d);font-weight:300;font-size:15px;line-height:1.6;font-variant-numeric:tabular-nums}
-.wrap{max-width:980px;margin:0 auto;padding:0 32px 96px}
-@media(max-width:640px){.wrap{padding:0 16px 60px}}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-m);font-size:14px;line-height:1.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:52px 52px;background-position:center}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1100px 600px at 50% -5%,rgba(79,214,182,.10),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:22px 20px 80px;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line2);background:rgba(13,20,18,.85);border-radius:14px;padding:14px 20px;backdrop-filter:blur(4px)}
+.brand .mk{font-family:var(--f-d);font-weight:700;font-size:22px;letter-spacing:1px}
+.brand .mk b{color:var(--teal)}
+.brand .sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.live{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,214,182,.5)}70%{box-shadow:0 0 0 8px rgba(79,214,182,0)}100%{box-shadow:0 0 0 0 rgba(79,214,182,0)}}
+.clocks{margin-left:auto;display:flex;gap:10px}
+.clk{border:1px solid var(--line2);border-radius:10px;padding:7px 14px;min-width:116px}
+.clk .l{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.clk .v{font-family:var(--f-d);font-weight:700;font-size:22px;line-height:1.1}
+.clk.atk .v{color:var(--red)} .clk.def{border-color:var(--teal-dim)} .clk.def .v{color:var(--teal)}
+h1.lead{font-family:var(--f-d);font-weight:700;font-size:clamp(1.4rem,3.2vw,2.1rem);line-height:1.1;margin:2px}
+.lead em{font-style:normal;color:var(--teal)}
+.hint{color:var(--muted);font-size:13px;margin:0 2px;max-width:72ch}
 
-/* top bar */
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:26px 0;font-family:var(--f-m);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);flex-wrap:wrap}
-.brand{font-family:var(--f-px);font-size:15px;line-height:.95;letter-spacing:.08em;color:var(--ink);display:inline-block}
-.brand i{font-style:normal;display:inline-block;width:.62em;height:.62em;background:var(--atk);margin:0 1em 0 .2em;box-shadow:.78em 0 0 var(--sig)}
-.top .run{display:flex;gap:20px;flex-wrap:wrap}
-.key{border:1px solid var(--faint);border-radius:999px;padding:1px 9px;color:var(--ink)}
-button{font-family:var(--f-d);font-size:14px;font-weight:400;color:var(--ink);background:#2A2A2A;border:1px solid var(--faint);border-radius:999px;padding:8px 22px;cursor:pointer;transition:background .15s}
-button:hover{background:#363636}
-button:disabled{background:transparent;color:var(--faint);cursor:default}
-button:focus-visible{outline:1px solid var(--sig);outline-offset:3px}
+.scene{position:relative;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:#060A09}
+#cv{display:block;width:100%;height:auto}
+.statusline{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--f-d);font-weight:700;
+  font-size:clamp(1rem,2.4vw,1.6rem);letter-spacing:2px;text-transform:uppercase;pointer-events:none;transition:color .3s}
 
-/* section label */
-.sec{display:flex;align-items:center;gap:10px;margin:72px 0 22px;font-family:var(--f-m);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--sig)}
-.sec b{color:var(--sig);font-weight:400}
-.sec::after{content:"";width:9px;height:9px;background:var(--sig)}
+.dock{border:1px solid var(--line2);background:rgba(13,20,18,.85);border-radius:14px;padding:16px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;backdrop-filter:blur(4px)}
+.dock .step{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-right:4px}
+button{font-family:var(--f-d);font-weight:600;font-size:14px;letter-spacing:.4px;color:var(--ink);background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:11px 18px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px}
+button .k{font-family:var(--f-m);font-size:11px;color:var(--muted)}
+button:hover:not(:disabled){border-color:var(--teal);color:var(--teal-ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.attack{border-color:var(--red-dim)} button.attack:hover:not(:disabled){border-color:var(--red);color:var(--red-ink)}
+button.primary{background:var(--teal);color:#06110E;border-color:var(--teal)}
+button.primary:hover:not(:disabled){filter:brightness(1.08);color:#06110E}
+button.next{animation:beckon 1.6s infinite}
+@keyframes beckon{0%,100%{box-shadow:0 0 0 0 rgba(79,214,182,0)}50%{box-shadow:0 0 0 4px rgba(79,214,182,.18)}}
+.ghost{background:transparent}
+.spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--teal);border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1fr 1fr;margin-top:48px}
-@media(max-width:760px){.hero{grid-template-columns:1fr}}
-.side{padding:8px 0 36px}
-.side+.side{padding-left:40px;border-left:1px solid var(--line)}
-@media(max-width:760px){.side+.side{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:24px}}
-.side .lbl{font-family:var(--f-m);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.side .lbl::before{content:"› ";color:var(--atk)}
-.side .num{font-weight:200;font-size:clamp(4rem,11vw,8.5rem);line-height:.95;letter-spacing:-.04em;margin:14px 0 12px}
-.side .num small{font-size:.32em;letter-spacing:0;font-weight:300;margin-left:.14em;color:var(--muted)}
-.side.atk .num{color:var(--atk)}
-.side.def .num{color:var(--sig)}
-.side .note{color:var(--muted);font-size:14px;max-width:36ch}
-.ratio{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.ratio .big{font-weight:300;font-size:1.75rem}
-.ratio .big em{font-style:normal;color:var(--sig);font-weight:400}
-.ratio span{color:var(--muted);font-family:var(--f-m);font-size:12px}
+.evi{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:820px){.evi{grid-template-columns:1fr}}
+.card{border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.card .t{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
+.term{background:var(--sunk);border:1px solid var(--line2);border-radius:10px;padding:12px 14px;font-size:12.5px;min-height:132px;display:flex;flex-direction:column;gap:5px;overflow:auto}
+.term .cmd{color:var(--ink)} .term .cmd .p{color:var(--teal)}
+.term .res.c200{color:var(--amber)} .term .res.c403{color:var(--teal)} .term .res.c0{color:var(--muted)}
+.term .loot{color:var(--red-ink);background:var(--red-dim);border-left:2px solid var(--red);padding:6px 10px;border-radius:0 6px 6px 0;white-space:pre-wrap;word-break:break-word}
+.term .ok{color:var(--teal-ink)} .term .ph{color:var(--muted)}
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rung{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:9px 6px;text-align:center;opacity:.32;transition:.35s}
+.rung .n{font-family:var(--f-d);font-weight:700;font-size:15px}
+.rung .t2{font-size:8.5px;color:var(--muted);margin-top:2px;line-height:1.15}
+.rung.on{opacity:1;border-color:var(--teal-dim);background:#0c1b17} .rung.on .n{color:var(--teal)}
+.rung.on.cur{border-color:var(--teal);box-shadow:0 0 18px -7px var(--teal)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12px;margin-top:4px}
+.kv dt{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.kv dd{margin:0} .kv code{color:var(--teal-ink)}
 
-/* window metric: measured advisory -> verified mitigation, per case */
-.win{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
-.win .c{padding:16px 18px;border:1px solid var(--line);background:var(--panel)}
-.win .c .d{font-weight:200;font-size:1.9rem;letter-spacing:-.03em;color:var(--sig)}
-.win .c .d small{font-size:.42em;letter-spacing:0;color:var(--muted);margin-left:3px}
-.win .c .id{font-family:var(--f-m);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:6px;overflow-wrap:anywhere}
-.win .c .pr{font-family:var(--f-m);font-size:11px;color:var(--faint);margin-top:3px}
-.win .c.agg{border-color:var(--faint)}
-.win .c.agg .d{color:var(--ink)}
-/* discipline: declined cases, each with the reason the loop stopped */
-.win .c .dec{font-family:var(--f-m);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:9px}
-.win .c .why{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.45}
-.win .c .lvtxt{font-family:var(--f-m);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-top:5px}
-
-/* timeline: cells like the ARC task boards */
-.tl{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;position:relative;padding-top:10px}
-.tl .fill{position:absolute;top:0;left:0;height:3px;background:var(--sig);width:0}
-.tl .ev{padding:14px;border:1px solid var(--line);background:var(--panel);opacity:.3;transition:opacity .25s,border-color .25s}
-.tl .ev.on{opacity:1;border-color:var(--faint)}
-.tl .ev .t{font-weight:300;font-size:1.6rem;letter-spacing:-.02em}
-.tl .ev .t small{font-size:.55em;color:var(--muted);margin-left:2px}
-.tl .ev .n{font-family:var(--f-m);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-top:4px}
-.tl .ev.fin.on{border-color:var(--sig)}
-.tl .ev.fin.on .t,.tl .ev.fin.on .n{color:var(--sig)}
-@media(max-width:760px){.tl{grid-template-columns:1fr 1fr}}
-
-/* case grid */
-.case{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);border:1px solid var(--line);background:var(--panel)}
-@media(max-width:860px){.case{grid-template-columns:1fr}}
-.cell{padding:24px 26px;border-bottom:1px solid var(--line)}
-.col{min-width:0}
-.case>.col+.col{border-left:1px solid var(--line)}
-@media(max-width:860px){.case>.col+.col{border-left:0}}
-.cell:last-child{border-bottom:0}
-.cell h3{margin:0 0 16px;font-family:var(--f-m);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);font-weight:400}
-.cell h3::before{content:"› ";color:var(--atk)}
-.ctitle{font-weight:300;font-size:1.6rem;line-height:1.2;margin:6px 0 14px}
-.tags{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--f-m);font-size:12px;color:var(--muted)}
-.tags b{color:var(--ink);font-weight:400}
-.tags .hot{color:var(--atk)}
-
-.taint{display:flex;flex-direction:column}
-.taint .st{display:flex;gap:14px;align-items:flex-start;opacity:.15;transition:opacity .3s}
-.taint .st.on{opacity:1}
-.taint .rail{display:flex;flex-direction:column;align-items:center;padding-top:6px}
-.taint .dot{width:11px;height:11px;border:1px solid var(--ink)}
-.taint .st.src .dot{background:var(--atk);border-color:var(--atk)}
-.taint .st.sink .dot{background:var(--sig);border-color:var(--sig)}
-.taint .bar{width:1px;height:24px;background:var(--faint)}
-.taint .st:last-child .bar{display:none}
-.taint .k{font-family:var(--f-m);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.taint .v{font-family:var(--f-m);font-size:13px;overflow-wrap:anywhere}
-
-.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;align-items:end}
-.rung{padding-top:6px;opacity:.3;transition:opacity .2s}
-.rung .h{background:var(--line);border:1px solid var(--faint);margin-bottom:8px;transition:background .2s}
-.rung.on{opacity:1}
-.rung.on .h{background:var(--ink);border-color:var(--ink)}
-.rung.on.cur .h{background:var(--sig);border-color:var(--sig)}
-.rung .n{font-family:var(--f-m);font-size:13px}
-.rung .t{font-size:11px;color:var(--muted);line-height:1.25}
-
-.term{background:#070707;font-family:var(--f-m);font-size:13px;padding:18px 20px;min-height:178px;border-top:1px solid var(--line)}
-.term .ln{white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.5em}
-.term .p{color:var(--muted)}
-.term .bad{color:var(--atk)}
-.term .ok{color:var(--sig)}
-.term .sys{color:var(--muted)}
-.caret{display:inline-block;width:8px;height:1.05em;background:var(--sig);vertical-align:-2px;animation:bl 1s steps(1) infinite}
-@keyframes bl{50%{opacity:0}}
-
-/* triage table */
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;font-family:var(--f-m);font-weight:400;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 12px 10px 0;border-bottom:1px solid var(--faint)}
-td{padding:13px 12px 13px 0;border-bottom:1px solid var(--line);vertical-align:middle}
-tr.noise td{color:var(--faint)}
-tr.noise td .lv i.on{background:var(--faint);border-color:var(--faint)}
-td .sum{color:var(--muted);font-size:13px;display:block}
-tr.noise td .sum{color:var(--faint)}
-.lv{display:inline-grid;grid-template-columns:repeat(5,11px);gap:2px;vertical-align:middle}
-.lv i{width:11px;height:11px;border:1px solid var(--line)}
-.lv i.on{background:var(--ink);border-color:var(--ink)}
-.lv i.on.top{background:var(--sig);border-color:var(--sig)}
-.dec{font-family:var(--f-m);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-.dec.actuar{color:var(--sig)} .dec.revisar,.dec.preparar{color:var(--atk)}
-.pri.critica{color:var(--atk)}
-@media(max-width:700px){.hide-s{display:none}}
-
-.mode{font-family:var(--f-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
-.mode.live{color:var(--sig)} .mode.live::before{content:"";display:inline-block;width:8px;height:8px;background:var(--sig);margin-right:7px}
-.mode.busy{color:var(--atk)}
-.err{border:1px solid var(--atk);padding:18px;margin-top:40px}
-.foot{margin-top:56px;color:var(--faint);font-family:var(--f-m);font-size:12px}
-code{font-family:var(--f-m);color:var(--ink)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:6px;flex-wrap:wrap}
+.sec-h h2{font-family:var(--f-d);font-weight:700;font-size:1.15rem;margin:0}
+.sec-h .note{color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.find{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px}
+.find .id{font-size:11px;color:var(--muted)} .find .nm{font-family:var(--f-d);font-weight:600;font-size:14px;margin-top:2px}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.b2{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
+.b2.actuar,.b2.mitigar{color:var(--teal)} .b2.revisar,.b2.preparar{color:var(--amber)} .b2.ignorar,.b2.vigilar{color:var(--muted)} .b2.kev{color:var(--red)} .b2.clase{color:var(--muted)}
+.mini{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.mini span{height:7px;border-radius:3px;background:var(--line);opacity:.5} .mini span.on{background:var(--teal);opacity:1}
+.err{border:1px solid var(--red);background:var(--red-dim);color:var(--red-ink);border-radius:12px;padding:16px;font-size:13px}
+.foot{color:var(--muted);font-size:11.5px;text-align:center;margin-top:8px} .foot code{color:var(--teal-ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
-    <span class="brand">VENTANA<i></i><br>CERO</span>
-    <span class="run" id="run">cargando corrida…</span>
-    <span><span class="mode" id="mode"></span> &nbsp; <button id="play">Reproducir</button></span>
+    <div class="brand"><div class="mk">◢ VENTANA <b>CERO</b></div><div class="sub">consola de defensa · n-day</div></div>
+    <div class="live"><span class="dot" id="dot"></span><span id="livetxt">conectando…</span></div>
+    <div class="clocks">
+      <div class="clk atk"><div class="l">Atacante (IA)</div><div class="v" id="clk-atk">~4 h</div></div>
+      <div class="clk def"><div class="l">Ventana Cero</div><div class="v" id="clk-def">—</div></div>
+    </div>
   </div>
-  <div id="app"></div>
+
+  <div>
+    <h1 class="lead">El mismo ataque, dos finales. <em>En vivo, contra un servidor real.</em></h1>
+    <p class="hint">La ventana está abierta: el ataque entra y roba un archivo. Activa Ventana Cero y la ventana se cierra; el mismo ataque rebota. No es una animación de adorno: cada botón es una petición HTTP real y la escena refleja el resultado verdadero.</p>
   </div>
+
+  <div class="scene">
+    <canvas id="cv" width="1200" height="520"></canvas>
+    <div class="statusline" id="status" style="color:var(--muted)">LISTO</div>
+  </div>
+
+  <div class="dock" id="dock"></div>
+
+  <div class="evi">
+    <div class="card">
+      <span class="t">Evidencia · terminal del atacante (HTTP real)</span>
+      <div class="term" id="term"><span class="ph">// aquí aparece la petición y la respuesta reales</span></div>
+    </div>
+    <div class="card">
+      <span class="t">Ventana Cero · escalera de confianza</span>
+      <div class="ladder" id="ladder"></div>
+      <dl class="kv" id="kv" style="display:none"></dl>
+    </div>
+  </div>
+
+  <div class="sec-h">
+    <h2>El panorama completo</h2>
+    <span class="note">todas las dependencias analizadas · por prioridad</span>
+    <button class="ghost" id="btn-full"><span class="k">POST</span> Correr análisis completo</button>
+  </div>
+  <div class="grid" id="panorama"></div>
+
+  <p class="foot">Servido por <code>python -m ventana_cero.server</code> · cada botón es HTTP real contra la app víctima y el lazo · <code>github.com/CalitoTech/ventana-cero</code></p>
+</div>
+
 <script>
-const NIV = ["dependencia presente","símbolo referenciado","alcanzable","con taint","PoC confirmado"];
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"");
-let DATA = null, HERO = null, playing = false, LIVE = false;
+const NIV=["dependencia","símbolo ref.","alcanzable","con taint","PoC confirmado"];
+let LIVE=false,PROT=false,ATACADO=false,RUN=null,BUSY=false;
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function esc(s){return(s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function fmtDur(s){if(s==null)return"—";if(s<90)return(+s).toFixed(1)+" s";if(s<5400)return Math.round(s/60)+" min";return(s/3600).toFixed(1)+" h"}
+async function api(path,method="GET"){const r=await fetch(path,{method});try{return await r.json()}catch(e){throw new Error("HTTP "+r.status)}}
 
-function splitDur(s){
-  if(s==null) return ["—",""];
-  if(s<90) return [s.toFixed(2),"s"];
-  if(s<5400) return [String(Math.round(s/60)),"min"];
-  return [(s/3600).toFixed(1).replace(/\.0$/,""),"h"];
+/* ====================== ESCENA 2D (canvas) ====================== */
+const cv=$("cv"), ctx=cv.getContext("2d");
+const W=1200,H=520;
+const ATK={x:150,y:260}, WALLX=600, WINY0=175, WINY1=345, SRV={x:1040,y:260};
+const C={bg:"#060A09",line:"#1F2D27",wall:"#0E1613",teal:"#4FD6B6",tealDim:"#17342C",red:"#FF6B4A",redDim:"#3A1712",amber:"#EEB54A",ink:"#E9F1ED",muted:"#6E867C"};
+const S={close:0,sealing:false,server:"idle",shake:0,flash:0,t:0,packets:[],parts:[],scan:0};
+
+function dpr(){return Math.min(window.devicePixelRatio||1,2)}
+function resize(){
+  const cssW=cv.clientWidth||cv.parentElement.clientWidth;
+  const cssH=cssW*H/W; cv.style.height=cssH+"px";
+  const d=dpr(); cv.width=Math.round(cssW*d); cv.height=Math.round(cssH*d);
 }
-const durHTML = s => { const [n,u]=splitDur(s); return `${n}<small>${u}</small>`; };
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 
-function ladder(nivel, upto){
-  const top = upto==null ? nivel : upto;
-  return `<div class="ladder">` + NIV.map((t,i)=>
-    `<div class="rung ${i<=top?"on":""} ${i===top?"cur":""}"><div class="h" style="height:${10+i*9}px"></div><div class="n">${i}</div><div class="t">${t}</div></div>`
-  ).join("") + `</div>`;
+function drawAttacker(){
+  ctx.save();ctx.translate(ATK.x,ATK.y);
+  ctx.fillStyle="#140d0c";ctx.strokeStyle=C.red;ctx.lineWidth=2;rr(-70,-56,140,112,14);ctx.fill();ctx.stroke();
+  ctx.fillStyle=C.red;ctx.font="700 46px 'Chakra Petch',sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("</>",0,-6);
+  ctx.fillStyle=C.muted;ctx.font="600 15px 'JetBrains Mono',monospace";ctx.fillText("ATACANTE",0,40);
+  ctx.restore();
 }
-
-function median(a){const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2;}
-
-// measured window (advisory -> verified mitigation) for every actionable case
-function windowStrip(d){
-  const act=d.hallazgos.filter(h=>h.segundos_hasta_mitigar!=null);
-  if(!act.length) return "";
-  const med=median(act.map(h=>h.segundos_hasta_mitigar));
-  const cells=act.map(h=>`<div class="c"><div class="d">${durHTML(h.segundos_hasta_mitigar)}</div>
-    <div class="id">${esc(h.advisory_id)}</div>
-    ${h.pr_parche_codigo?`<div class="pr">+ ${esc(h.pr_parche_codigo)}</div>`:""}</div>`).join("");
-  const agg=`<div class="c agg"><div class="d">${durHTML(med)}</div>
-    <div class="id">mediana · ${act.length} casos</div>
-    <div class="pr">lazo ${d.segundos_totales}s total</div></div>`;
-  return `<div class="win">${cells}${agg}</div>`;
+function drawServer(){
+  const st=S.server;const glow=st==="breach"?C.red:(st==="safe"?C.teal:C.line);
+  ctx.save();ctx.translate(SRV.x,SRV.y);
+  if(st!=="idle"){ctx.shadowColor=glow;ctx.shadowBlur=28}
+  ctx.fillStyle="#0c1512";ctx.strokeStyle=glow;ctx.lineWidth=2;rr(-78,-72,156,144,14);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.strokeStyle=st==="idle"?C.line:glow;ctx.globalAlpha=.6;
+  for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-60,-30+i*34);ctx.lineTo(60,-30+i*34);ctx.stroke()}
+  ctx.globalAlpha=1;
+  // archivo secreto
+  ctx.fillStyle=st==="breach"?C.redDim:"#0a130f";ctx.strokeStyle=st==="breach"?C.red:C.tealDim;rr(-20,24,40,30,5);ctx.fill();ctx.stroke();
+  ctx.fillStyle=st==="breach"?C.red:C.muted;ctx.font="700 16px 'Chakra Petch'";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("🔒",0,40);
+  ctx.fillStyle=C.muted;ctx.font="600 15px 'JetBrains Mono'";ctx.fillText("api-ejemplo",0,96);
+  ctx.restore();
 }
-
-// why the loop declined to act on a finding — derived from its own fields
-function porQue(h){
-  if(h.resultado_poc==="no_disparo") return "había taint estático, pero el PoC no lo confirmó: sin prueba no se mitiga";
-  if(h.nivel===0) return "el símbolo vulnerable no aparece en tu código";
-  if(h.nivel===1) return "el símbolo se referencia pero nunca se invoca";
-  if(h.nivel===2) return "se llama sin entrada no confiable (dato constante o saneado antes del sink)";
-  return esc(h.nivel_texto);
-}
-
-// the declined cases, each with the concrete reason: the triage isn't theater
-function disciplineStrip(d){
-  const no=d.hallazgos.filter(h=>!["actuar","mitigar"].includes(h.decision));
-  if(!no.length) return "";
-  return `<div class="win">` + no.map(h=>`<div class="c">
-    <div class="dec ${h.decision}">${esc(h.decision).toUpperCase()}</div>
-    <div class="id">${esc(h.advisory_id)} · ${esc(h.paquete)}==${esc(h.version)}</div>
-    <div class="lvtxt">nivel ${h.nivel} · ${esc(h.nivel_texto)}</div>
-    <div class="why">${porQue(h)}</div></div>`).join("") + `</div>`;
-}
-
-function timeline(h){
-  const et = h.etapas||[];
-  return `<div class="tl" id="tl" style="--n:${et.length}"><div class="fill" id="fill"></div>
-    ${et.map((e,i)=>`<div class="ev ${i===et.length-1?"fin":""}" data-t="${e.t}">
-      <div class="t">${e.t.toFixed(3)}<small>s</small></div><div class="n">${esc(e.etapa)}</div></div>`).join("")}
-  </div>`;
-}
-
-function taint(h){
-  const p = h.camino_taint||[];
-  return `<div class="taint">` + p.map((s,i)=>{
-    const m = s.match(/^(\w+):\s*(.*)$/); const k = m?m[1]:"paso", v = m?m[2]:s;
-    const cls = i===0?"src":(i===p.length-1?"sink":"");
-    return `<div class="st ${cls} on"><div class="rail"><div class="dot"></div><div class="bar"></div></div>
-      <div><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div></div></div>`;
-  }).join("") + `</div>`;
-}
-
-// drop "(caso: …)" asides from advisory titles
-const corto = s => String(s||"").replace(/\s*\([^)]*\)\s*$/, "");
-
-function termLines(h){
-  const p = h.poc, url = `${p.ruta}?${p.param}=${p.valor||""}`;
-  const L = [
-    [`<span class="p">$</span> `, `curl "${url}"`, ""],
-    ["", `${p.respuesta_muestra||""} ${p.respuesta_codigo||200}`, "bad"],
-  ];
-  if(h.parche_virtual_verificado){
-    L.push(["", `[ventana-cero] parche virtual ${h.parche_virtual.id} activo`, "sys"]);
-    L.push([`<span class="p">$</span> `, `curl "${url}"`, ""]);
-    L.push(["", "403 bloqueado", "ok"]);
+function drawWall(){
+  ctx.fillStyle=C.wall;ctx.fillRect(WALLX-26,0,52,H);
+  ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.strokeRect(WALLX-26,0,52,H);
+  // marco de la ventana
+  ctx.strokeStyle=S.close>.5?C.teal:C.muted;ctx.lineWidth=3;rr(WALLX-30,WINY0-6,60,(WINY1-WINY0)+12,8);ctx.stroke();
+  // panes que cierran desde arriba y abajo
+  const gap=WINY1-WINY0, ph=(gap/2)*S.close;
+  if(S.close>0){
+    ctx.save();ctx.shadowColor=C.teal;ctx.shadowBlur=16*S.close;
+    ctx.fillStyle="rgba(79,214,182,"+(0.14+0.16*S.close)+")";ctx.strokeStyle=C.teal;ctx.lineWidth=2;
+    rr(WALLX-24,WINY0,48,ph,4);ctx.fill();ctx.stroke();
+    rr(WALLX-24,WINY1-ph,48,ph,4);ctx.fill();ctx.stroke();
+    ctx.restore();
+    // rejilla del escudo cuando está cerrada
+    if(S.close>=.98){ctx.strokeStyle="rgba(79,214,182,.45)";ctx.lineWidth=1;
+      for(let y=WINY0+8;y<WINY1;y+=12){ctx.beginPath();ctx.moveTo(WALLX-22,y);ctx.lineTo(WALLX+22,y);ctx.stroke()}
+      ctx.fillStyle=C.teal;ctx.font="700 22px 'Chakra Petch'";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("✓",WALLX,(WINY0+WINY1)/2);
+    }
   }
-  return L;
+  // etiqueta
+  ctx.fillStyle=S.close>.5?C.teal:C.muted;ctx.font="600 13px 'JetBrains Mono'";ctx.textAlign="center";
+  ctx.fillText(S.close>.5?"VENTANA CERRADA":"VENTANA ABIERTA",WALLX,WINY1+34);
 }
-const termStatic = h => termLines(h).map(([pre,t,c])=>`<div class="ln">${pre}<span class="${c}">${esc(t)}</span></div>`).join("");
-
-function triage(d){
-  return `<table><thead><tr><th>Aviso</th><th class="hide-s">Paquete</th><th>Nivel</th><th class="hide-s">Prioridad</th><th>Decisión</th></tr></thead><tbody>` +
-    d.hallazgos.map(h=>{
-      const noise = !["actuar","revisar"].includes(h.decision);
-      const lv = NIV.map((_,i)=>`<i class="${i<=h.nivel?"on":""} ${i===h.nivel&&h.nivel===4?"top":""}"></i>`).join("");
-      return `<tr class="${noise?"noise":""}"><td>${esc(h.advisory_id)}<span class="sum">${esc(corto(h.resumen))}</span></td>
-        <td class="hide-s">${esc(h.paquete)}==${esc(h.version)}</td>
-        <td><span class="lv">${lv}</span> ${h.nivel}</td>
-        <td class="hide-s pri ${norm(h.prioridad)}">${esc(h.prioridad)}</td>
-        <td class="dec ${h.decision}">${esc(h.decision).toUpperCase()}</td></tr>`;
-    }).join("") + `</tbody></table>`;
+function spawnAttack(){S.packets.push({x:ATK.x+70,y:ATK.y,vx:420,vy:0,kind:"atk",trail:[],prev:ATK.x+70,hit:false})}
+function spawnLegit(){S.packets.push({x:ATK.x+70,y:ATK.y+70,vx:460,vy:0,kind:"legit",trail:[],prev:ATK.x+70})}
+function spawnLoot(){S.packets.push({x:SRV.x-78,y:SRV.y,vx:-520,vy:0,kind:"loot",trail:[]})}
+function burst(x,y,col){for(let i=0;i<22;i++){const a=Math.random()*6.28,s=60+Math.random()*220;S.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,col})}}
+function drawPacket(p){
+  const col=p.kind==="legit"?C.teal:(p.kind==="loot"?C.red:C.red);
+  p.trail.forEach((t,i)=>{const a=i/p.trail.length*0.5;ctx.globalAlpha=a;ctx.fillStyle=col;ctx.beginPath();ctx.arc(t.x,t.y,p.kind==="legit"?4:6,0,6.28);ctx.fill()});
+  ctx.globalAlpha=1;ctx.shadowColor=col;ctx.shadowBlur=18;ctx.fillStyle=col;
+  if(p.kind==="loot"){ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle=C.red;rr(-11,-8,22,16,3);ctx.fill();ctx.restore();}
+  else{ctx.beginPath();ctx.arc(p.x,p.y,p.kind==="legit"?6:8,0,6.28);ctx.fill();}
+  ctx.shadowBlur=0;ctx.globalAlpha=1;
 }
-
-function render(d){
-  const r = d.resumen||{};
-  HERO = d.hallazgos.find(h=>h.poc && h.parche_virtual_verificado) || d.hallazgos[0];
-  const def = HERO.segundos_hasta_mitigar;
-  const x = def ? Math.round(d.atacante_seg_supuesto/def) : null;
-  $("#run").innerHTML = `<span>corrida ${esc(d.generado)}</span><span>${d.segundos_totales} s total</span>`;
-  $("#app").innerHTML = `
-  <section class="hero">
-    <div class="side atk"><div class="lbl">Atacante con IA · supuesto</div>
-      <div class="num">${durHTML(d.atacante_seg_supuesto)}</div>
-      <div class="note">del aviso público al exploit funcionando.</div></div>
-    <div class="side def"><div class="lbl">Ventana Cero · medido</div>
-      <div class="num" id="defnum">${durHTML(def)}</div>
-      <div class="note">del aviso a la mitigación verificada contra el PoC.</div></div>
-  </section>
-  <div class="ratio"><div class="big">${x?`<em>${x.toLocaleString("es")}×</em> antes que el atacante`:""}</div>
-    <span>${r.accionables||0} accionables · ${r.ruido_descartado||0} descartados como ruido</span></div>
-
-  <div class="sec"><b>01</b> La ventana · medida de aviso a mitigación verificada</div>
-  ${windowStrip(d)}
-
-  <div class="sec"><b>02</b> La carrera</div>
-  ${timeline(HERO)}
-
-  <div class="sec"><b>03</b> La prueba</div>
-  <div class="case">
-    <div class="col">
-      <div class="cell">
-        <div class="tags"><span>${esc(HERO.advisory_id)}</span><span>${esc(HERO.paquete)}==${esc(HERO.version)}</span></div>
-        <div class="ctitle">${esc(HERO.resumen)}</div>
-        <div class="tags"><span>EPSS <b>${HERO.epss??"—"}</b></span>${HERO.kev?`<span class="hot">en KEV</span>`:""}<span>prioridad <b class="${norm(HERO.prioridad)==="critica"?"hot":""}">${esc(HERO.prioridad)}</b></span></div>
-      </div>
-      <div class="cell"><h3>Camino de taint</h3><div id="taint">${taint(HERO)}</div></div>
-      <div class="cell"><h3>Escalera de confianza</h3><div id="ladder">${ladder(HERO.nivel)}</div></div>
-    </div>
-    <div class="col">
-      <div class="cell"><h3>Parche virtual</h3>
-        <div class="tags" style="flex-direction:column;gap:6px">
-          <span>bloquea <b>${esc(HERO.parche_virtual?.patron||"—")}</b> en <b>${esc(HERO.parche_virtual?.ruta||"—")}</b></span>
-          <span>estado ${HERO.parche_virtual_verificado?`<b style="color:var(--sig)">verificado</b>`:`<b class="hot">sin verificar</b>`}</span>
-          ${HERO.pr_parche_codigo?`<span>parche de código <b>${esc(HERO.pr_parche_codigo)}</b></span>`:""}
-        </div></div>
-      <div class="term" id="term">${HERO.poc?termStatic(HERO):""}</div>
-    </div>
-  </div>
-
-  <div class="sec"><b>04</b> La disciplina · lo que NO tocamos y por qué</div>
-  ${disciplineStrip(d)}
-
-  <div class="sec"><b>05</b> El triage · ${r.total||d.hallazgos.length} avisos</div>
-  ${triage(d)}`;
-  resetTimeline(true);
-}
-
-function resetTimeline(full){
-  const f=$("#fill"); if(!f) return;
-  f.style.width = full ? "100%" : "0%";
-  $$("#tl .ev").forEach(e=>e.classList.toggle("on", !!full));
-}
-
-async function tween(ms, fn){
-  const t0=performance.now();
-  return new Promise(res=>{ const step=now=>{ const k=Math.min(1,(now-t0)/ms); fn(k); k<1?requestAnimationFrame(step):res(); }; requestAnimationFrame(step); });
-}
-
-async function typeLine(el, pre, text, cls, speed){
-  const line=document.createElement("div"); line.className="ln"; el.appendChild(line);
-  const span=document.createElement("span"); span.className=cls;
-  line.innerHTML=pre; line.appendChild(span);
-  const caret=document.createElement("span"); caret.className="caret"; line.appendChild(caret);
-  if(speed){ for(const ch of text){ span.textContent+=ch; await sleep(speed); } }
-  else span.textContent=text;
-  caret.remove();
-}
-
-function setMode(cls, txt){ const m=$("#mode"); m.className="mode "+cls; m.textContent=txt; }
-
-// live: POST /api/run runs the real loop, then the panel replays that fresh run
-async function run(){
-  if(playing) return;
-  if(!LIVE) return play();
-  playing=true; $("#play").disabled=true; setMode("busy","analizando…");
-  try{
-    const r=await fetch("api/run",{method:"POST"});
-    const d=await r.json();
-    if(!r.ok) throw new Error(d.error||r.status);
-    DATA=d; render(d); setMode("live","en vivo");
-  }catch(e){
-    setMode("busy","falló la corrida: "+e.message); playing=false; $("#play").disabled=false; return;
-  }
-  playing=false; play();
-}
-
-async function play(){
-  if(playing||!HERO) return; playing=true; $("#play").disabled=true;
-  const h=HERO, T=h.segundos_hasta_mitigar||1, defnum=$("#defnum");
-  // reset
-  resetTimeline(false);
-  $$("#taint .st").forEach(s=>s.classList.remove("on"));
-  $("#ladder").innerHTML=ladder(h.nivel,-1);
-  const term=$("#term"); term.innerHTML="";
-  defnum.innerHTML=durHTML(0);
-  $("#tl").scrollIntoView({behavior:"smooth",block:"center"});
-  await sleep(700);
-
-  // 1. race: playhead moves along sqrt axis; real clock counts up
-  // stages are evenly spaced; the fill follows the stage index while the clock shows real time
-  const evs=$$("#tl .ev"), fill=$("#fill"), ts=evs.map(e=>+e.dataset.t), n=ts.length;
-  await tween(4200, k=>{
-    const pos=k*(n-1), i=Math.min(n-2,Math.floor(pos)), f=pos-i;
-    const t=n>1 ? ts[i]+(ts[i+1]-ts[i])*f : T;
-    fill.style.width=(((pos+0.5)/n)*100)+"%";
-    defnum.innerHTML=durHTML(t);
-    evs.forEach((e,j)=>e.classList.toggle("on", j<=pos+1e-9));
+function update(dt){
+  S.t+=dt;
+  if(S.sealing){S.close=Math.min(1,S.close+dt/1.6)}
+  if(S.flash>0)S.flash=Math.max(0,S.flash-dt*2);
+  if(S.shake>0)S.shake=Math.max(0,S.shake-dt*40);
+  S.packets.forEach(p=>{
+    p.prev=p.x;p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.trail){p.trail.push({x:p.x,y:p.y});if(p.trail.length>10)p.trail.shift()}
+    if(p.kind==="atk"&&!p.hit&&p.prev<WALLX&&p.x>=WALLX){
+      if(S.close>.5){p.hit=true;p.dead=true;burst(WALLX,p.y,C.teal);setStatus("BLOQUEADO",C.teal);S.flash=0;spawnLegit();}
+    }
+    if(p.kind==="atk"&&!p.dead&&p.x>=SRV.x-80){p.dead=true;S.server="breach";S.shake=10;S.flash=1;burst(SRV.x-70,p.y,C.red);setStatus("DATOS ROBADOS",C.red);spawnLoot();}
+    if(p.kind==="loot"&&p.x<=ATK.x+70){p.dead=true}
+    if(p.kind==="legit"&&p.x>=SRV.x-80){p.dead=true;burst(SRV.x-70,p.y,C.teal)}
+    if(p.x<-40||p.x>W+40)p.dead=true;
   });
-  defnum.innerHTML=durHTML(T); fill.style.width="100%";
-  await sleep(900);
+  S.packets=S.packets.filter(p=>!p.dead);
+  S.parts.forEach(q=>{q.life-=dt*1.4;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.94;q.vy*=.94});
+  S.parts=S.parts.filter(q=>q.life>0);
+}
+function draw(){
+  const d=dpr();ctx.setTransform(cv.width/W,0,0,cv.width/W,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(S.shake>0)ctx.translate((Math.random()-.5)*S.shake,(Math.random()-.5)*S.shake);
+  if(S.flash>0){ctx.fillStyle="rgba(255,107,74,"+(S.flash*0.14)+")";ctx.fillRect(0,0,W,H)}
+  // linea base de conexion
+  ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(ATK.x+70,ATK.y);ctx.lineTo(SRV.x-80,SRV.y);ctx.stroke();ctx.setLineDash([]);
+  drawWall();drawAttacker();drawServer();
+  S.parts.forEach(q=>{ctx.globalAlpha=Math.max(0,q.life);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y,3,0,6.28);ctx.fill()});ctx.globalAlpha=1;
+  S.packets.forEach(drawPacket);
+  ctx.restore();
+}
+let last=0;
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();requestAnimationFrame(loop)}
+function setStatus(txt,col){const e=$("status");e.textContent=txt;e.style.color=col}
 
-  // 2. proof
-  $("#taint").scrollIntoView({behavior:"smooth",block:"center"});
-  await sleep(600);
-  for(const s of $$("#taint .st")){ s.classList.add("on"); await sleep(450); }
-  for(let i=0;i<=h.nivel;i++){ $("#ladder").innerHTML=ladder(h.nivel,i); await sleep(320); }
-  if(h.poc){
-    const L=termLines(h);
-    for(const [pre,t,c] of L){ await typeLine(term,pre,t,c, pre?18:0); await sleep(pre?250:550); }
-  }
-  await sleep(800);
-  $("table").scrollIntoView({behavior:"smooth",block:"center"});
-  playing=false; $("#play").disabled=false;
+/* ====================== LADDER / evidencia ====================== */
+function ladder(upto){$("ladder").innerHTML=NIV.map((t,i)=>{const on=i<=upto?"on":"",cur=i===upto?"cur":"";return`<div class="rung ${on} ${cur}"><div class="n">${i}</div><div class="t2">${t}</div></div>`}).join("")}
+function termAttack(res,bloqueado){
+  const a=res.ataque,leg=res.legitimo;const cc=a.codigo===403?"c403":(a.codigo===200?"c200":"c0");
+  const loot=bloqueado?`<div class="res ${cc}">&larr; ${a.codigo} Forbidden · bloqueado por Ventana Cero</div>`
+    :`<div class="res ${cc}">&larr; ${a.codigo} OK · respuesta del servidor:</div><div class="loot">${esc(a.cuerpo)}</div>`;
+  $("term").innerHTML=`<div class="cmd"><span class="p">atacante@kali</span>:~$ ${esc(a.curl.replace('curl ',''))}</div>`+loot+
+    `<div class="cmd" style="margin-top:8px"><span class="p">usuario@normal</span>:~$ GET ${esc(leg.ruta)}?${esc(leg.param)}=${esc(leg.valor)}</div>`+
+    `<div class="res ${leg.codigo===200?'c200':'c0'}">&larr; ${leg.codigo} · <span class="ok">${esc(leg.cuerpo)}</span></div>`;
+}
+function pintarKv(h){const d=$("kv");d.style.display="grid";const arr=h.camino_taint||[];
+  d.innerHTML=`<dt>Símbolo</dt><dd><code>${esc(h.simbolo_vulnerable||'—')}</code></dd><dt>PoC</dt><dd>${esc(h.resultado_poc||'—')} · jaula aislada</dd>`+
+    (arr.length?`<dt>Taint</dt><dd>${arr.map(esc).join(' → ')}</dd>`:'')+
+    `<dt>Parche</dt><dd>${h.parche_virtual?esc(h.parche_virtual.descr):'—'} ${h.parche_virtual_verificado?'· <span style="color:var(--teal)">✓ verificado</span>':''}</dd>`;
 }
 
-fetch("api/status").then(r=>r.ok?r.json():null).catch(()=>null).then(st=>{
-  LIVE=!!(st&&st.en_vivo);
-  $("#play").textContent = LIVE ? "Correr análisis" : "Reproducir";
-  setMode(LIVE?"live":"", LIVE?"en vivo":"foto de la última corrida");
-  return fetch("run.json",{cache:"no-store"});
-}).then(r=>r.json()).then(d=>{
-  DATA=d; render(d);
-  $("#play").addEventListener("click", run);
-  document.addEventListener("keydown", e=>{ if(e.code==="Space"&&e.target.tagName!=="BUTTON"){ e.preventDefault(); run(); } });
-}).catch(()=>{
-  $("#run").textContent=""; $("#play").style.display="none";
-  $("#app").innerHTML=`<div class="err">No pude cargar <code>run.json</code>. Corre <code>python -m ventana_cero</code> y sirve esta carpeta con <code>python -m http.server -d ui/public</code>.</div>`;
-});
+/* ====================== acciones ====================== */
+async function atacar(){
+  if(BUSY||!LIVE)return;BUSY=true;render();
+  setStatus(PROT?"ATAQUE ENTRANTE…":"ATAQUE ENTRANTE…",PROT?C.teal:C.red);
+  try{
+    const res=await api("/api/demo/atacar","POST");
+    const bloqueado=res.ataque.codigo===403||!res.robado;
+    spawnAttack();
+    await sleep(PROT?900:1200);          // deja correr la animación
+    termAttack(res,PROT&&bloqueado);
+    if(!PROT)ATACADO=true;
+  }catch(e){setStatus("ERROR",C.muted)}
+  BUSY=false;render();
+}
+async function proteger(){
+  if(BUSY||!LIVE||PROT)return;BUSY=true;render();
+  setStatus("SELLANDO LA VENTANA…",C.teal);S.sealing=true;
+  let step=0;const anim=setInterval(()=>ladder(Math.min(step++,3)),240);
+  try{
+    const res=await api("/api/demo/proteger","POST");
+    clearInterval(anim);
+    const h=res.hallazgo||{};const top=h.nivel==null?4:h.nivel;
+    for(let i=0;i<=top;i++){ladder(i);await sleep(180)}
+    S.close=1;S.sealing=false;S.server="safe";PROT=true;
+    $("clk-def").textContent=fmtDur(h.segundos_hasta_mitigar);
+    pintarKv(h);setStatus("VENTANA CERRADA · PROTEGIDO",C.teal);
+  }catch(e){clearInterval(anim);S.sealing=false;setStatus("ERROR",C.muted)}
+  BUSY=false;render();
+}
+async function reiniciar(){
+  if(BUSY||!LIVE)return;BUSY=true;render();
+  try{await api("/api/demo/reset","POST")}catch(e){}
+  PROT=false;ATACADO=false;S.close=0;S.sealing=false;S.server="idle";S.packets=[];S.parts=[];
+  ladder(-1);$("kv").style.display="none";$("clk-def").textContent="—";setStatus("LISTO",C.muted);
+  $("term").innerHTML='<span class="ph">// aquí aparece la petición y la respuesta reales</span>';
+  BUSY=false;render();
+}
+async function correrFull(){const b=$("btn-full");b.disabled=true;b.innerHTML='<span class="spin"></span> analizando…';
+  try{RUN=await api("/api/run","POST");renderPanorama();if(RUN.atacante_seg_supuesto)$("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto)}
+  catch(e){$("panorama").innerHTML=`<div class="err">${esc(e.message)}</div>`}
+  b.disabled=false;b.innerHTML='<span class="k">POST</span> Correr análisis completo'}
+function renderPanorama(){if(!RUN||!RUN.hallazgos)return;$("panorama").innerHTML=RUN.hallazgos.map(h=>{
+  const mini=NIV.map((_,i)=>`<span class="${i<=h.nivel?'on':''}"></span>`).join("");
+  const kev=h.kev?'<span class="b2 kev">KEV</span>':'';const clase=h.clase?`<span class="b2 clase">${esc(h.clase)}</span>`:'';
+  return`<div class="find"><div class="id">${esc(h.advisory_id)} · ${esc(h.paquete)}==${esc(h.version)}</div><div class="nm">${esc(h.resumen)}</div>
+    <div class="mini">${mini}</div><div class="badges">${kev}${clase}<span class="b2 ${h.decision}">${esc(h.decision)}</span></div></div>`}).join("")}
+
+function render(){
+  const next=(!ATACADO&&!PROT)?"atacar":(!PROT?"proteger":"reatacar");
+  $("dock").innerHTML="";const s=document.createElement("span");s.className="step";s.textContent="demo guiada ›";$("dock").appendChild(s);
+  const mk=(label,cls,k,onclick,isNext,disabled)=>{const b=document.createElement("button");b.className=cls+(isNext&&!disabled?" next":"");b.disabled=BUSY||!LIVE||disabled;b.innerHTML=(k?`<span class="k">${k}</span>`:"")+label;b.onclick=onclick;$("dock").appendChild(b)};
+  mk("Lanzar ataque","attack","1",atacar,next==="atacar",false);
+  mk("Activar Ventana Cero","primary","2",proteger,next==="proteger",PROT);
+  mk("Repetir ataque","attack","3",atacar,next==="reatacar",!PROT);
+  mk("Reiniciar","ghost","",reiniciar,false,false);
+  if(BUSY){const sp=document.createElement("span");sp.className="spin";$("dock").appendChild(sp)}
+}
+async function boot(){
+  resize();window.addEventListener("resize",resize);requestAnimationFrame(loop);
+  ladder(-1);render();$("btn-full").onclick=correrFull;
+  try{const st=await api("/api/status");LIVE=!!st.en_vivo}catch(e){LIVE=false}
+  $("dot").className="dot"+(LIVE?" on":"");$("livetxt").textContent=LIVE?"servidor en vivo":"modo estático";
+  try{RUN=await fetch("run.json").then(r=>r.json());renderPanorama();if(RUN.atacante_seg_supuesto)$("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto)}catch(e){}
+  if(!LIVE)$("dock").innerHTML='<div class="err">Para la demo interactiva corre <code>python -m ventana_cero.server</code> y abre http://localhost:8000</div>';
+  render();
+}
+boot();
 </script>
 </body>
 </html>
