@@ -99,6 +99,7 @@ y determinista (ideal para la demo). Con la clave, mejora derivar el símbolo y 
 - `roadmap.md` — el plan de 36h y el reparto por persona.
 - `contrato.md` — el objeto `Hallazgo` que conecta todo el código.
 - `TASKS.md` — los tickets del siguiente tramo.
+- `guion-pitch.md` — el guion cronometrado del pitch de 3 minutos.
 - `artifacts/` — las páginas interactivas (respaldo).
 
 **Código (`ventana_cero/`)** — un módulo por etapa del lazo:
