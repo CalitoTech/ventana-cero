@@ -1,7 +1,7 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 06:37:46",
-  "segundos_totales": 3.39,
+  "generado": "2026-10-24 06:39:09",
+  "segundos_totales": 3.43,
   "atacante_seg_supuesto": 14400,
   "resumen": {
     "total": 5,
@@ -57,14 +57,14 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "out\\VC-2026-0001.patch",
+      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmphwp_8nmk\\VC-2026-0001.patch",
       "epss": 0.94,
       "kev": true,
       "prioridad": "crítica",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.379,
+      "segundos_hasta_mitigar": 1.438,
       "etapas": [
         {
           "etapa": "detectado",
@@ -76,15 +76,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.024
+          "t": 0.022
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.752
+          "t": 0.774
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.378
+          "t": 1.437
         }
       ]
     },
@@ -130,14 +130,14 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "out\\VC-2026-0003.patch",
+      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmphwp_8nmk\\VC-2026-0003.patch",
       "epss": 0.71,
       "kev": true,
       "prioridad": "crítica",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.301,
+      "segundos_hasta_mitigar": 1.296,
       "etapas": [
         {
           "etapa": "detectado",
@@ -149,15 +149,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.021
+          "t": 0.023
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.656
+          "t": 0.664
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.301
+          "t": 1.294
         }
       ]
     },
@@ -212,11 +212,11 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.029
+          "t": 0.021
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.647
+          "t": 0.648
         }
       ]
     },
@@ -258,7 +258,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 0",
-          "t": 0.021
+          "t": 0.019
         }
       ]
     },
@@ -300,7 +300,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.032
+          "t": 0.02
         }
       ]
     }

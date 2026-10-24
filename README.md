@@ -1,5 +1,7 @@
 # Ventana Cero
 
+> 👋 **¿Primera vez? Empieza por [EMPIEZA-AQUI.md](EMPIEZA-AQUI.md).**
+
 **Defensa autónoma del n-day, con prueba.** Cuando se publica una vulnerabilidad,
 Ventana Cero confirma si te afecta y es *alcanzable*, lo prueba con un PoC en un
 sandbox aislado, aplica una mitigación instantánea y prepara el parche de código
