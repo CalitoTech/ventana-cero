@@ -1,15 +1,16 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 07:40:06",
+  "generado": "2026-10-24 07:43:30",
   "segundos_totales": 0.57,
   "atacante_seg_supuesto": 14400,
   "resumen": {
-    "total": 5,
+    "total": 7,
     "accionables": 2,
-    "ruido_descartado": 3,
+    "ruido_descartado": 5,
     "por_decision": {
       "actuar": 2,
       "revisar": 1,
+      "preparar": 2,
       "ignorar": 1,
       "vigilar": 1
     }
@@ -64,7 +65,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 0.228,
+      "segundos_hasta_mitigar": 0.226,
       "etapas": [
         {
           "etapa": "detectado",
@@ -80,11 +81,11 @@
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.119
+          "t": 0.12
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 0.227
+          "t": 0.225
         }
       ]
     },
@@ -137,7 +138,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 0.22,
+      "segundos_hasta_mitigar": 0.223,
       "etapas": [
         {
           "etapa": "detectado",
@@ -149,7 +150,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.003
+          "t": 0.002
         },
         {
           "etapa": "PoC: disparo",
@@ -157,7 +158,7 @@
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 0.22
+          "t": 0.222
         }
       ]
     },
@@ -212,11 +213,95 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.002
+          "t": 0.003
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.112
+          "t": 0.109
+        }
+      ]
+    },
+    {
+      "advisory_id": "VC-2026-0007",
+      "paquete": "zipkit",
+      "version": "0.4.0",
+      "commit_fix": "f1x0007",
+      "resumen": "Path traversal en zipkit.open_member() (caso: la entrada se sanea antes del sink)",
+      "simbolo_vulnerable": "zipkit.open_member",
+      "parametro_peligroso": "nombre",
+      "nivel": 2,
+      "camino_taint": [],
+      "evidencia": [
+        "zipkit==0.4.0 cae en el rango afectado de VC-2026-0007",
+        "símbolo vulnerable derivado: zipkit.open_member (param: nombre)",
+        "el símbolo se llama, pero con datos constantes (sin taint)"
+      ],
+      "poc": null,
+      "resultado_poc": null,
+      "parche_virtual": null,
+      "parche_virtual_verificado": false,
+      "pr_parche_codigo": null,
+      "epss": 0.52,
+      "kev": false,
+      "prioridad": "alta",
+      "decision": "preparar",
+      "nivel_texto": "alcanzable en el grafo",
+      "clase": "path-traversal",
+      "segundos_hasta_mitigar": null,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.0
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 2",
+          "t": 0.002
+        }
+      ]
+    },
+    {
+      "advisory_id": "VC-2026-0006",
+      "paquete": "logfmt",
+      "version": "2.1.0",
+      "commit_fix": "f1x0006",
+      "resumen": "Inyección de formato en logfmt.render_line() (caso: llamado solo con constante)",
+      "simbolo_vulnerable": "logfmt.render_line",
+      "parametro_peligroso": "plantilla",
+      "nivel": 2,
+      "camino_taint": [],
+      "evidencia": [
+        "logfmt==2.1.0 cae en el rango afectado de VC-2026-0006",
+        "símbolo vulnerable derivado: logfmt.render_line (param: plantilla)",
+        "el símbolo se llama, pero con datos constantes (sin taint)"
+      ],
+      "poc": null,
+      "resultado_poc": null,
+      "parche_virtual": null,
+      "parche_virtual_verificado": false,
+      "pr_parche_codigo": null,
+      "epss": 0.35,
+      "kev": false,
+      "prioridad": "media",
+      "decision": "preparar",
+      "nivel_texto": "alcanzable en el grafo",
+      "clase": "format-injection",
+      "segundos_hasta_mitigar": null,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.0
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 2",
+          "t": 0.002
         }
       ]
     },
@@ -300,7 +385,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.002
+          "t": 0.003
         }
       ]
     }

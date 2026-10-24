@@ -1,0 +1,17 @@
+{
+  "id": "VC-2026-0006",
+  "summary": "Inyección de formato en logfmt.render_line() (caso: llamado solo con constante)",
+  "details": "render_line() pasa la plantilla a str.format sin restringir. En el repo víctima solo se llama con una plantilla constante, así que la escalera queda en nivel 2 (preparar).",
+  "severity": "high",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "logfmt"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "2.0.0"}, {"fixed": "2.2.0"}]}]}
+  ],
+  "commit_fix": "f1x0006",
+  "fix_diff": "--- a/logfmt/__init__.py\n+++ b/logfmt/__init__.py\n@@\n def render_line(plantilla: str, **contexto) -> str:\n-    return plantilla.format(**contexto)\n+    return string.Template(plantilla).safe_substitute(contexto)\n",
+  "ground_truth_symbol": "logfmt.render_line",
+  "ground_truth_param": "plantilla",
+  "clase": "format-injection",
+  "epss": 0.35,
+  "kev": false
+}

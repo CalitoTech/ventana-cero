@@ -1,0 +1,16 @@
+{
+  "id": "VC-2026-0008",
+  "summary": "Deserialización insegura en minicache.load() (caso: la versión instalada ya trae el fix)",
+  "details": "Afecta a minicache < 1.4.0. El repo víctima fija minicache==1.4.2, así que el detector no debe reportarlo: es la alerta que un escáner por nombre de paquete dispararía de más.",
+  "severity": "critical",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "minicache"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "1.4.0"}]}]}
+  ],
+  "commit_fix": "f1x0008",
+  "ground_truth_symbol": "minicache.load",
+  "ground_truth_param": "blob",
+  "clase": "deserializacion",
+  "epss": 0.61,
+  "kev": false
+}

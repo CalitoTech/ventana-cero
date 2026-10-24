@@ -1,0 +1,17 @@
+{
+  "id": "VC-2026-0007",
+  "summary": "Path traversal en zipkit.open_member() (caso: la entrada se sanea antes del sink)",
+  "details": "open_member() une el nombre al directorio base sin normalizar. En el repo víctima la entrada pasa por os.path.basename antes de llegar al sink, así que el taint se corta y la escalera queda en nivel 2.",
+  "severity": "high",
+  "affected": [
+    {"package": {"ecosystem": "PyPI", "name": "zipkit"},
+     "ranges": [{"type": "SEMVER", "events": [{"introduced": "0"}, {"fixed": "0.5.0"}]}]}
+  ],
+  "commit_fix": "f1x0007",
+  "fix_diff": "--- a/zipkit/__init__.py\n+++ b/zipkit/__init__.py\n@@\n def open_member(nombre: str) -> str:\n-    with open(os.path.join(_BASE, nombre), encoding=\"utf-8\") as f:\n+    ruta = os.path.normpath(os.path.join(_BASE, nombre))\n+    if not ruta.startswith(_BASE):\n+        raise ValueError(\"ruta fuera del directorio base\")\n+    with open(ruta, encoding=\"utf-8\") as f:\n",
+  "ground_truth_symbol": "zipkit.open_member",
+  "ground_truth_param": "nombre",
+  "clase": "path-traversal",
+  "epss": 0.52,
+  "kev": false
+}

@@ -22,6 +22,9 @@ GROUND_TRUTH = {
     "VC-2026-0004": {"debe_mitigar": False},  # taint, pero el PoC no confirma -> revisar
     "VC-2026-0002": {"debe_mitigar": False},  # presente pero no alcanzable (ruido)
     "VC-2026-0005": {"debe_mitigar": False},  # solo referenciado (ruido)
+    "VC-2026-0006": {"debe_mitigar": False},  # llamado solo con constante (nivel 2)
+    "VC-2026-0007": {"debe_mitigar": False},  # entrada saneada antes del sink (nivel 2)
+    "VC-2026-0008": {"debe_mitigar": False},  # versión instalada ya trae el fix
 }
 
 
@@ -39,10 +42,11 @@ def main():
         )
     vp = fp = fn = vn = 0
     tiempos = []
-    for h in rep["hallazgos"]:
-        gt = GROUND_TRUTH.get(h["advisory_id"], {}).get("debe_mitigar")
-        if gt is None:
-            continue
+    por_id = {h["advisory_id"]: h for h in rep["hallazgos"]}
+    for aid, etiqueta in GROUND_TRUTH.items():
+        gt = etiqueta["debe_mitigar"]
+        # un aviso que el detector descarta (p. ej. versión ya parcheada) no se mitiga
+        h = por_id.get(aid, {"decision": "descartado"})
         mitigado = h["decision"] in ("mitigar", "actuar")
         if gt and mitigado:
             vp += 1

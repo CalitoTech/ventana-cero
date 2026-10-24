@@ -22,8 +22,25 @@ class TestLazo(unittest.TestCase):
             )
         cls.por_id = {h["advisory_id"]: h for h in cls.rep["hallazgos"]}
 
-    def test_detecta_cinco(self):
-        self.assertEqual(len(self.rep["hallazgos"]), 5)
+    def test_detecta_siete(self):
+        # 8 avisos; minicache ya está en una versión con el fix y no se reporta
+        self.assertEqual(len(self.rep["hallazgos"]), 7)
+
+    def test_version_ya_parcheada_no_es_hallazgo(self):
+        self.assertNotIn("VC-2026-0008", self.por_id)
+
+    def test_llamado_con_constante_queda_en_nivel_2(self):
+        h = self.por_id["VC-2026-0006"]
+        self.assertEqual(h["nivel"], 2)
+        self.assertEqual(h["decision"], "preparar")
+        self.assertIsNone(h["resultado_poc"])
+
+    def test_sanitizador_corta_el_taint(self):
+        # la entrada no confiable pasa por os.path.basename antes del sink
+        h = self.por_id["VC-2026-0007"]
+        self.assertEqual(h["nivel"], 2)
+        self.assertEqual(h["decision"], "preparar")
+        self.assertFalse(h["camino_taint"])
 
     def test_ssti_llega_a_nivel_4_y_mitiga(self):
         h = self.por_id["VC-2026-0001"]
