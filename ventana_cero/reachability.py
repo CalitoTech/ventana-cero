@@ -144,10 +144,13 @@ def analizar(h: Hallazgo, dir_repo: str) -> Hallazgo:
             arbol = ast.parse(py.read_text(encoding="utf-8"))
         except Exception:
             continue
-        # referencia simple del nombre (import o mención)
-        fuente_txt = py.read_text(encoding="utf-8")
-        if func_vuln in fuente_txt:
-            ref = True
+        # referencia por AST (Name o Attribute), no por subcadena, para evitar
+        # falsos positivos como "parse" dentro de "parse_qs"
+        for nodo in ast.walk(arbol):
+            if isinstance(nodo, ast.Attribute) and nodo.attr == func_vuln:
+                ref = True
+            elif isinstance(nodo, ast.Name) and nodo.id == func_vuln:
+                ref = True
         v = _Taint(func_vuln)
         v.visit(arbol)
         llamado = llamado or v.llamado

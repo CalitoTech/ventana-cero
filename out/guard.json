@@ -1,0 +1,13 @@
+{
+  "reglas": [
+    {
+      "id": "vp-vc-2026-0001",
+      "tipo": "regla_borde",
+      "ruta": "/preview",
+      "param": "tpl",
+      "patron": "\\{\\{.*\\}\\}",
+      "descr": "bloquea tpl que coincide con \\{\\{.*\\}\\} en /preview",
+      "reversible": true
+    }
+  ]
+}

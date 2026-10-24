@@ -1,2 +1,3 @@
 # Manifiesto del repo víctima (ficticio). El detector lo cruza con los avisos.
 tinytpl==1.0.0
+fastjson==1.5.0

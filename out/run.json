@@ -1,0 +1,79 @@
+{
+  "proyecto": "Ventana Cero",
+  "generado": "2026-10-24 06:16:57",
+  "segundos_totales": 1.4,
+  "atacante_seg_supuesto": 14400,
+  "hallazgos": [
+    {
+      "advisory_id": "VC-2026-0001",
+      "paquete": "tinytpl",
+      "version": "1.0.0",
+      "commit_fix": "abc1234",
+      "resumen": "Ejecución de código en tinytpl.render() vía plantilla no confiable",
+      "simbolo_vulnerable": "tinytpl.render",
+      "parametro_peligroso": "plantilla",
+      "nivel": 4,
+      "camino_taint": [
+        "fuente: params.get('tpl', [''])[0]",
+        "var: tpl",
+        "sink: render(...) en do_GET()"
+      ],
+      "evidencia": [
+        "tinytpl==1.0.0 cae en el rango afectado de VC-2026-0001",
+        "símbolo vulnerable derivado: tinytpl.render (param: plantilla)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso",
+        "PoC confirmado en el sandbox: ejecución reproducida",
+        "parche virtual verificado: el PoC ya no se dispara"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/preview",
+        "param": "tpl",
+        "valor": "{{7*6}}",
+        "espera_contiene": "42",
+        "descr": "canario aritmético: si la plantilla se evalúa, responde 42",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "42"
+      },
+      "resultado_poc": "disparo",
+      "parche_virtual": {
+        "id": "vp-vc-2026-0001",
+        "tipo": "regla_borde",
+        "ruta": "/preview",
+        "param": "tpl",
+        "patron": "\\{\\{.*\\}\\}",
+        "descr": "bloquea tpl que coincide con \\{\\{.*\\}\\} en /preview",
+        "reversible": true
+      },
+      "parche_virtual_verificado": true,
+      "pr_parche_codigo": "out\\VC-2026-0001.patch",
+      "decision": "actuar",
+      "nivel_texto": "PoC confirmado",
+      "segundos_hasta_mitigar": 1.36
+    },
+    {
+      "advisory_id": "VC-2026-0002",
+      "paquete": "fastjson",
+      "version": "1.5.0",
+      "commit_fix": "def5678",
+      "resumen": "Deserialización insegura en fastjson.parse() (caso: presente pero NO alcanzable)",
+      "simbolo_vulnerable": "fastjson.parse",
+      "parametro_peligroso": "data",
+      "nivel": 0,
+      "camino_taint": [],
+      "evidencia": [
+        "fastjson==1.5.0 cae en el rango afectado de VC-2026-0002",
+        "símbolo vulnerable derivado: fastjson.parse (param: data)",
+        "el símbolo no aparece en el código propio"
+      ],
+      "poc": null,
+      "resultado_poc": null,
+      "parche_virtual": null,
+      "parche_virtual_verificado": false,
+      "pr_parche_codigo": null,
+      "decision": "ignorar",
+      "nivel_texto": "dependencia presente",
+      "segundos_hasta_mitigar": null
+    }
+  ]
+}

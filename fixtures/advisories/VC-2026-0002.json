@@ -1,6 +1,7 @@
 {
   "id": "VC-2026-0002",
-  "summary": "Fuga de datos en fastjson.parse() (ejemplo que NO afecta: versión ya corregida)",
+  "summary": "Deserialización insegura en fastjson.parse() (caso: presente pero NO alcanzable)",
+  "details": "El paquete está instalado y la versión es afectada, pero el símbolo vulnerable no se usa en el código propio. Debe caer a 'ignorar': demuestra reducción de ruido.",
   "severity": "high",
   "affected": [
     {
@@ -10,5 +11,6 @@
   ],
   "commit_fix": "def5678",
   "ground_truth_symbol": "fastjson.parse",
+  "ground_truth_param": "data",
   "clase": "deserializacion"
 }
