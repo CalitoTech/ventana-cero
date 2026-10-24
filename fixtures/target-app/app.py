@@ -9,6 +9,7 @@ Rutas (cada una ejercita un caso distinto de la escalera de confianza):
   GET /doc?name=...      -> zipkit.open_member(basename(name))  saneado antes del sink (nivel 2)
   GET /config?doc=...   -> yaml.load(doc)       CVE-2017-18342 real (PyYAML 3.13): nivel 4
   GET /gpg?data=...     -> gnupg.encrypt(data)   CVE-2019-6690 real (python-gnupg 0.4.3): nivel 4
+  GET /buscar?nombre=.. -> sqlalchemy.buscar(n)   CVE-2019-7164 real (SQLAlchemy 1.2.17): nivel 4
   GET /welcome?name=...  -> saludo literal          no usa ningún sink
   GET /health            -> ok
 
@@ -33,6 +34,7 @@ import logfmt    # noqa: E402  (vendored, vulnerable: inyección de formato)
 import zipkit    # noqa: E402  (vendored, vulnerable: path traversal)
 import yaml      # noqa: E402  (reproducción de PyYAML 3.13: CVE-2017-18342)
 import gnupg     # noqa: E402  (reproducción de python-gnupg 0.4.3: CVE-2019-6690)
+import sqlalchemy  # noqa: E402  (reproducción de SQLAlchemy 1.2.17: CVE-2019-7164)
 
 # Referencia al símbolo débil SIN llamarlo: la escalera debe quedarse en nivel 1.
 HASHER = oldhash.md5  # referenciado, nunca invocado
@@ -107,6 +109,9 @@ class Handler(BaseHTTPRequestHandler):
         elif u.path == "/gpg":
             data = params.get("data", ["hola"])[0]        # fuente no confiable
             self._responder(200, gnupg.encrypt(data))       # sink CVE-2019-6690
+        elif u.path == "/buscar":
+            nombre = params.get("nombre", ["alpha"])[0]   # fuente no confiable
+            self._responder(200, str(sqlalchemy.buscar(nombre)))  # sink CVE-2019-7164
         elif u.path == "/welcome":
             name = params.get("name", ["amigo"])[0]
             self._responder(200, f"Hola {name}")       # tainted, no llega a un sink

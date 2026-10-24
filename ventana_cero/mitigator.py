@@ -22,6 +22,7 @@ PATRON_POR_CLASE = {
     "deserializacion": r"__(eval|reduce|class|import)__",
     "deserializacion-yaml": r"!!python/",
     "inyeccion-comando": r"[;&|`$]",
+    "inyeccion-sql": r"['\";]|--",
 }
 
 

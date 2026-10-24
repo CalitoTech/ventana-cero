@@ -47,6 +47,9 @@ POCS_POR_CLASE = {
     "inyeccion-comando": {"metodo": "GET", "ruta": "/gpg", "param": "data",
                           "valor": ";echo 42", "espera_contiene": "42",
                           "descr": "comando encadenado ';echo 42': si la entrada llega al shell, responde 42"},
+    "inyeccion-sql": {"metodo": "GET", "ruta": "/buscar", "param": "nombre",
+                      "valor": "' UNION SELECT '42' -- ", "espera_contiene": "42",
+                      "descr": "UNION SELECT '42': si la entrada llega cruda al SQL, responde 42"},
 }
 
 

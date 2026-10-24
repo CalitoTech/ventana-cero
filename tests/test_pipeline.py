@@ -22,9 +22,9 @@ class TestLazo(unittest.TestCase):
             )
         cls.por_id = {h["advisory_id"]: h for h in cls.rep["hallazgos"]}
 
-    def test_detecta_nueve(self):
-        # 10 avisos; minicache ya está en una versión con el fix y no se reporta
-        self.assertEqual(len(self.rep["hallazgos"]), 9)
+    def test_detecta_diez(self):
+        # 11 avisos; minicache ya está en una versión con el fix y no se reporta
+        self.assertEqual(len(self.rep["hallazgos"]), 10)
 
     def test_version_ya_parcheada_no_es_hallazgo(self):
         self.assertNotIn("VC-2026-0008", self.por_id)
@@ -82,7 +82,7 @@ class TestLazo(unittest.TestCase):
 
     def test_no_hay_falsos_positivos(self):
         accionables = [h for h in self.rep["hallazgos"] if h["decision"] in ("mitigar", "actuar")]
-        self.assertEqual(len(accionables), 4)
+        self.assertEqual(len(accionables), 5)
 
     def test_cve_real_de_pypi_se_confirma_y_mitiga(self):
         # CVE-2017-18342: yaml.load() de PyYAML < 5.1 construye objetos Python arbitrarios
@@ -97,6 +97,15 @@ class TestLazo(unittest.TestCase):
         h = self.por_id["CVE-2019-6690"]
         self.assertEqual(h["paquete"], "python-gnupg")
         self.assertEqual(h["simbolo_vulnerable"], "python-gnupg.encrypt")
+        self.assertEqual(h["nivel"], 4)
+        self.assertEqual(h["resultado_poc"], "disparo")
+        self.assertTrue(h["parche_virtual_verificado"])
+
+    def test_cve_inyeccion_sql_se_confirma_y_mitiga(self):
+        # CVE-2019-7164: SQLAlchemy < 1.3.0 arma el SQL por concatenación sin bind
+        h = self.por_id["CVE-2019-7164"]
+        self.assertEqual(h["paquete"], "sqlalchemy")
+        self.assertEqual(h["simbolo_vulnerable"], "sqlalchemy.buscar")
         self.assertEqual(h["nivel"], 4)
         self.assertEqual(h["resultado_poc"], "disparo")
         self.assertTrue(h["parche_virtual_verificado"])

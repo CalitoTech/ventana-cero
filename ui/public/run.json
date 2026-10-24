@@ -1,14 +1,14 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 09:37:57",
-  "segundos_totales": 5.9,
+  "generado": "2026-10-24 09:54:35",
+  "segundos_totales": 7.23,
   "atacante_seg_supuesto": 14400,
   "resumen": {
-    "total": 9,
-    "accionables": 4,
+    "total": 10,
+    "accionables": 5,
     "ruido_descartado": 5,
     "por_decision": {
-      "actuar": 4,
+      "actuar": 5,
       "revisar": 1,
       "preparar": 2,
       "ignorar": 1,
@@ -65,7 +65,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "inyeccion-comando",
-      "segundos_hasta_mitigar": 1.283,
+      "segundos_hasta_mitigar": 1.272,
       "etapas": [
         {
           "etapa": "detectado",
@@ -81,11 +81,11 @@
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.636
+          "t": 0.645
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.282
+          "t": 1.271
         }
       ]
     },
@@ -138,7 +138,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.302,
+      "segundos_hasta_mitigar": 1.315,
       "etapas": [
         {
           "etapa": "detectado",
@@ -154,11 +154,11 @@
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.637
+          "t": 0.664
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.3
+          "t": 1.314
         }
       ]
     },
@@ -211,7 +211,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.272,
+      "segundos_hasta_mitigar": 1.297,
       "etapas": [
         {
           "etapa": "detectado",
@@ -223,15 +223,88 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.007
+          "t": 0.009
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.63
+          "t": 0.652
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.268
+          "t": 1.296
+        }
+      ]
+    },
+    {
+      "advisory_id": "CVE-2019-7164",
+      "paquete": "sqlalchemy",
+      "version": "1.2.17",
+      "commit_fix": null,
+      "resumen": "Inyección SQL en SQLAlchemy al construir una consulta con entrada no confiable (CVE real)",
+      "simbolo_vulnerable": "sqlalchemy.buscar",
+      "parametro_peligroso": "nombre",
+      "nivel": 4,
+      "camino_taint": [
+        "fuente: params.get('nombre', ['alpha'])[0]",
+        "var: nombre",
+        "sink: buscar(...) en do_GET()"
+      ],
+      "evidencia": [
+        "sqlalchemy==1.2.17 cae en el rango afectado de CVE-2019-7164",
+        "símbolo vulnerable derivado: sqlalchemy.buscar (param: nombre; heurística sobre el diff)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso",
+        "PoC confirmado en el sandbox: ejecución reproducida",
+        "parche virtual verificado: el PoC ya no se dispara"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/buscar",
+        "param": "nombre",
+        "valor": "' UNION SELECT '42' -- ",
+        "espera_contiene": "42",
+        "descr": "UNION SELECT '42': si la entrada llega cruda al SQL, responde 42",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "['42']"
+      },
+      "resultado_poc": "disparo",
+      "parche_virtual": {
+        "id": "vp-cve-2019-7164",
+        "tipo": "regla_borde",
+        "ruta": "/buscar",
+        "param": "nombre",
+        "patron": "['\\\";]|--",
+        "descr": "bloquea nombre que coincide con ['\\\";]|-- en /buscar",
+        "reversible": true
+      },
+      "parche_virtual_verificado": true,
+      "pr_parche_codigo": "CVE-2019-7164.patch",
+      "epss": 0.55,
+      "kev": false,
+      "prioridad": "alta",
+      "decision": "actuar",
+      "nivel_texto": "PoC confirmado",
+      "clase": "inyeccion-sql",
+      "segundos_hasta_mitigar": 1.329,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.002
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.014
+        },
+        {
+          "etapa": "PoC: disparo",
+          "t": 0.665
+        },
+        {
+          "etapa": "parche virtual verificado",
+          "t": 1.328
         }
       ]
     },
@@ -286,11 +359,11 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.008
+          "t": 0.009
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.667
+          "t": 0.649
         }
       ]
     },
@@ -332,7 +405,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.007
+          "t": 0.008
         }
       ]
     },
@@ -412,11 +485,11 @@
         },
         {
           "etapa": "símbolo derivado",
-          "t": 0.0
+          "t": 0.001
         },
         {
           "etapa": "alcanzabilidad: nivel 0",
-          "t": 0.007
+          "t": 0.009
         }
       ]
     },
@@ -469,7 +542,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "deserializacion-yaml",
-      "segundos_hasta_mitigar": 1.336,
+      "segundos_hasta_mitigar": 1.328,
       "etapas": [
         {
           "etapa": "detectado",
@@ -481,15 +554,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.01
+          "t": 0.011
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.692
+          "t": 0.678
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.334
+          "t": 1.327
         }
       ]
     },
@@ -531,7 +604,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.009
+          "t": 0.008
         }
       ]
     }

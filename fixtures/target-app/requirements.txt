@@ -9,3 +9,4 @@ zipkit==0.4.0
 minicache==1.4.2
 PyYAML==3.13
 python-gnupg==0.4.3
+SQLAlchemy==1.2.17
