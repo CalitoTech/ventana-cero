@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "ui", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8000", "-d", "ui/public"], "port": 8000 }
+    { "name": "ui", "runtimeExecutable": "python", "runtimeArgs": ["-m", "ventana_cero.server", "--puerto", "8000"], "port": 8000 }
   ]
 }

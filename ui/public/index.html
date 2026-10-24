@@ -125,6 +125,9 @@ tr.noise td .sum{color:var(--faint)}
 .pri.critica{color:var(--atk)}
 @media(max-width:700px){.hide-s{display:none}}
 
+.mode{font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.mode.live{color:var(--sig)} .mode.live::before{content:"";display:inline-block;width:7px;height:7px;background:var(--sig);margin-right:7px;vertical-align:1px}
+.mode.busy{color:var(--mid)}
 .err{border:1px solid var(--atk);padding:18px;margin-top:40px}
 .foot{margin-top:48px;color:var(--faint);font-size:12px}
 code{font-family:var(--f-m);color:var(--ink)}
@@ -135,10 +138,10 @@ code{font-family:var(--f-m);color:var(--ink)}
   <div class="top">
     <span class="brand">VENTANA<i>/</i>CERO</span>
     <span class="run" id="run">cargando corrida…</span>
-    <span><span class="key">espacio</span> reproducir &nbsp; <button id="play">Reproducir</button></span>
+    <span><span class="mode" id="mode"></span> &nbsp; <span class="key">espacio</span> &nbsp; <button id="play">Reproducir</button></span>
   </div>
   <div id="app"></div>
-  <p class="foot">Panel estático: lee <code>run.json</code> generado por <code>python -m ventana_cero</code>.</p>
+  <p class="foot">Panel estático: lee <code>run.json</code> generado por <code>python -m ventana_cero</code>. En vivo con <code>python -m ventana_cero.server</code>.</p>
 </div>
 <script>
 const NIV = ["dependencia presente","símbolo referenciado","alcanzable","con taint","PoC confirmado"];
@@ -147,7 +150,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"");
-let DATA = null, HERO = null, playing = false;
+let DATA = null, HERO = null, playing = false, LIVE = false;
 
 function splitDur(s){
   if(s==null) return ["—",""];
@@ -280,6 +283,24 @@ async function typeLine(el, pre, text, cls, speed){
   caret.remove();
 }
 
+function setMode(cls, txt){ const m=$("#mode"); m.className="mode "+cls; m.textContent=txt; }
+
+// live: POST /api/run runs the real loop, then the panel replays that fresh run
+async function run(){
+  if(playing) return;
+  if(!LIVE) return play();
+  playing=true; $("#play").disabled=true; setMode("busy","analizando…");
+  try{
+    const r=await fetch("api/run",{method:"POST"});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||r.status);
+    DATA=d; render(d); setMode("live","en vivo · corrida recién hecha");
+  }catch(e){
+    setMode("busy","falló la corrida: "+e.message); playing=false; $("#play").disabled=false; return;
+  }
+  playing=false; play();
+}
+
 async function play(){
   if(playing||!HERO) return; playing=true; $("#play").disabled=true;
   const h=HERO, T=h.segundos_hasta_mitigar||1, defnum=$("#defnum");
@@ -319,10 +340,15 @@ async function play(){
   playing=false; $("#play").disabled=false;
 }
 
-fetch("run.json").then(r=>r.json()).then(d=>{
+fetch("api/status").then(r=>r.ok?r.json():null).catch(()=>null).then(st=>{
+  LIVE=!!(st&&st.en_vivo);
+  $("#play").textContent = LIVE ? "Correr análisis" : "Reproducir";
+  setMode(LIVE?"live":"", LIVE?"en vivo":"foto de la última corrida");
+  return fetch("run.json",{cache:"no-store"});
+}).then(r=>r.json()).then(d=>{
   DATA=d; render(d);
-  $("#play").addEventListener("click", play);
-  document.addEventListener("keydown", e=>{ if(e.code==="Space"&&e.target.tagName!=="BUTTON"){ e.preventDefault(); play(); } });
+  $("#play").addEventListener("click", run);
+  document.addEventListener("keydown", e=>{ if(e.code==="Space"&&e.target.tagName!=="BUTTON"){ e.preventDefault(); run(); } });
 }).catch(()=>{
   $("#run").textContent=""; $("#play").style.display="none";
   $("#app").innerHTML=`<div class="err">No pude cargar <code>run.json</code>. Corre <code>python -m ventana_cero</code> y sirve esta carpeta con <code>python -m http.server -d ui/public</code>.</div>`;
