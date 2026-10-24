@@ -33,10 +33,13 @@ def _indexar_avisos(dir_avisos: str) -> dict[str, dict]:
 
 
 def correr(manifiesto: str, dir_avisos: str, dir_repo: str,
-           dir_salida: str = "out", dir_ui: str | None = None) -> dict:
+           dir_salida: str = "out", dir_ui: str | None = None,
+           solo: str | None = None) -> dict:
     t0 = time.time()
     avisos = _indexar_avisos(dir_avisos)
     hallazgos = detector.detectar(manifiesto, dir_avisos)
+    if solo:  # demo interactiva: correr un solo aviso para que sea instantáneo
+        hallazgos = [h for h in hallazgos if h.advisory_id == solo]
 
     salida = Path(dir_salida)
     salida.mkdir(parents=True, exist_ok=True)
