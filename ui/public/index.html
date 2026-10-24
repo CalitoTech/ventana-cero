@@ -8,18 +8,25 @@
 :root{
   --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
   --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
-  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --ok:#5CC38A;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --mid-bg:#352711; --ok:#5CC38A;
   --f-d:"Archivo","Helvetica Neue",Arial,sans-serif; --f-b:system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-m:ui-monospace,"IBM Plex Mono",Consolas,monospace;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.5}
-.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 72px;display:flex;flex-direction:column;gap:28px}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 72px;display:flex;flex-direction:column;gap:24px}
 h1{font-family:var(--f-d);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;margin:0;letter-spacing:-.01em}
-h2{font-family:var(--f-d);font-size:1.2rem;margin:0}
+h2{font-family:var(--f-d);font-size:1.15rem;margin:0}
 .eyebrow{font-family:var(--f-m);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
 header{display:flex;flex-direction:column;gap:8px}
 .sub{color:var(--muted);font-size:1.02rem}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13px}
+.stat b{font-family:var(--f-d);font-size:1.1rem}
+button{font-family:var(--f-b);font-weight:600;font-size:14px;color:var(--bg);background:var(--accent);border:0;border-radius:10px;padding:9px 18px;cursor:pointer;margin-left:auto}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
 .race{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:560px){.race{grid-template-columns:1fr}}
 .clock{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:6px}
@@ -28,16 +35,20 @@ header{display:flex;flex-direction:column;gap:8px}
 .clock.atk{border-color:var(--atk)} .clock.atk .big{color:var(--atk)}
 .clock.def{border-color:var(--accent);background:var(--accent-soft)} .clock.def .big{color:var(--accent-ink)}
 .clock .note{font-size:12.5px;color:var(--muted)}
-.finding{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.finding{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;transition:opacity .4s, transform .4s}
+.finding.hidden{opacity:0;transform:translateY(10px)}
 .ftop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
 .ftop .id{font-family:var(--f-m);font-size:13px;color:var(--muted)}
 .ftop h2{margin-top:2px}
-.chip{font-family:var(--f-m);font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;white-space:nowrap;border:1px solid currentColor}
-.chip.actuar,.chip.mitigar{color:var(--ok)} .chip.ignorar,.chip.vigilar{color:var(--muted)} .chip.preparar{color:var(--mid)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font-family:var(--f-m);font-size:11px;font-weight:600;padding:4px 11px;border-radius:99px;white-space:nowrap;border:1px solid currentColor}
+.chip.actuar,.chip.mitigar{color:var(--ok)} .chip.revisar,.chip.preparar{color:var(--mid)} .chip.ignorar,.chip.vigilar{color:var(--muted)}
+.chip.critica{color:var(--atk)} .chip.alta{color:var(--mid)} .chip.media,.chip.baja{color:var(--muted)}
+.chip.clase{color:var(--accent-ink)} .chip.kev{color:var(--atk);background:var(--atk-bg)}
 .ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.rung{background:var(--sunk);border-radius:8px;padding:10px 8px;text-align:center;opacity:.4;border:1px solid transparent}
+.rung{background:var(--sunk);border-radius:8px;padding:10px 8px;text-align:center;opacity:.35;border:1px solid transparent;transition:opacity .25s, border-color .25s, background .25s}
 .rung .n{font-family:var(--f-m);font-weight:600;font-size:13px}
-.rung .t{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.25}
+.rung .t{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.2}
 .rung.on{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
 .rung.on.cur{box-shadow:0 0 0 2px var(--accent)}
 .meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px}
@@ -62,17 +73,24 @@ code{font-family:var(--f-m);background:var(--sunk);padding:1px 5px;border-radius
     <span class="eyebrow">Ventana Cero · panel de la demo</span>
     <h1>De aviso a protección, con prueba</h1>
     <p class="sub" id="sub">Cargando corrida…</p>
+    <div class="bar">
+      <div class="pills" id="stats"></div>
+      <button id="play">▶ Reproducir</button>
+    </div>
   </header>
+  <div id="race"></div>
   <div id="app"></div>
-  <p class="foot">Panel estático: lee <code>run.json</code> generado por <code>python -m ventana_cero</code>. Sírvelo con <code>python -m http.server -d ui/public</code>.</p>
+  <p class="foot">Panel estático: lee <code>run.json</code> de <code>python -m ventana_cero</code>. Sírvelo con <code>python -m http.server -d ui/public</code>.</p>
 </div>
 <script>
-const NIV = ["dependencia presente","símbolo referenciado","alcanzable en el grafo","con taint","PoC confirmado"];
+const NIV = ["dependencia presente","símbolo referenciado","alcanzable","con taint","PoC confirmado"];
+let DATA = null;
 function fmtDur(s){ if(s==null) return "—"; if(s<90) return s.toFixed(1)+" s"; if(s<5400) return Math.round(s/60)+" min"; return (s/3600).toFixed(1)+" h"; }
-function ladder(nivel){
+function ladder(nivel, upto){
+  const top = upto==null?nivel:upto;
   let h='<div class="ladder">';
   for(let i=0;i<5;i++){
-    const on=i<=nivel?"on":""; const cur=i===nivel?"cur":"";
+    const on=i<=top?"on":""; const cur=i===top?"cur":"";
     h+=`<div class="rung ${on} ${cur}"><div class="n">${i}</div><div class="t">${NIV[i]}</div></div>`;
   }
   return h+'</div>';
@@ -82,7 +100,7 @@ function terminal(h){
   const antes = (h.poc.respuesta_codigo||200)+" · "+(h.poc.respuesta_muestra||"");
   const ok = h.parche_virtual_verificado;
   return `<div class="term"><span class="th">Terminal del atacante</span>`+
-    `<span class="ln">$ curl "/preview?tpl=${h.poc.valor||''}"</span>`+
+    `<span class="ln">$ curl "${h.poc.ruta}?${h.poc.param}=${h.poc.valor||''}"</span>`+
     `<span class="ln">sin Ventana Cero → <span class="bad">${antes}</span></span>`+
     (ok?`<span class="ln">con Ventana Cero → <span class="ok">403 bloqueado</span></span>`:``)+
     `</div>`;
@@ -102,10 +120,13 @@ function finding(h){
         (h.pr_parche_codigo?`<dt>PR parche código</dt><dd><code>${h.pr_parche_codigo}</code> (requiere revisión humana)</dd>`:``)+
         (h.segundos_hasta_mitigar!=null?`<dt>Tiempo a mitigar</dt><dd>${fmtDur(h.segundos_hasta_mitigar)}</dd>`:``)+`</div>`;
   }
-  return `<div class="finding">
+  const pri = (h.prioridad||"baja").replace("í","i");
+  const kev = h.kev?`<span class="chip kev">KEV</span>`:``;
+  const clase = h.clase?`<span class="chip clase">${h.clase}</span>`:``;
+  return `<div class="finding" data-id="${h.advisory_id}" data-nivel="${h.nivel}">
     <div class="ftop"><div><div class="id">${h.advisory_id} · ${h.paquete}==${h.version}</div><h2>${h.resumen}</h2></div>
-      <span class="chip ${h.decision}">${h.decision.toUpperCase()}</span></div>
-    ${ladder(h.nivel)}
+      <div class="badges"><span class="chip ${pri}">prioridad ${h.prioridad}</span>${kev}${clase}<span class="chip ${h.decision}">${h.decision.toUpperCase()}</span></div></div>
+    <div class="ladderbox">${ladder(h.nivel)}</div>
     <div class="meta">
       ${h.simbolo_vulnerable?`<dt>Símbolo</dt><dd><code>${h.simbolo_vulnerable}</code> · param <code>${h.parametro_peligroso||'?'}</code></dd>`:''}
       <dt>Nivel</dt><dd>${h.nivel} — ${h.nivel_texto}</dd>
@@ -116,18 +137,52 @@ function finding(h){
     ${mit}
   </div>`;
 }
-fetch("run.json").then(r=>r.json()).then(d=>{
-  document.getElementById("sub").textContent =
-    `${d.hallazgos.length} hallazgos · corrida ${d.generado} · ${d.segundos_totales}s`;
-  const mitigados = d.hallazgos.filter(h=>h.segundos_hasta_mitigar!=null);
-  const defSeg = mitigados.length? Math.max(...mitigados.map(h=>h.segundos_hasta_mitigar)) : null;
-  const race = `<div class="race">
+function renderRace(d){
+  const mitig = d.hallazgos.filter(h=>h.segundos_hasta_mitigar!=null);
+  const defSeg = mitig.length? Math.max(...mitig.map(h=>h.segundos_hasta_mitigar)) : null;
+  document.getElementById("race").innerHTML = `<div class="race">
     <div class="clock atk"><span class="lbl">Atacante con IA (supuesto)</span><span class="big">${fmtDur(d.atacante_seg_supuesto)}</span><span class="note">arma el exploit tras el aviso</span></div>
-    <div class="clock def"><span class="lbl">Ventana Cero (medido)</span><span class="big">${fmtDur(defSeg)}</span><span class="note">de aviso a mitigación verificada</span></div>
+    <div class="clock def"><span class="lbl">Ventana Cero (medido)</span><span class="big" id="defclock">${fmtDur(defSeg)}</span><span class="note">de aviso a mitigación verificada</span></div>
   </div>`;
-  document.getElementById("app").innerHTML = race + d.hallazgos.map(finding).join("");
+}
+function renderStats(d){
+  const r=d.resumen||{};
+  document.getElementById("stats").innerHTML =
+    `<span class="stat"><b>${r.total||d.hallazgos.length}</b> hallazgos</span>`+
+    `<span class="stat" style="color:var(--ok)"><b>${r.accionables||0}</b> accionables</span>`+
+    `<span class="stat" style="color:var(--muted)"><b>${r.ruido_descartado||0}</b> ruido descartado</span>`;
+}
+function render(d){
+  renderStats(d); renderRace(d);
+  document.getElementById("app").innerHTML = d.hallazgos.map(finding).join("");
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function reproducir(){
+  const btn=document.getElementById("play"); btn.disabled=true;
+  const cards=[...document.querySelectorAll(".finding")];
+  cards.forEach(c=>{ c.classList.add("hidden"); c.querySelector(".ladderbox").innerHTML=ladder(0,0); });
+  const defEl=document.getElementById("defclock"); if(defEl) defEl.textContent="0.0 s";
+  let maxSeg=0;
+  for(const c of cards){
+    c.classList.remove("hidden");
+    const nivel=+c.dataset.nivel;
+    for(let i=0;i<=nivel;i++){ c.querySelector(".ladderbox").innerHTML=ladder(nivel,i); await sleep(230); }
+    const id=c.dataset.id;
+    const h=DATA.hallazgos.find(x=>x.advisory_id===id);
+    if(h && h.segundos_hasta_mitigar!=null){ maxSeg=Math.max(maxSeg,h.segundos_hasta_mitigar); if(defEl) defEl.textContent=fmtDur(maxSeg); }
+    await sleep(260);
+  }
+  btn.disabled=false;
+}
+fetch("run.json").then(r=>r.json()).then(d=>{
+  DATA=d;
+  document.getElementById("sub").textContent =
+    `corrida ${d.generado} · ${d.segundos_totales}s · ordenado por prioridad`;
+  render(d);
+  document.getElementById("play").addEventListener("click", reproducir);
 }).catch(e=>{
   document.getElementById("sub").textContent="";
+  document.getElementById("play").style.display="none";
   document.getElementById("app").innerHTML =
     `<div class="err">No pude cargar <code>run.json</code>. Corre <code>python -m ventana_cero</code> y sirve esta carpeta con <code>python -m http.server -d ui/public</code>, luego abre http://localhost:8000.</div>`;
 });

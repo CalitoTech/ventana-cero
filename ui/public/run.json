@@ -1,7 +1,7 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 06:36:02",
-  "segundos_totales": 3.44,
+  "generado": "2026-10-24 06:37:46",
+  "segundos_totales": 3.39,
   "atacante_seg_supuesto": 14400,
   "resumen": {
     "total": 5,
@@ -57,14 +57,14 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpmxokpakz\\VC-2026-0001.patch",
+      "pr_parche_codigo": "out\\VC-2026-0001.patch",
       "epss": 0.94,
       "kev": true,
       "prioridad": "crítica",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.424,
+      "segundos_hasta_mitigar": 1.379,
       "etapas": [
         {
           "etapa": "detectado",
@@ -72,19 +72,19 @@
         },
         {
           "etapa": "símbolo derivado",
-          "t": 0.001
+          "t": 0.0
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.025
+          "t": 0.024
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.788
+          "t": 0.752
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.422
+          "t": 1.378
         }
       ]
     },
@@ -130,14 +130,14 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpmxokpakz\\VC-2026-0003.patch",
+      "pr_parche_codigo": "out\\VC-2026-0003.patch",
       "epss": 0.71,
       "kev": true,
       "prioridad": "crítica",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.31,
+      "segundos_hasta_mitigar": 1.301,
       "etapas": [
         {
           "etapa": "detectado",
@@ -149,15 +149,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.02
+          "t": 0.021
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.687
+          "t": 0.656
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.308
+          "t": 1.301
         }
       ]
     },
@@ -208,15 +208,15 @@
         },
         {
           "etapa": "símbolo derivado",
-          "t": 0.001
+          "t": 0.0
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.023
+          "t": 0.029
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.652
+          "t": 0.647
         }
       ]
     },
@@ -258,7 +258,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 0",
-          "t": 0.02
+          "t": 0.021
         }
       ]
     },
@@ -300,7 +300,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.02
+          "t": 0.032
         }
       ]
     }
