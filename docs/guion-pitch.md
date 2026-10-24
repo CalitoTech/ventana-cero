@@ -96,9 +96,13 @@ abierto más nube."
 - **"¿El LLM es confiable?"** → "No dependemos de él para decidir: propone; el
   sandbox decide. En el panel se ve: 'símbolo propuesto por el LLM', y después el
   taint y el PoC lo confirman o lo descartan. Corre incluso sin LLM, con heurísticas."
-- **"¿Dónde corre el PoC?"** → "En la demo, en un subproceso local contra nuestra
-  propia app. En producción, en un contenedor aislado sin red y con límites. Y los
-  PoC son canarios benignos (7*6=42), nunca un exploit con daño."
+- **"¿Dónde corre el PoC?"** → "Contra nuestra propia app, dentro de una jaula: sin
+  red de salida, sin procesos hijos, sin archivos fuera del repo, con tiempo y
+  memoria limitados; cada intento bloqueado queda como evidencia. En producción va
+  además en un contenedor aislado. Y los PoC son canarios benignos (7*6=42), nunca
+  un exploit con daño." *(Si insisten: la jaula usa audit hooks de Python, que
+  contienen al PoC pero no son una frontera de seguridad contra código hostil; por
+  eso el contenedor en producción.)*
 
 ## Checklist antes de subir al escenario
 - [ ] `python -m ventana_cero.demo --sin-pausa` termina en "Ventana cerrada."
