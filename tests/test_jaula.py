@@ -33,6 +33,20 @@ class TestJaula(unittest.TestCase):
         self.assertIn("BLOQUEADO", r.stdout)
         self.assertIn("VC_BLOQUEO socket.connect", r.stderr)
 
+    def test_bloquea_red_saliente_por_nombre(self):
+        # create_connection resuelve el nombre primero: la jaula corta en getaddrinfo
+        r = _correr_en_jaula("""
+            import socket
+            try:
+                socket.create_connection(("example.com", 80), timeout=3)
+                print("CONECTO A INTERNET")
+            except PermissionError:
+                print("BLOQUEADO")
+        """)
+        self.assertNotIn("CONECTO A INTERNET", r.stdout)
+        self.assertIn("BLOQUEADO", r.stdout)
+        self.assertIn("VC_BLOQUEO socket.getaddrinfo", r.stderr)
+
     def test_permite_localhost(self):
         r = _correr_en_jaula("""
             import socket
