@@ -51,31 +51,64 @@ donde esas herramientas terminan:
 El LLM **propone** (símbolo, camino de taint, PoC); el análisis estático recorta
 y el **sandbox confirma**. Nunca declaramos "alcanzable" por la opinión del modelo.
 
+## Cómo arrancar
+
+Requisito: **Python 3.11+**. No hace falta instalar nada (el esqueleto usa solo la
+librería estándar). El LLM es opcional: sin `ANTHROPIC_API_KEY`, cada etapa cae a
+una heurística determinista y el lazo corre completo offline.
+
+```bash
+# 1. correr el lazo de punta a punta sobre el caso de la demo
+python -m ventana_cero
+
+# 2. ver el panel de la demo
+python -m http.server -d ui/public      # abrir http://localhost:8000
+
+# 3. pruebas
+python -m unittest discover -s tests
+
+# 4. evaluación (métricas)
+python eval/run_eval.py
+```
+
+Con el LLM activo (opcional, mejora derivar el símbolo y el PoC):
+```bash
+export ANTHROPIC_API_KEY=sk-...
+```
+
 ## Estructura del repo
 
 ```
-services/
-  detector/      # 1 · matching de avisos contra dependencias (OSV)
-  reachability/  # 2-3 · símbolo del fix, AST, taint, la escalera
-  sandbox/       # prueba: contenedor aislado + runner de PoC
-  mitigator/     # 4-5 · parche virtual + PR del parche de código
-  orchestrator/  # el lazo que une todo + motor de política
-  ui/            # dashboard: grafo, los dos relojes, terminal del atacante
+ventana_cero/        # el paquete: un módulo por etapa del lazo
+  hallazgo.py        #   contrato de datos (el objeto que fluye por el lazo)
+  llm.py             #   puente OPCIONAL con el LLM (+ fallback heurístico)
+  detector.py        # 1 · matching de avisos contra dependencias (OSV)
+  reachability.py    # 2-3 · símbolo del fix, AST, taint, la escalera
+  sandbox.py         #   prueba: subproceso aislado + runner de PoC
+  mitigator.py       # 4-5 · parche virtual + parche de código
+  policy.py          #   mapea la escalera a una decisión
+  orchestrator.py    #   el lazo que une todo + emite out/run.json
 fixtures/
-  target-app/    # repo víctima sembrado para la demo
-  advisories/    # avisos enlatados con su commit de fix
-eval/            # banco de pruebas y métricas
-docs/            # product brief, alcanzabilidad, roadmap
+  target-app/        # repo víctima sembrado (app + librería vulnerable ficticia)
+  advisories/        # avisos enlatados estilo OSV, con su commit de fix
+ui/public/           # panel de la demo (estático, lee run.json)
+eval/                # banco de pruebas y métricas
+tests/               # prueba de humo del lazo (unittest)
+docs/                # product brief, alcanzabilidad, roadmap, decisión
 ```
 
 ## Contrato de datos
 
 Objeto `Hallazgo` que fluye por todo el lazo. Ver [`docs/contrato.md`](docs/contrato.md).
 
-## Cómo arrancar
+## Estado actual
 
-Ver la [hoja de ruta](docs/roadmap.md). Regla de oro: primero el **esqueleto que
-camina** (el lazo entero sobre un caso, aunque sea feo), después la calidad.
+Esqueleto que camina: el lazo corre de punta a punta sobre el caso de la demo.
+- `VC-2026-0001` (tinytpl, SSTI) → nivel 4 → **ACTUAR** + parche virtual verificado.
+- `VC-2026-0002` (fastjson, presente pero no alcanzable) → nivel 0 → **IGNORAR** (ruido descartado).
+
+Siguiente: endurecer el taint, más casos, el PR del parche de código y pulir la UI.
+Ver la [hoja de ruta](docs/roadmap.md).
 
 ## ⚠️ Ética y alcance
 

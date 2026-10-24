@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventana Cero — panel</title>
+<style>
+:root{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --ok:#5CC38A;
+  --f-d:"Archivo","Helvetica Neue",Arial,sans-serif; --f-b:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-m:ui-monospace,"IBM Plex Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 72px;display:flex;flex-direction:column;gap:28px}
+h1{font-family:var(--f-d);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;margin:0;letter-spacing:-.01em}
+h2{font-family:var(--f-d);font-size:1.2rem;margin:0}
+.eyebrow{font-family:var(--f-m);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+header{display:flex;flex-direction:column;gap:8px}
+.sub{color:var(--muted);font-size:1.02rem}
+.race{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.race{grid-template-columns:1fr}}
+.clock{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:6px}
+.clock .lbl{font-family:var(--f-m);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.clock .big{font-family:var(--f-d);font-weight:800;font-size:2.4rem;line-height:1}
+.clock.atk{border-color:var(--atk)} .clock.atk .big{color:var(--atk)}
+.clock.def{border-color:var(--accent);background:var(--accent-soft)} .clock.def .big{color:var(--accent-ink)}
+.clock .note{font-size:12.5px;color:var(--muted)}
+.finding{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.ftop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.ftop .id{font-family:var(--f-m);font-size:13px;color:var(--muted)}
+.ftop h2{margin-top:2px}
+.chip{font-family:var(--f-m);font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;white-space:nowrap;border:1px solid currentColor}
+.chip.actuar,.chip.mitigar{color:var(--ok)} .chip.ignorar,.chip.vigilar{color:var(--muted)} .chip.preparar{color:var(--mid)}
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rung{background:var(--sunk);border-radius:8px;padding:10px 8px;text-align:center;opacity:.4;border:1px solid transparent}
+.rung .n{font-family:var(--f-m);font-weight:600;font-size:13px}
+.rung .t{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.25}
+.rung.on{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.rung.on.cur{box-shadow:0 0 0 2px var(--accent)}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px}
+.meta dt{font-family:var(--f-m);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.meta dd{margin:0}
+.taint{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--f-m);font-size:12.5px}
+.taint .b{padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--sunk)}
+.taint .b.src{border-color:var(--atk);color:var(--atk)} .taint .b.sink{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.taint .arw{color:var(--muted)}
+.term{background:#0A110F;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:var(--f-m);font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+.term .th{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7FA99B}
+.term .ln{color:#EAF5F0;overflow-wrap:anywhere}
+.term .bad{color:var(--atk);font-weight:600} .term .ok{color:var(--ok);font-weight:600}
+.err{background:var(--atk-bg);border:1px solid var(--atk);border-radius:12px;padding:18px;color:var(--ink)}
+.foot{color:var(--muted);font-size:12.5px}
+code{font-family:var(--f-m);background:var(--sunk);padding:1px 5px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Ventana Cero · panel de la demo</span>
+    <h1>De aviso a protección, con prueba</h1>
+    <p class="sub" id="sub">Cargando corrida…</p>
+  </header>
+  <div id="app"></div>
+  <p class="foot">Panel estático: lee <code>run.json</code> generado por <code>python -m ventana_cero</code>. Sírvelo con <code>python -m http.server -d ui/public</code>.</p>
+</div>
+<script>
+const NIV = ["dependencia presente","símbolo referenciado","alcanzable en el grafo","con taint","PoC confirmado"];
+function fmtDur(s){ if(s==null) return "—"; if(s<90) return s.toFixed(1)+" s"; if(s<5400) return Math.round(s/60)+" min"; return (s/3600).toFixed(1)+" h"; }
+function ladder(nivel){
+  let h='<div class="ladder">';
+  for(let i=0;i<5;i++){
+    const on=i<=nivel?"on":""; const cur=i===nivel?"cur":"";
+    h+=`<div class="rung ${on} ${cur}"><div class="n">${i}</div><div class="t">${NIV[i]}</div></div>`;
+  }
+  return h+'</div>';
+}
+function terminal(h){
+  if(!h.poc) return "";
+  const antes = (h.poc.respuesta_codigo||200)+" · "+(h.poc.respuesta_muestra||"");
+  const ok = h.parche_virtual_verificado;
+  return `<div class="term"><span class="th">Terminal del atacante</span>`+
+    `<span class="ln">$ curl "/preview?tpl=${h.poc.valor||''}"</span>`+
+    `<span class="ln">sin Ventana Cero → <span class="bad">${antes}</span></span>`+
+    (ok?`<span class="ln">con Ventana Cero → <span class="ok">403 bloqueado</span></span>`:``)+
+    `</div>`;
+}
+function finding(h){
+  let taint="";
+  if(h.camino_taint && h.camino_taint.length){
+    const b=h.camino_taint.map((p,i)=>{
+      const cls=i===0?"src":(i===h.camino_taint.length-1?"sink":"");
+      return `<span class="b ${cls}">${p}</span>`;
+    }).join('<span class="arw">▶</span>');
+    taint=`<div><div class="eyebrow" style="margin-bottom:6px">Camino de taint</div><div class="taint">${b}</div></div>`;
+  }
+  let mit="";
+  if(h.parche_virtual){
+    mit=`<div class="meta"><dt>Parche virtual</dt><dd>${h.parche_virtual.descr} ${h.parche_virtual_verificado?'<b style="color:var(--ok)">✓ verificado</b>':'<b style="color:var(--atk)">sin verificar</b>'}</dd>`+
+        (h.pr_parche_codigo?`<dt>PR parche código</dt><dd><code>${h.pr_parche_codigo}</code> (requiere revisión humana)</dd>`:``)+
+        (h.segundos_hasta_mitigar!=null?`<dt>Tiempo a mitigar</dt><dd>${fmtDur(h.segundos_hasta_mitigar)}</dd>`:``)+`</div>`;
+  }
+  return `<div class="finding">
+    <div class="ftop"><div><div class="id">${h.advisory_id} · ${h.paquete}==${h.version}</div><h2>${h.resumen}</h2></div>
+      <span class="chip ${h.decision}">${h.decision.toUpperCase()}</span></div>
+    ${ladder(h.nivel)}
+    <div class="meta">
+      ${h.simbolo_vulnerable?`<dt>Símbolo</dt><dd><code>${h.simbolo_vulnerable}</code> · param <code>${h.parametro_peligroso||'?'}</code></dd>`:''}
+      <dt>Nivel</dt><dd>${h.nivel} — ${h.nivel_texto}</dd>
+      ${h.resultado_poc?`<dt>PoC</dt><dd>${h.resultado_poc}</dd>`:''}
+    </div>
+    ${taint}
+    ${terminal(h)}
+    ${mit}
+  </div>`;
+}
+fetch("run.json").then(r=>r.json()).then(d=>{
+  document.getElementById("sub").textContent =
+    `${d.hallazgos.length} hallazgos · corrida ${d.generado} · ${d.segundos_totales}s`;
+  const mitigados = d.hallazgos.filter(h=>h.segundos_hasta_mitigar!=null);
+  const defSeg = mitigados.length? Math.max(...mitigados.map(h=>h.segundos_hasta_mitigar)) : null;
+  const race = `<div class="race">
+    <div class="clock atk"><span class="lbl">Atacante con IA (supuesto)</span><span class="big">${fmtDur(d.atacante_seg_supuesto)}</span><span class="note">arma el exploit tras el aviso</span></div>
+    <div class="clock def"><span class="lbl">Ventana Cero (medido)</span><span class="big">${fmtDur(defSeg)}</span><span class="note">de aviso a mitigación verificada</span></div>
+  </div>`;
+  document.getElementById("app").innerHTML = race + d.hallazgos.map(finding).join("");
+}).catch(e=>{
+  document.getElementById("sub").textContent="";
+  document.getElementById("app").innerHTML =
+    `<div class="err">No pude cargar <code>run.json</code>. Corre <code>python -m ventana_cero</code> y sirve esta carpeta con <code>python -m http.server -d ui/public</code>, luego abre http://localhost:8000.</div>`;
+});
+</script>
+</body>
+</html>

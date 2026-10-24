@@ -1,7 +1,7 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 06:16:57",
-  "segundos_totales": 1.4,
+  "generado": "2026-10-24 06:23:01",
+  "segundos_totales": 1.46,
   "atacante_seg_supuesto": 14400,
   "hallazgos": [
     {
@@ -46,10 +46,10 @@
         "reversible": true
       },
       "parche_virtual_verificado": true,
-      "pr_parche_codigo": "out\\VC-2026-0001.patch",
+      "pr_parche_codigo": "C:\\Users\\carlo\\AppData\\Local\\Temp\\tmpwfod6osk\\VC-2026-0001.patch",
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
-      "segundos_hasta_mitigar": 1.36
+      "segundos_hasta_mitigar": 1.44
     },
     {
       "advisory_id": "VC-2026-0002",
