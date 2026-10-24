@@ -23,11 +23,48 @@ from urllib.parse import quote
 
 from . import orchestrator
 from .sandbox import _esperar, _puerto_libre
+import socket
+from contextlib import closing
 
 DIR_REPO = "fixtures/target-app"
 AVISO = "VC-2026-0001"
 ATAQUE = ("/preview", "tpl", "{{7*6}}")      # SSTI: el canario aritmético responde 42
 LEGITIMO = ("/preview", "tpl", "hola")
+
+
+def _libre(puerto: int) -> bool:
+    """¿El puerto está libre en 127.0.0.1? (evita atacar un servicio ajeno)."""
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 0)
+        try:
+            s.bind(("127.0.0.1", puerto))
+            return True
+        except OSError:
+            return False
+
+
+def _resolver_puerto(preferido: int | None, salida) -> int:
+    """Usa el puerto pedido si está libre; si no, cae a uno libre y lo anuncia.
+
+    Sin esto la demo corría contra cualquier servicio que ya ocupara el puerto
+    fijo (un /health ajeno pasaba la verificación), dando resultados confusos.
+    """
+    if not preferido:
+        return _puerto_libre()
+    if _libre(preferido):
+        return preferido
+    libre = _puerto_libre()
+    salida(f"  (puerto {preferido} ocupado por otro proceso; uso el {libre})")
+    return libre
+
+
+def _es_nuestra_app(puerto: int) -> bool:
+    """Confirma que quien responde es la app víctima, no un servicio ajeno."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{puerto}/health", timeout=1) as r:
+            return r.read().decode(errors="replace").strip() == "ok"
+    except Exception:
+        return False
 
 
 def _levantar(puerto: int, guard: str | None = None) -> subprocess.Popen:
@@ -37,9 +74,11 @@ def _levantar(puerto: int, guard: str | None = None) -> subprocess.Popen:
         env["VC_GUARD"] = guard
     proc = subprocess.Popen([sys.executable, os.path.join(DIR_REPO, "app.py")],
                             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if not _esperar(puerto):
+    if not _esperar(puerto) or not _es_nuestra_app(puerto):
         _bajar(proc)
-        raise RuntimeError(f"la app víctima no levantó en el puerto {puerto}")
+        raise RuntimeError(
+            f"la app víctima no levantó limpia en el puerto {puerto} "
+            f"(¿lo ocupa otro proceso?)")
     return proc
 
 
@@ -69,7 +108,7 @@ def ejecutar(puerto: int | None = None, dir_salida: str = "out",
              dir_ui: str | None = "ui/public", pausa: bool = True,
              salida=print) -> dict:
     """Corre los tres pasos y devuelve el resultado de cada petición."""
-    puerto = puerto or _puerto_libre()
+    puerto = _resolver_puerto(puerto, salida)
     esperar = (lambda m: input(f"\n[Enter] {m}")) if pausa else (lambda m: None)
     pasos = {}
 
