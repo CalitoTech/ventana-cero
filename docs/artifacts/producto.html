@@ -1,0 +1,305 @@
+<title>Ventana Cero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: brief de producto en una columna; problema, el lazo de defensa, arquitectura, negocio, recorte MVP y ética. */
+:root{
+  --bg:#EEF1EF; --surface:#FBFCFB; --sunk:#E4E9E6; --ink:#141F1B; --muted:#5B6B65; --line:#CCD6D1;
+  --accent:#0F6A5B; --accent-soft:#D6EAE4; --accent-ink:#0A4A40;
+  --atk:#B4321F; --atk-bg:#F6E1DB; --mid:#B26A00; --mid-bg:#F7EBD6; --ok:#2F7D4F;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --mid-bg:#352711; --ok:#5CC38A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --mid-bg:#352711; --ok:#5CC38A; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:20px;padding-block:36px 72px;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.5vw,3.2rem);font-weight:800;letter-spacing:-.015em}
+h2{font-size:1.55rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0;max-width:72ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.14rem;color:var(--muted);max-width:66ch}
+header{display:flex;flex-direction:column;gap:14px}
+.badge{align-self:flex-start;font-family:var(--f-mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:99px}
+section{display:flex;flex-direction:column;gap:18px}
+.note{font-size:13px;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--sunk);padding:1px 5px;border-radius:5px}
+b{font-weight:600}
+.one{font-family:var(--f-display);font-weight:700;font-size:1.3rem;line-height:1.3;background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:18px 22px}
+.one b{color:var(--accent-ink)}
+
+/* timeline del n-day */
+.tl{display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.tl .mark{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tl .mark b{color:var(--ink)}
+.trow{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center}
+@media (max-width:520px){.trow{grid-template-columns:1fr;gap:4px}}
+.trow .who{font-size:13px;font-weight:600}
+.trbar{height:26px;border-radius:7px;position:relative;display:flex;align-items:center;padding:0 10px;font:600 11.5px var(--f-mono);color:#fff;white-space:nowrap;overflow:hidden}
+.trbar.atk{background:var(--atk);width:22%}
+.trbar.def{background:var(--muted);width:92%}
+.trbar.vz{background:var(--accent);width:12%}
+.tl .cap{font-size:13px;color:var(--muted)}
+
+/* pasos del lazo */
+.loop{display:flex;flex-direction:column;gap:10px}
+.step{display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.step .n{width:40px;height:40px;border-radius:10px;background:var(--accent);color:var(--surface);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:18px}
+.step.now .n{background:var(--mid)}
+.step .b h3{font-size:1.02rem}
+.step .b p{font-size:14px;color:var(--muted);margin-top:3px}
+.step .tagline{font-family:var(--f-mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-top:5px}
+
+/* dos columnas genérico */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:660px){.two{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card h3{font-size:1rem}
+.card p{font-size:14px;color:var(--muted)}
+.card .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+
+/* diagrama */
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:660px){.split{grid-template-columns:1fr}}
+.col h3{font-size:.95rem;margin-bottom:8px}
+.col ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.col.llm{background:var(--accent-soft);border-radius:12px;padding:16px 18px}
+.col.det{background:var(--sunk);border-radius:12px;padding:16px 18px}
+
+/* tabla */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+tr.mine td{background:var(--accent-soft)}
+tr.mine td:first-child{color:var(--accent-ink)}
+
+/* metricas */
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:660px){.metrics{grid-template-columns:1fr}}
+.metric{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.metric .m{font-family:var(--f-mono);font-weight:600;font-size:14px;color:var(--accent)}
+.metric p{font-size:13.5px;color:var(--muted)}
+
+/* mvp */
+.mvp{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.mvp .row{display:grid;grid-template-columns:140px 1fr;gap:14px;font-size:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.mvp .row:last-child{border-bottom:0;padding-bottom:0}
+@media (max-width:520px){.mvp .row{grid-template-columns:1fr;gap:3px}}
+.mvp .row b{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+.ethics{background:var(--atk-bg);border-left:4px solid var(--atk);border-radius:0 12px 12px 0;padding:18px 22px;display:flex;flex-direction:column;gap:8px}
+.ethics h3{font-size:1rem;color:var(--atk)}
+.ethics ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="badge">Propuesta de producto · team-21 · def/acc</span>
+    <h1>Ventana Cero</h1>
+    <p class="lede">Defensa autónoma del n-day: cuando sale una vulnerabilidad, cierra tu ventana de exposición antes de que el atacante llegue. Con prueba, sin humano en el camino crítico.</p>
+    <p class="note">"Ventana Cero" es un nombre provisional. La idea: llevar a cero la ventana entre que se publica la vuln y que estás protegido.</p>
+  </header>
+
+  <section>
+    <span class="eyebrow">El problema</span>
+    <h2>La ventana del n-day</h2>
+    <p>El peligro no es el día cero. Es lo que pasa después del anuncio. Cuando se publica una vulnerabilidad crítica (el caso reciente de PHP), los atacantes con IA convierten el aviso en un exploit funcionando en horas. Los defensores tardan días o semanas en parchear. Esa diferencia es la ventana, y ahí ocurre casi todo el daño.</p>
+    <div class="tl">
+      <div class="mark"><b>Día 0:</b>&nbsp;se publica el aviso</div>
+      <div class="trow"><span class="who">Atacante con IA</span><div class="trbar atk">exploit en horas</div></div>
+      <div class="trow"><span class="who">Defensa tradicional</span><div class="trbar def">triage + parche + review + deploy · días</div></div>
+      <div class="trow"><span class="who">Ventana Cero</span><div class="trbar vz">minutos</div></div>
+      <p class="cap">La franja entre la barra roja y la gris es la ventana de exposición. El producto la lleva a casi cero con una mitigación instantánea, mientras el parche de verdad se prepara con calma.</p>
+    </div>
+    <div class="two">
+      <div class="card"><span class="k">Por qué el defensor es lento · 1</span><h3>Ruido</h3><p>Los escáneres marcan cientos de CVEs en dependencias. El 95% no es alcanzable en tu sistema. Nadie sabe cuál es el que importa.</p></div>
+      <div class="card"><span class="k">Por qué el defensor es lento · 2</span><h3>Fricción del parche</h3><p>El parche de código tarde días: review, pruebas de regresión, ventana de deploy. Mientras tanto, estás expuesto.</p></div>
+      <div class="card"><span class="k">Por qué el defensor es lento · 3</span><h3>Desconfianza</h3><p>Nadie deja que una IA parchee producción sola, porque a veces se equivoca. Siempre hay un humano frenando el proceso.</p></div>
+      <div class="card"><span class="k">La ventaja def/acc</span><h3>El defensor llega primero</h3><p>La misma capacidad (IA que encuentra y explota) favorece al defensor: tiene el código fuente, el CI y el derecho de actuar antes del ataque.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">La idea</span>
+    <div class="one">No es "una IA que parchea". Es un sistema que <b>solo actúa sobre lo que puede probar</b>, tapa el hueco <b>ya</b> y prepara el parche bueno <b>con calma</b>, sin un humano en el camino crítico.</div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Nuestro diferenciador</span>
+    <h2>Lo que detecta ya existe. Lo que actúa, no.</h2>
+    <p>La detección de vulnerabilidades conocidas está resuelta y saturada: Dependabot, Snyk, Socket, CodeQL, Semgrep. No la reconstruimos, la <b>consumimos como entrada</b>. Nuestro valor empieza donde esas herramientas terminan: en qué pasa <b>después</b> de la alerta.</p>
+    <div class="split">
+      <div class="col det">
+        <h3>Lo que reusamos · ya existe</h3>
+        <ul>
+          <li>Feeds de avisos: OSV.dev, GHSA, CISA KEV, EPSS.</li>
+          <li>Escáneres de dependencias: Dependabot, Snyk, Socket.</li>
+          <li>Análisis de código: CodeQL, Semgrep.</li>
+        </ul>
+      </div>
+      <div class="col llm">
+        <h3>Lo que construimos · el foso</h3>
+        <ul>
+          <li>Prueba de alcanzabilidad y PoC en tu contexto real.</li>
+          <li>Mitigación instantánea generada desde el aviso.</li>
+          <li>Parche con prueba y la decisión de aplicarlo solo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Capacidad</th><th>¿Ya existe?</th><th>¿Es nuestro diferenciador?</th></tr></thead>
+      <tbody>
+        <tr><td>Detectar vulns conocidas (deps y código)</td><td>Sí, muy maduro</td><td>No — lo consumimos</td></tr>
+        <tr><td>Priorizar por alcanzabilidad</td><td>Emergente (Endor, Socket, Semgrep)</td><td>En parte — es un paso del lazo</td></tr>
+        <tr><td>Descubrir 0-days con IA</td><td>Frontera / research</td><td>No — es la amenaza, no el producto</td></tr>
+        <tr class="mine"><td>Mitigar y parchar solo, con prueba, tras el aviso</td><td>Casi nadie</td><td>Sí — aquí está el foso</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Marco para el pitch: que la IA ya descubra y explote 0-days sola (Google "Big Sleep" en SQLite, XBOW en HackerOne) no nos compite; <b>es justo lo que nos justifica</b>. A esa velocidad de ataque, la única respuesta es una defensa igual de automática. Verifiquen esos ejemplos antes de citarlos.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Cómo funciona</span>
+    <h2>El lazo, de aviso a protección</h2>
+    <div class="loop">
+      <div class="step"><div class="n">1</div><div class="b"><h3>Vigilar</h3><p>Escucha los feeds de avisos (CVE, GHSA, boletines de proveedores) y los cruza con tu inventario de dependencias (SBOM).</p><div class="tagline">entrada</div></div></div>
+      <div class="step"><div class="n">2</div><div class="b"><h3>Triar por alcanzabilidad</h3><p>No "¿tengo este paquete?" sino "¿el código vulnerable es alcanzable desde una entrada no confiable en mi app?". Un agente razona sobre el grafo de llamadas. Esto mata el ruido.</p><div class="tagline">¿me afecta de verdad?</div></div></div>
+      <div class="step"><div class="n">3</div><div class="b"><h3>Probar en sandbox</h3><p>Genera un PoC en un entorno aislado que confirma que es explotable en tu contexto. Si no se puede probar, baja la prioridad. El que sí se prueba, es real.</p><div class="tagline">prueba, no suposición</div></div></div>
+      <div class="step now"><div class="n">4</div><div class="b"><h3>Mitigar al instante</h3><p>Genera un parche virtual (regla de WAF/RASP, flag de config, toggle) que tapa el hueco en segundos. Es el freno de emergencia que cierra la ventana.</p><div class="tagline">la pieza que gana la carrera</div></div></div>
+      <div class="step"><div class="n">5</div><div class="b"><h3>Parchear de verdad</h3><p>Genera el parche de código, corre los tests y abre un PR con el PoC adjunto: fallaba antes, pasa después. Un humano lo revisa y lo fusiona.</p><div class="tagline">parche con prueba</div></div></div>
+      <div class="step"><div class="n">6</div><div class="b"><h3>Verificar y vigilar</h3><p>Confirma que el PoC ahora falla, retira el parche virtual cuando el de código está en producción y vigila intentos de evasión.</p><div class="tagline">cierre del ciclo</div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">El foso</span>
+    <h2>Por qué esto no es un auto-patcher</h2>
+    <p>Un auto-patcher es una <b>capacidad</b> ("dame un bug y te doy un parche"). Ventana Cero es una <b>propiedad del sistema</b>: confiable, autónomo y a tiempo. Cuatro cosas lo separan:</p>
+    <div class="two">
+      <div class="card"><span class="k">1</span><h3>Con prueba</h3><p>Solo toca lo que confirma explotable, y cada cambio lleva un PoC. Eso genera la confianza que permite correr sin humano.</p></div>
+      <div class="card"><span class="k">2</span><h3>A dos velocidades</h3><p>Mitigación instantánea ahora + parche de código verificado después. El producto es la ventana, no el parche.</p></div>
+      <div class="card"><span class="k">3</span><h3>Alcanzabilidad primero</h3><p>Tria por explotabilidad, no por presencia de la librería. Mata la fatiga de alertas.</p></div>
+      <div class="card"><span class="k">4</span><h3>En tu contexto</h3><p>Lo prueba en tu deploy real, no en abstracto. "Te afecta a ti" es distinto de "existe un CVE".</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Arquitectura</span>
+    <h2>Cómo está hecho por dentro</h2>
+    <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  FEED[Avisos<br/>CVE · GHSA · boletines] --> NORM[Normalizador]
+  SBOM[(Inventario de<br/>dependencias)] --> REACH
+  NORM --> REACH[Analizador de<br/>alcanzabilidad]
+  REACH -->|alcanzable| SBX[Sandbox aislado<br/>sin salida a red]
+  SBX --> POC[Generador de PoC]
+  POC -->|explotable| VP[Parche virtual<br/>instantáneo]
+  POC --> CP[Parche de código<br/>+ PoC adjunto]
+  VP --> POL{Motor de política}
+  CP --> POL
+  POL -->|auto| APPLY[Aplicar mitigación]
+  POL -->|requiere humano| PR[PR a revisión]
+  APPLY --> AUD[(Auditoría y linaje)]
+  PR --> AUD
+</pre>
+    </div>
+    <div class="split">
+      <div class="col llm">
+        <h3>Dónde está el LLM</h3>
+        <ul>
+          <li>Razonar sobre el grafo de llamadas para la alcanzabilidad.</li>
+          <li>Generar el PoC dentro del sandbox.</li>
+          <li>Redactar el parche virtual y el parche de código.</li>
+        </ul>
+      </div>
+      <div class="col det">
+        <h3>Dónde NO está (determinista)</h3>
+        <ul>
+          <li>El aislamiento del sandbox y el bloqueo de red.</li>
+          <li>La verificación: correr tests y el PoC, comparar antes/después.</li>
+          <li>La política de qué se aplica solo y qué va a un humano.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Regla de oro: el LLM propone; la verificación determinista y la política deciden. Nada irreversible se aplica sin prueba o sin humano.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Qué medir</span>
+    <h2>Métricas que importan</h2>
+    <div class="metrics">
+      <div class="metric"><span class="m">Tiempo hasta mitigar</span><p>Del aviso al parche virtual aplicado. Compáralo con el tiempo del atacante para armar el exploit. Es el número estrella.</p></div>
+      <div class="metric"><span class="m">Reducción de ruido</span><p>Alcanzables / total de alertas. "340 CVEs, 12 realmente alcanzables" es la frase de venta.</p></div>
+      <div class="metric"><span class="m">Exploits bloqueados</span><p>% de ataques que el parche virtual detiene en el banco de pruebas.</p></div>
+      <div class="metric"><span class="m">Falsos positivos</span><p>Tráfico legítimo bloqueado por el parche virtual, y parches de código que rompen tests. Honestidad total aquí.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Negocio</span>
+    <h2>Cómo se vuelve producto</h2>
+    <div class="two">
+      <div class="card"><span class="k">A quién</span><h3>Equipos que envían rápido y tienen superficie</h3><p>Seguridad y plataforma en SaaS, fintech e infraestructura. También proveedores de seguridad gestionada (MSSP) que protegen a muchos clientes.</p></div>
+      <div class="card"><span class="k">Cómo entrar</span><h3>Primero observar, después actuar</h3><p>Arranca como triage de alcanzabilidad (solo lectura, mucha confianza): el informe es la venta. Luego parche virtual. Luego PRs. Nadie te deja tocar producción el día uno.</p></div>
+      <div class="card"><span class="k">Precio</span><h3>Núcleo abierto + nube</h3><p>El motor, open source (es seguridad, quieren ver el código). Se paga el panel de flota, las políticas, la retención de auditoría y las alertas. Cobro por servicio vigilado o por mitigación.</p></div>
+      <div class="card"><span class="k">El foso que compone</span><h3>La biblioteca de recetas</h3><p>Con el tiempo acumulas firmas de alcanzabilidad, PoCs verificados y recetas de parche por CWE y ecosistema. Ese dato mejora el producto y es difícil de copiar.</p></div>
+    </div>
+    <h3 style="margin-top:4px">Contra qué compites, con honestidad</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Enfoque</th><th>Qué hace</th><th>Qué le falta</th></tr></thead>
+      <tbody>
+        <tr><td>CRS del AIxCC</td><td>Encuentra y parchea bugs en un código dado, autónomo</td><td>Es investigación/competencia; no es respuesta a n-day de dependencias a escala de flota</td></tr>
+        <tr><td>Copilot Autofix · Snyk</td><td>Sugiere parches para tu código</td><td>No prueba explotabilidad, no mitiga al instante, no es autónomo</td></tr>
+        <tr><td>Endor · Semgrep</td><td>Alcanzabilidad: te dice qué CVE importa</td><td>Triage, pero no mitiga ni parchea solo</td></tr>
+        <tr><td>WAF · RASP</td><td>Parche virtual que tapa el hueco</td><td>Reglas manuales; no se generan solas desde el aviso ni con prueba</td></tr>
+        <tr class="mine"><td>Ventana Cero</td><td>El lazo completo y autónomo, con prueba</td><td>Lo que hay que construir y demostrar</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Ninguna pieza es nueva por sí sola. Lo que casi nadie tiene es el lazo pegado: aviso → ¿me afecta y es alcanzable? → PoC → mitigación instantánea → PR con prueba, sin humano en el medio.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Para la hackathon</span>
+    <h2>El recorte de 36 horas</h2>
+    <p>No intenten el producto general: harían una versión peor de AIxCC. Hagan una rebanada vertical, completa, sobre un caso.</p>
+    <div class="mvp">
+      <div class="row"><b>Alcance</b><span>Un ecosistema (por ejemplo PHP, como el caso que motivó esto, o Python) y una clase de vuln (un CWE). Repo vulnerable sembrado + un aviso preparado.</span></div>
+      <div class="row"><b>El lazo mínimo</b><span>Alcanzabilidad simple → PoC en sandbox → parche virtual → PR con test. Si falta tiempo, recorten el PR de código y quédense con alcanzabilidad + PoC + parche virtual.</span></div>
+      <div class="row"><b>La demo</b><span>La carrera con dos relojes: el atacante arma el exploit, Ventana Cero cierra la ventana antes. El mismo ataque, bloqueado en vivo.</span></div>
+      <div class="row"><b>Evaluación</b><span>Sobre N casos sembrados: tiempo hasta mitigar, precisión de alcanzabilidad, % de exploits bloqueados y falsos positivos. Usen Cybench e Inspect Cyber, que el track recomienda.</span></div>
+      <div class="row"><b>Qué se puede simular</b><span>El feed de avisos puede ser un aviso enlatado; el SBOM, el propio repo; la "flota", 2 o 3 servicios. Todo determinista para la demo.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">No negociable</span>
+    <h2>Ética y doble uso</h2>
+    <div class="ethics">
+      <h3>Estás construyendo algo que escribe PoCs. Trátalo con cuidado.</h3>
+      <ul>
+        <li>Los PoC corren <b>solo contra tu propio código, en un sandbox aislado sin salida a red</b>. Nunca contra terceros.</li>
+        <li>La salida son parches y mitigaciones, <b>nunca exploits listos para usar</b>.</li>
+        <li>Nada irreversible se aplica sin prueba o sin un humano que apruebe.</li>
+        <li>Déjalo explícito en el pitch: refuerza el marco def/acc (ventaja del defensor) y evita que el jurado lo lea como una herramienta ofensiva.</li>
+      </ul>
+    </div>
+    <p class="note">El marco para el pitch: la amenaza es IA contra IA. Los atacantes ya automatizan la explotación; la única respuesta a esa velocidad es una defensa igual de automática, pero con prueba.</p>
+  </section>
+</div>

@@ -1,0 +1,322 @@
+<title>Qué construimos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: brief de decisión en una columna; criterios, tarjetas de opción, tabla comparativa y un asistente de elección. */
+:root{
+  --bg:#EEF1EF; --surface:#FBFCFB; --sunk:#E4E9E6; --ink:#141F1B; --muted:#5B6B65; --line:#CCD6D1;
+  --accent:#0F6A5B; --accent-soft:#D6EAE4;
+  --hi:#2F7D4F; --hi-bg:#DBEEE2; --mid:#B26A00; --mid-bg:#F7EBD6; --lo:#9A4A2E; --lo-bg:#F2E0D8;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32;
+  --hi:#5CC38A; --hi-bg:#15301F; --mid:#E0A23C; --mid-bg:#352711; --lo:#E58467; --lo-bg:#3A1E15; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32;
+  --hi:#5CC38A; --hi-bg:#15301F; --mid:#E0A23C; --mid-bg:#352711; --lo:#E58467; --lo-bg:#3A1E15; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:20px;padding-block:36px 72px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.5rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0;max-width:70ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.12rem;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+section{display:flex;flex-direction:column;gap:18px}
+.note{font-size:13px;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.92em}
+b{font-weight:600}
+
+/* pesos */
+.weights{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.wrow{display:grid;grid-template-columns:150px 1fr 48px;gap:12px;align-items:center}
+@media (max-width:520px){.wrow{grid-template-columns:110px 1fr 42px}}
+.wrow .lbl{font-size:14px;font-weight:500}
+.bar{height:12px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.wrow .pct{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.keyline{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 20px;font-size:1.05rem;line-height:1.45}
+.keyline b{color:var(--accent)}
+
+/* tarjetas de opción */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:720px){.cards{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.card.out{opacity:.72}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card .name{display:flex;flex-direction:column;gap:3px}
+.card .tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.verdict{font-family:var(--f-mono);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;border:1px solid currentColor}
+.verdict.go{color:var(--hi)} .verdict.maybe{color:var(--mid)} .verdict.no{color:var(--lo)}
+.card dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:14px}
+.card dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.card dd{margin:0;color:var(--ink)}
+.card dd.m{color:var(--muted)}
+
+/* tabla */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk);vertical-align:bottom}
+tbody th{font-weight:500;font-size:13.5px}
+tr:last-child td,tr:last-child th{border-bottom:0}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:7px;white-space:nowrap}
+.chip.hi{background:var(--hi-bg);color:var(--hi)} .chip.mid{background:var(--mid-bg);color:var(--mid)} .chip.lo{background:var(--lo-bg);color:var(--lo)}
+td.c{text-align:center}
+
+/* originalidad */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+.mean{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.mean h3{font-size:1rem}
+.mean p{font-size:14px;color:var(--muted)}
+.analogy{background:var(--sunk);border-radius:12px;padding:18px 20px;font-size:15px;line-height:1.5}
+
+/* asistente */
+.helper{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:20px}
+.q{display:flex;flex-direction:column;gap:9px}
+.q p{font-weight:600;font-size:14.5px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font-family:var(--f-body);font-size:13.5px;font-weight:500;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.result{border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:8px}
+.result .head{font-family:var(--f-mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.result .pick{font-family:var(--f-display);font-weight:800;font-size:1.5rem;color:var(--accent);line-height:1.1}
+.result .why{font-size:14px;color:var(--muted)}
+
+/* enlaces */
+.links{display:flex;flex-direction:column;gap:10px}
+.links a{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;text-decoration:none;color:var(--ink)}
+.links a:hover{border-color:var(--accent)}
+.links .arw{color:var(--accent);font-family:var(--f-mono)}
+.links small{display:block;color:var(--muted);font-size:13px;font-weight:400}
+.links b{font-size:15px}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">team-21 · Platanus Hack 26 · AI Security</span>
+    <h1>Qué construimos</h1>
+    <p class="lede">Cuatro ideas sobre la mesa. Esta página es para decidir en equipo cuál llevamos, sin enamorarnos de la más vistosa.</p>
+    <p class="note">Las valoraciones son una lectura de trabajo, no una verdad. Discútanlas; para eso están.</p>
+  </header>
+
+  <section>
+    <span class="eyebrow">Primero</span>
+    <h2>Cómo nos evalúan, y qué significa</h2>
+    <div class="weights">
+      <div class="wrow"><span class="lbl">Aspecto técnico</span><span class="bar"><i style="width:100%"></i></span><span class="pct">25%</span></div>
+      <div class="wrow"><span class="lbl">Ambición</span><span class="bar"><i style="width:80%"></i></span><span class="pct">20%</span></div>
+      <div class="wrow"><span class="lbl">Ejecución</span><span class="bar"><i style="width:80%"></i></span><span class="pct">20%</span></div>
+      <div class="wrow"><span class="lbl">Impacto</span><span class="bar"><i style="width:80%"></i></span><span class="pct">20%</span></div>
+      <div class="wrow"><span class="lbl">Originalidad</span><span class="bar"><i style="width:60%"></i></span><span class="pct">15%</span></div>
+    </div>
+    <div class="keyline">La originalidad pesa <b>solo 15%</b>. Lo técnico, la ambición, la ejecución y el impacto suman <b>85%</b>. La pregunta que decide no es "¿cuál es más original?", es <b>"¿cuál podemos construir de verdad en el tiempo que tenemos y demostrar sin que se caiga?"</b></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Las opciones</span>
+    <h2>Las cuatro ideas</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="top"><div class="name"><span class="tag">OWASP ASI06 · AI control</span><h3>Raíz · memoria y linaje</h3></div><span class="verdict maybe">Carril saturado</span></div>
+        <dl>
+          <dt>Qué</dt><dd>Una capa que, antes de cada acción sensible, dice qué recuerdo la causó, de dónde vino y si es confiable. La detiene si no lo es.</dd>
+          <dt>Demo</dt><dd class="m">Un agente que, por un issue envenenado, mete una puerta trasera. Raíz la detiene y rastrea la cadena hasta el origen.</dd>
+          <dt>Ojo</dt><dd class="m">El "Provenance Firewall" de Bogotá ya hizo la pieza central (memoria que no gana autoridad sin permiso). Hay que girar el pitch a lo que ese no hizo: atribución y linaje.</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name"><span class="tag">OWASP ASI10 · AI control</span><h3>Agentes pícaros · contención</h3></div><span class="verdict maybe">Demo vistosa</span></div>
+        <dl>
+          <dt>Qué</dt><dd>Un plano de control para un enjambre de agentes: monitoreo de comportamiento y un kill switch que congela en cascada y bloquea acciones irreversibles.</dd>
+          <dt>Demo</dt><dd class="m">Un worker se vuelve pícaro; un clic congela todo su subárbol y frena una acción destructiva a un paso de ejecutarse.</dd>
+          <dt>Lo difícil</dt><dd class="m">Multiagente en vivo es frágil. Necesita a alguien fuerte en orquestación.</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <div class="top"><div class="name"><span class="tag">Defensa · def/acc</span><h3>Defensa autónoma con prueba (n-day)</h3></div><span class="verdict go">Carril vacío</span></div>
+        <dl>
+          <dt>Qué</dt><dd>Cuando sale una vuln (tipo PHP), un agente confirma si te afecta y es alcanzable, lo prueba con un PoC en sandbox, aplica un parche virtual al instante y abre el PR con el parche probado.</dd>
+          <dt>Demo</dt><dd class="m">Una carrera con dos relojes: el atacante arma el exploit, el defensor cierra la ventana antes.</dd>
+          <dt>Ventaja</dt><dd class="m">Es "IA para la seguridad" (def/acc). Ningún finalista previo está en este carril: todos son guardrails.</dd>
+          <dt>Lo difícil</dt><dd class="m">Recortar a un lenguaje y una clase de vuln. Es de doble uso: PoC solo contra código propio.</dd>
+        </dl>
+      </div>
+      <div class="card out">
+        <div class="top"><div class="name"><span class="tag">Descartada</span><h3>Auto-patcher a secas</h3></div><span class="verdict no">No</span></div>
+        <dl>
+          <dt>Qué</dt><dd>"Dame un bug y te doy un parche con IA."</dd>
+          <dt>Por qué no</dt><dd class="m">Ya lo hacen AIxCC, Copilot Autofix, Snyk. Compites contra gigantes y pierdes originalidad al instante.</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">El dato que inclina la balanza</span>
+    <h2>Hay dos carriles, y uno está vacío</h2>
+    <p>"AI Security" significa dos cosas, y conviene no mezclarlas:</p>
+    <div class="two">
+      <div class="mean"><h3>Seguridad DE la IA</h3><p>Proteger apps y agentes de IA: guardrails, firewalls, gateways MCP, anti-prompt-injection, DLP, verificación de acciones.</p></div>
+      <div class="mean"><h3>IA PARA la seguridad (def/acc)</h3><p>Usar IA para defender sistemas: descubrir y parchar vulnerabilidades solas, detectar phishing, endurecer infraestructura. Está en el brief del track.</p></div>
+    </div>
+    <div class="analogy">Mira los ~16 finalistas de las paradas anteriores: Ikarus (gateway MCP), ChatWall (anti-injection), Hackan't y Tranquera (proteger Claude Code), Aegis (DLP), Roxy (verificar acciones), Provenance Firewall (memoria). <b>Todos son del primer carril. Todos son guardrails.</b> La defensa n-day es del segundo carril, y ahí <b>no hay competencia previa</b>: te diferencias por categoría, no por detalle.</div>
+    <p class="note">Consecuencia: Raíz está en el carril lleno y tiene un primo cercano ya premiado (el Provenance Firewall). La defensa n-day está sola en su carril, con bendición explícita del brief.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Lado a lado</span>
+    <h2>Comparación</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Criterio</th><th>Raíz</th><th>Agentes pícaros</th><th>Defensa n-day</th></tr></thead>
+      <tbody>
+        <tr><th>Originalidad · 15%</th><td class="c"><span class="chip hi">Alta</span></td><td class="c"><span class="chip mid">Media</span></td><td class="c"><span class="chip mid">Media-baja</span></td></tr>
+        <tr><th>Ambición · 20%</th><td class="c"><span class="chip hi">Alta</span></td><td class="c"><span class="chip hi">Alta</span></td><td class="c"><span class="chip hi">Media-alta</span></td></tr>
+        <tr><th>Ejecución 36 h · 20%</th><td class="c"><span class="chip mid">Media</span></td><td class="c"><span class="chip lo">Media-baja</span></td><td class="c"><span class="chip mid">Media</span></td></tr>
+        <tr><th>Impacto · 20%</th><td class="c"><span class="chip hi">Medio-alto</span></td><td class="c"><span class="chip hi">Alto</span></td><td class="c"><span class="chip hi">Alto</span></td></tr>
+        <tr><th>Técnico · 25%</th><td class="c"><span class="chip hi">Alto</span></td><td class="c"><span class="chip hi">Alto</span></td><td class="c"><span class="chip hi">Alto</span></td></tr>
+        <tr><th>Encaje con el track</th><td class="c"><span class="chip hi">Alto</span></td><td class="c"><span class="chip hi">Alto</span></td><td class="c"><span class="chip hi">Alto</span></td></tr>
+        <tr><th>Carril en finalistas previos</th><td class="c"><span class="chip lo">Saturado</span></td><td class="c"><span class="chip mid">Medio</span></td><td class="c"><span class="chip hi">Vacío</span></td></tr>
+        <tr><th>Fácil de entender</th><td class="c"><span class="chip mid">Media</span></td><td class="c"><span class="chip hi">Alta</span></td><td class="c"><span class="chip hi">Alta</span></td></tr>
+        <tr><th>Riesgo en la demo</th><td class="c"><span class="chip mid">Medio</span></td><td class="c"><span class="chip lo">Alto</span></td><td class="c"><span class="chip mid">Medio</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">La duda de siempre</span>
+    <h2>Qué significa "original"</h2>
+    <p>"Original" significa dos cosas distintas, y es fácil mezclarlas:</p>
+    <div class="two">
+      <div class="mean"><h3>Invención</h3><p>Nadie en el mundo lo había pensado. Es nivel paper de investigación. Casi nadie lo logra en una hackathon, y no es lo que piden.</p></div>
+      <div class="mean"><h3>Combinación</h3><p>Las piezas ya existen, pero nadie las había juntado así o para este caso. Esto es lo que gana el 99% de las hackathons.</p></div>
+    </div>
+    <div class="analogy">El antibiótico ya existe: ese es el auto-patcher. Lo que no existe es <b>el protocolo del hospital</b> que confirma la infección con un análisis antes de recetar y aísla al paciente mientras tanto. El antibiótico es una <b>capacidad</b>; el protocolo es un <b>sistema</b>. Nadie premia por reinventar el antibiótico. La diferencia entre nuestras ideas y "lo que ya existe" está casi siempre en el sistema, no en la capacidad.</div>
+    <p class="note">Por eso un auto-patcher responde "¿puedo generar el parche?", y la defensa n-day responde "¿puedo confiar en aplicarlo solo, a tiempo?". Esa segunda pregunta es la que hoy nadie resuelve bien.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Para decidir juntos</span>
+    <h2>Asistente de decisión</h2>
+    <p>Elijan una respuesta en cada fila. Abajo aparece la opción que mejor calza. No es un oráculo: es para ordenar la conversación.</p>
+    <div class="helper">
+      <div class="q" data-q="prio">
+        <p>1 · ¿Qué priorizamos?</p>
+        <div class="opts">
+          <button class="opt" data-v="orig">Destacar por lo original</button>
+          <button class="opt" data-v="demo">Una demo clara y de impacto</button>
+          <button class="opt" data-v="safe">Terminar seguro, sin sustos</button>
+        </div>
+      </div>
+      <div class="q" data-q="team">
+        <p>2 · ¿Dónde es más fuerte el equipo?</p>
+        <div class="opts">
+          <button class="opt" data-v="agents">Agentes y LLMs</button>
+          <button class="opt" data-v="orchestration">Sistemas y orquestación</button>
+          <button class="opt" data-v="security">Seguridad y código</button>
+        </div>
+      </div>
+      <div class="q" data-q="risk">
+        <p>3 · ¿Cuánto riesgo aguantamos?</p>
+        <div class="opts">
+          <button class="opt" data-v="high">Vamos con todo</button>
+          <button class="opt" data-v="low">Mejor a lo seguro</button>
+        </div>
+      </div>
+      <div class="result" id="result">
+        <span class="head">Recomendación</span>
+        <span class="pick" id="pick">Responde las tres filas</span>
+        <span class="why" id="why">La recomendación se ajusta a medida que eligen.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Mi lectura</span>
+    <h2>Si tuviera que elegir hoy</h2>
+    <p>Con el dato del carril sobre la mesa, mi recomendación se inclina a <b>defensa n-day</b>: compite sola en su categoría, el jurado la entiende al instante y la bendice el propio brief. Las otras dos siguen siendo válidas, pero con condiciones:</p>
+    <div class="two">
+      <div class="mean"><h3>Defensa n-day — la apuesta</h3><p>Único proyecto en el carril def/acc. Pierde algo de originalidad de invención, pero la gana por categoría. Enmárquenla como IA contra IA para que se lea claramente como AI Security.</p></div>
+      <div class="mean"><h3>Raíz — solo si giran el pitch</h3><p>Está en el carril lleno y tiene un primo premiado. Vale la pena solo si el pitch gira 100% sobre atribución y linaje, no sobre la procedencia.</p></div>
+    </div>
+    <p class="note"><b>Agentes pícaros</b> tiene la demo más espectacular y vive en un rincón menos saturado de la seguridad DE la IA, pero solo si tienen a alguien muy sólido en orquestación multiagente. Si no, se cae en vivo.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Material</span>
+    <h2>Lo que ya existe de Raíz</h2>
+    <div class="links">
+      <a href="https://claude.ai/artifact/6R3dyLs5rFYiitfMBBZB7a" target="_blank" rel="noopener"><span><b>Demo animada de Raíz</b><small>Reproductor de 3 minutos con el escenario del agente de programación</small></span><span class="arw">abrir →</span></a>
+      <a href="https://claude.ai/artifact/Uzw3yNgsnCb4HqKaeHZ73h" target="_blank" rel="noopener"><span><b>Presentación de Raíz</b><small>15 slides. Es privada: pídanle al dueño que la comparta</small></span><span class="arw">abrir →</span></a>
+    </div>
+    <p class="note">Las demos y slides de las otras dos ideas no están hechas todavía. Si eligen una, las armamos.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  var state={prio:null,team:null,risk:null};
+  var OPT={
+    raiz:{name:"Raíz · memoria y linaje"},
+    pica:{name:"Agentes pícaros · contención"},
+    nday:{name:"Defensa autónoma n-day"}
+  };
+  function recommend(){
+    if(!state.prio||!state.team||!state.risk) return null;
+    var s={raiz:0,pica:0,nday:1}; // n-day parte con ventaja: carril def/acc sin competencia previa
+    // prioridad
+    if(state.prio==="orig"){s.raiz+=3;s.pica+=1;}
+    if(state.prio==="demo"){s.pica+=2;s.nday+=3;}
+    if(state.prio==="safe"){s.nday+=3;s.raiz+=1;}
+    // fuerza del equipo
+    if(state.team==="agents"){s.raiz+=3;s.pica+=2;}
+    if(state.team==="orchestration"){s.pica+=3;s.nday+=1;}
+    if(state.team==="security"){s.nday+=3;s.raiz+=1;}
+    // riesgo
+    if(state.risk==="high"){s.pica+=2;s.raiz+=1;}
+    if(state.risk==="low"){s.nday+=2;s.pica-=2;}
+    var best=null,bv=-99;
+    for(var k in s){if(s[k]>bv){bv=s[k];best=k;}}
+    // razón
+    var why="";
+    if(best==="raiz") why="Encaja con un equipo fuerte en agentes que quiere destacar por originalidad. Blinden la demo y ensayen la explicación corta.";
+    if(best==="pica") why="La demo más vistosa, para un equipo fuerte en orquestación y con tolerancia al riesgo. Cuidado: multiagente en vivo es frágil.";
+    if(best==="nday") why="La apuesta más segura y clara de explicar, ideal si priorizan terminar bien o el equipo es fuerte en seguridad.";
+    // empate cercano
+    var vals=Object.keys(s).map(function(k){return s[k];}).sort(function(a,b){return b-a;});
+    var tie = vals[0]-vals[1] <= 1;
+    return {best:best,why:why,tie:tie};
+  }
+  function paint(){
+    var r=recommend();
+    var pick=document.getElementById("pick"), why=document.getElementById("why");
+    if(!r){pick.textContent="Responde las tres filas";why.textContent="La recomendación se ajusta a medida que eligen.";return;}
+    pick.textContent=OPT[r.best].name;
+    why.textContent=(r.tie?"Está muy parejo con otra opción, así que decidan por lo que más disfruten construir. ":"")+r.why;
+  }
+  document.querySelectorAll(".q").forEach(function(q){
+    var key=q.getAttribute("data-q");
+    q.querySelectorAll(".opt").forEach(function(btn){
+      btn.setAttribute("aria-pressed","false");
+      btn.addEventListener("click",function(){
+        state[key]=btn.getAttribute("data-v");
+        q.querySelectorAll(".opt").forEach(function(b){b.setAttribute("aria-pressed", b===btn?"true":"false");});
+        paint();
+      });
+    });
+  });
+  paint();
+})();
+</script>

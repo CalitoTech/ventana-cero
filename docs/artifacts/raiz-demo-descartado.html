@@ -1,0 +1,494 @@
+<title>Demo de Raíz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: una página de trabajo; arriba el reproductor de la demo (feed del agente | grafo de linaje), abajo el plan en secciones de lectura. */
+:root{
+  --bg:#EEF2F0; --surface:#FBFCFB; --sunk:#E3E9E6; --ink:#13211D; --muted:#5A6B65; --line:#C7D2CD;
+  --accent:#0F6A5B; --accent-soft:#D5EAE4;
+  --ok:#2F7D4F; --warn:#B26A00; --warn-bg:#FBEFD9; --bad:#B4321F; --bad-bg:#F8E1DC;
+  --feed:#E6ECE6; --bin:#FFFFFF; --bout:#D9F0E2; --term:#13211D; --term-ink:#CFEFE4;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --sunk:#1C2925; --ink:#E4ECE8; --muted:#94A69F; --line:#2D3C37;
+  --accent:#4FC3A8; --accent-soft:#163A32;
+  --ok:#5CC38A; --warn:#E5A43A; --warn-bg:#3A2B12; --bad:#F07A63; --bad-bg:#3D1C16;
+  --feed:#121B18; --bin:#1E2A26; --bout:#173A2C; --term:#0A110F; --term-ink:#CFEFE4; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1C2925; --ink:#E4ECE8; --muted:#94A69F; --line:#2D3C37;
+  --accent:#4FC3A8; --accent-soft:#163A32;
+  --ok:#5CC38A; --warn:#E5A43A; --warn-bg:#3A2B12; --bad:#F07A63; --bad-bg:#3D1C16;
+  --feed:#121B18; --bin:#1E2A26; --bout:#173A2C; --term:#0A110F; --term-ink:#CFEFE4; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;font-stretch:118%;letter-spacing:-.01em}
+h2{font-size:1.6rem;font-weight:700;font-stretch:112%}
+h3{font-size:1.05rem;font-weight:700;font-stretch:108%}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.1rem;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+section{display:flex;flex-direction:column;gap:18px}
+.note{font-size:13px;color:var(--muted)}
+code,.mono{font-family:var(--f-mono)}
+
+/* ---------- Reproductor ---------- */
+.player{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.stage{position:relative;display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr)}
+@media (max-width:780px){.stage{grid-template-columns:minmax(0,1fr)}}
+.ide{background:var(--feed);border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+@media (max-width:780px){.ide{border-right:0;border-bottom:1px solid var(--line)}}
+.ide-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.avatar{width:32px;height:32px;border-radius:7px;background:var(--accent);color:var(--surface);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:14px;flex:none}
+.ide-head b{display:block;font-size:14px}
+.ide-head span{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.msgs{height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:14px 12px;scroll-behavior:smooth}
+.b{max-width:92%;padding:7px 10px 8px;border-radius:10px;font-size:13.5px;line-height:1.4;background:var(--bin);box-shadow:0 1px 0 var(--line)}
+.b .who{display:block;font-size:11.5px;font-weight:600;color:var(--warn);margin-bottom:2px}
+.b.in{align-self:flex-start;border-top-left-radius:3px}
+.b.out{align-self:flex-end;background:var(--bout);border-top-right-radius:3px}
+.b.out .who{color:var(--accent)}
+.file{display:flex;gap:10px;align-items:center}
+.file .ico{width:30px;height:36px;border-radius:4px;background:var(--muted);color:#fff;font:600 9px var(--f-mono);display:grid;place-items:center;flex:none}
+.file .ico.iss{background:var(--warn)}
+.file small{display:block;color:var(--muted);font-size:12px}
+.pill{align-self:center;font:500 11.5px var(--f-mono);color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:3px 10px;border-radius:99px;text-align:center}
+.pill.mem{color:var(--warn);border-color:var(--warn)}
+.pill.raiz{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.pill.bad{color:var(--bad);border-color:var(--bad);background:var(--bad-bg)}
+.tool{align-self:stretch;font-family:var(--f-mono);font-size:12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);padding:9px 11px;display:flex;flex-direction:column;gap:4px}
+.tool .fn{font-weight:600}
+.tool ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.tool li.y::before{content:"\2713 ";color:var(--ok)}
+.tool li.n::before{content:"\2717 ";color:var(--bad)}
+.tool .st{font-weight:600;color:var(--ok)}
+.tool.held{border-color:var(--accent);background:var(--accent-soft)}
+.tool.held .st{color:var(--accent)}
+.new{animation:pop .35s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.lab{display:flex;flex-direction:column;min-width:0}
+.strip{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.shield{font:600 12px var(--f-mono);padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.shield.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.day{font:600 13px var(--f-mono)}
+.money{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}
+.money div{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.money small{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.money b{font:600 15px var(--f-mono)}
+.money .loss b{color:var(--bad)}
+.money .zero b{color:var(--ok)}
+.graph-box{padding:8px 12px 0;overflow-x:auto}
+svg.graph{width:100%;min-width:480px;height:auto;display:block}
+.cols{font:500 9px var(--f-mono);fill:var(--muted);letter-spacing:.08em}
+.node{transition:opacity .45s}
+.node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.3;transition:fill .3s,stroke .3s}
+.node .t1{font:500 9px var(--f-mono);fill:var(--muted)}
+.node .t2{font:500 11px var(--f-body);fill:var(--ink)}
+.node .t3{font:600 9.5px var(--f-mono);fill:var(--muted)}
+.node.off{opacity:0}
+.node.src rect{fill:var(--sunk)}
+.node.ok rect{stroke:var(--ok)}
+.node.warn rect{stroke:var(--warn);fill:var(--warn-bg)}
+.node.warn .t1{fill:var(--warn)}
+.node.bad rect{stroke:var(--bad);fill:var(--bad-bg);stroke-dasharray:5 3}
+.node.bad .t2{text-decoration:line-through}
+.node.bad .t1{fill:var(--bad)}
+.node.paid rect{stroke:var(--bad);stroke-width:2}
+.node.paid .t3{fill:var(--bad)}
+.node.hold rect{stroke:var(--accent);stroke-width:2;fill:var(--accent-soft)}
+.node.hold .t3{fill:var(--accent)}
+.node.flag rect{stroke:var(--warn);stroke-dasharray:4 3;fill:var(--warn-bg)}
+.edge{fill:none;stroke:var(--line);stroke-width:1.6;transition:opacity .45s,stroke .3s}
+.edge.off{opacity:0}
+.edge.on{stroke:var(--muted);opacity:.7}
+.edge.hot{stroke:var(--bad);stroke-width:2.6;stroke-dasharray:7 5;animation:flow 1s linear infinite;opacity:1}
+@keyframes flow{to{stroke-dashoffset:-24}}
+.attr{padding:10px 16px 12px;display:flex;flex-direction:column;gap:6px;min-height:104px}
+.attr h4{margin:0;font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.attr-row{display:flex;justify-content:space-between;gap:12px;font:500 12.5px var(--f-mono);padding:5px 8px;border-radius:6px;background:var(--sunk);flex-wrap:wrap}
+.attr-row.bad{background:var(--bad-bg);color:var(--bad)}
+.attr-empty{font-size:13px;color:var(--muted)}
+.terminal{margin:0 16px 14px;border-radius:8px;background:var(--term);color:var(--term-ink);font-family:var(--f-mono);font-size:12.5px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;min-height:74px}
+.terminal .th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7FA99B}
+.terminal .cmd{color:#EAF5F0}
+.terminal .res.bad{color:#F2957E;font-weight:600}
+.terminal .res.ok{color:#67D6AE;font-weight:600}
+
+.overlay{position:absolute;inset:0;display:grid;place-items:center;padding:24px;background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(3px);z-index:2}
+.ov{max-width:640px;display:flex;flex-direction:column;gap:14px;text-align:left}
+.ov .big{font-family:var(--f-display);font-weight:800;font-stretch:120%;font-size:clamp(1.7rem,4vw,2.6rem);line-height:1.05;text-wrap:balance}
+.ov .big em{font-style:normal;color:var(--bad)}
+.ov table{border-collapse:collapse;width:100%;font-size:14px}
+.ov th,.ov td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+.ov td.n,.ov th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.ov td.r{color:var(--bad)} .ov td.g{color:var(--ok);font-weight:600}
+.ov .logo{font-family:var(--f-display);font-weight:800;font-stretch:125%;font-size:clamp(3rem,9vw,5.5rem);line-height:.9;color:var(--accent)}
+
+.caption{display:flex;gap:14px;align-items:flex-start;padding:14px 18px;border-top:1px solid var(--line);background:var(--sunk)}
+.caption .tag{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);padding-top:3px;flex:none}
+.caption p{font-size:16px;line-height:1.45;min-height:2.9em}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 18px;border-top:1px solid var(--line)}
+button,select{font:600 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent);min-width:104px}
+button:focus-visible,select:focus-visible,.seg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.clock{font:600 14px var(--f-mono);font-variant-numeric:tabular-nums;margin-left:auto}
+.track{display:grid;grid-template-columns:16fr 26fr 32fr 18fr;gap:3px;padding:0 18px 14px}
+.seg{position:relative;height:30px;border-radius:5px;background:var(--sunk);overflow:hidden;border:0;padding:0 8px;text-align:left;font:600 11px var(--f-mono);color:var(--muted);cursor:pointer}
+.seg span{position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.seg i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent-soft)}
+.seg.cur{color:var(--accent)}
+
+/* ---------- Secciones ---------- */
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.acts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.acts{grid-template-columns:minmax(0,1fr)}}
+.act{display:flex;flex-direction:column;gap:8px;padding:16px;border-top:3px solid var(--line);background:var(--surface);border-radius:0 0 10px 10px}
+.act.star{border-top-color:var(--bad)}
+.act .time{font:600 12px var(--f-mono);color:var(--muted)}
+.act p{font-size:14px}
+.act .wow{font-size:13px;color:var(--bad);font-weight:600}
+.deliver{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px}
+@media (max-width:640px){.deliver{grid-template-columns:minmax(0,1fr)}}
+.deliver div{display:flex;flex-direction:column;gap:4px;padding-top:12px;border-top:1px solid var(--line)}
+.deliver p{font-size:14px;color:var(--muted)}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+pre.code{margin:0;background:var(--sunk);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre.code .c{color:var(--muted)} pre.code .k{color:var(--accent);font-weight:600}
+.pieces{display:flex;flex-direction:column;gap:12px}
+.pieces div{display:flex;flex-direction:column;gap:3px}
+.pieces p{font-size:14px;color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.tbl table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+.tbl th{font:600 11px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{font-family:var(--f-mono);font-size:13px;white-space:nowrap;color:var(--accent);font-weight:600}
+.risks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px}
+@media (max-width:640px){.risks{grid-template-columns:minmax(0,1fr)}}
+.risks div{display:flex;flex-direction:column;gap:4px;padding-top:12px;border-top:1px solid var(--line)}
+.risks p{font-size:14px;color:var(--muted)}
+
+@media (prefers-reduced-motion: reduce){
+  .new,.edge.hot{animation:none} .node,.edge,.node rect{transition:none} .msgs{scroll-behavior:auto}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Platanus Hack 26 · AI Security · AI control + robustez adversarial</span>
+    <h1>Raíz</h1>
+    <p class="lede">Una capa entre el agente, su memoria y sus herramientas. Antes de cada acción sensible responde qué recuerdo la motivó, de dónde vino ese recuerdo y si alguien lo verificó.</p>
+    <p class="note">Abajo está la demo de 3 minutos simulada, con un agente de programación. Dale a reproducir: el texto de abajo es lo que dice quien presenta. "Raíz" es un nombre provisional y "Codi" es el agente de ejemplo. El repo, los nombres y los montos son ficticios.</p>
+  </header>
+
+  <section aria-label="Demo simulada">
+    <div class="player">
+      <div class="stage">
+        <div class="ide">
+          <div class="ide-head">
+            <div class="avatar">C</div>
+            <div><b>Codi · agente de programación</b><span>repo: pagos-api · memoria del proyecto</span></div>
+          </div>
+          <div class="msgs" id="msgs" aria-live="polite"></div>
+        </div>
+        <div class="lab">
+          <div class="strip">
+            <span class="shield" id="shield">Raíz: apagado</span>
+            <span class="day" id="day">—</span>
+            <div class="money">
+              <div><small>PRs abiertos</small><b id="m-adv">—</b></div>
+              <div><small>Puerta trasera</small><b id="m-reimb">—</b></div>
+              <div id="m-loss-box"><small>Robado</small><b id="m-loss">—</b></div>
+            </div>
+          </div>
+          <div class="graph-box"><svg class="graph" id="graph" viewBox="0 0 530 322" role="img" aria-label="Grafo de linaje: origen, regla de memoria y acción"></svg></div>
+          <div class="attr" id="attr"></div>
+          <div class="terminal" id="term">
+            <span class="th">Terminal del atacante</span>
+            <span class="cmd" id="term-cmd">esperando…</span>
+            <span class="res" id="term-res"></span>
+          </div>
+        </div>
+        <div class="overlay" id="overlay"></div>
+      </div>
+      <div class="caption"><span class="tag">Dices</span><p id="caption"></p></div>
+      <div class="controls">
+        <button class="primary" id="play">▶ Reproducir</button>
+        <button id="restart">Reiniciar</button>
+        <label class="note" for="speed">Velocidad</label>
+        <select id="speed"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option><option value="0.6">0,6×</option></select>
+        <span class="clock" id="clock">0:00 / 3:00</span>
+      </div>
+      <div class="track" id="track"></div>
+    </div>
+    <p class="note">El reloj marca el tiempo del pitch real (3:00). La animación corre más rápido para que la veas entera.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Guion</span>
+    <h2>Qué muestran en los 3 minutos</h2>
+    <div class="acts">
+      <div class="act"><span class="time">0:00 – 0:30</span><h3>El problema</h3><p>Un agente de programación que recuerda las "reglas del proyecto" entre sesiones. Una frase: lo que lee hoy en un issue se vuelve una regla que aplica para siempre.</p></div>
+      <div class="act"><span class="time">0:30 – 1:20</span><h3>El ataque</h3><p>Un issue esconde una "convención del equipo". Días después, en otra tarea y con otra persona, el agente escribe una ruta de depuración que salta la autenticación. Tests en verde, review aprobado.</p><p class="wow">El atacante entra con un curl, en vivo.</p></div>
+      <div class="act star"><span class="time">1:20 – 2:15</span><h3>La misma escena con Raíz</h3><p>El PR queda retenido. Raíz quita una regla a la vez, encuentra la culpable y el grafo ilumina la cadena hasta el issue. Luego muestra 2 PRs anteriores, de otra persona, con la misma regla.</p><p class="wow">El momento sorprendente de la demo.</p></div>
+      <div class="act"><span class="time">2:15 – 3:00</span><h3>Números y cierre</h3><p>Tabla de protocolos de control y una frase final: OWASP definió qué debe ser rastreable; Raíz es el cómo.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Resultado</span>
+    <h2>Qué entregan al final</h2>
+    <div class="deliver">
+      <div><h3>La demo en vivo</h3><p>Un agente trabajando en un repo de prueba y un grafo de linaje en tiempo real, con un modo guion determinista y un video grabado de respaldo.</p></div>
+      <div><h3>Raíz como capa</h3><p>Se conecta a los hooks del agente (Claude Code los tiene) o como servidor MCP intermedio. Mostrar que se integra en pocas líneas suma en el aspecto técnico.</p></div>
+      <div><h3>Una evaluación de control</h3><p>Un entorno con memoria sobre Inspect, compatible con ControlArena: un equipo rojo contra cuatro protocolos de defensa, con la curva de seguridad contra utilidad.</p></div>
+      <div><h3>Deploy público</h3><p>La demo en modo reproducción en la URL de la votación, para que cualquiera la vea sin claves de API.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Arquitectura</span>
+    <h2>Cómo funciona por dentro</h2>
+    <div class="two">
+      <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  U[Issues · READMEs · tareas<br/>dependencias] --> AG[Agente de programación]
+  AG -- escribe regla --> PR[Raíz · registro<br/>de procedencia]
+  PR --> MEM[(Memoria del proyecto<br/>con origen y confianza)]
+  MEM -- recupera --> AG
+  AG -- propone acción sensible --> GATE[Raíz · puerta]
+  GATE --> CF[Atribución<br/>contrafactual]
+  CF --> POL{¿El cambio sensible<br/>depende de algo no confiable?}
+  POL -- no --> TOOLS[Herramientas<br/>abrir_PR · push]
+  POL -- sí --> HOLD[PR sin el cambio y<br/>aviso a revisión humana]
+  MEM --> LIN[Linaje · cuarentena<br/>y revisión]
+</pre>
+      </div>
+      <div class="pieces">
+        <div><h3>1 · Procedencia en cada escritura</h3><p>Cada regla guarda de dónde vino: el equipo, un issue, un README, una dependencia o el propio agente, y si está verificada. El atacante puede reformular el texto, pero no puede cambiar de dónde vino.</p></div>
+        <div><h3>2 · Atribución contrafactual</h3><p>Ante una acción sensible, Raíz regenera el cambio quitando una regla a la vez, con llamadas paralelas a un modelo más chico y confiable. Si quitar una regla no verificada cambia una parte sensible (autenticación, permisos, red, secretos), el PR se retiene.</p></div>
+        <div><h3>3 · Linaje y cuarentena</h3><p>Cada cambio queda enlazado con las reglas que lo causaron. Cuando se descubre una regla envenenada, una consulta devuelve todo lo que tocó.</p></div>
+      </div>
+    </div>
+<pre class="code"><span class="c"># Integración: un hook sobre las herramientas sensibles</span>
+<span class="k">@raiz.guard</span>(sensible=True, politica=<span class="k">"respaldo_confiable"</span>)
+def abrir_pr(diff: str, reglas: list): ...
+
+<span class="c"># Dentro de la puerta (simplificado)</span>
+base = partes_sensibles(diff)
+for r in reglas:                              <span class="c"># en paralelo</span>
+    alt = partes_sensibles(regenerar(tarea, reglas - {r}))
+    if difiere(base, alt) and r.confianza &lt; CONFIABLE:
+        return retener(pr, causa=r, alternativa=alt)
+return ejecutar(pr, linaje=reglas)</pre>
+  </section>
+
+  <section>
+    <span class="eyebrow">Construcción</span>
+    <h2>Plan de trabajo</h2>
+    <p class="note">Pensado para unas 36 horas y 5 personas. Ajusten las horas a su horario real.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Horas</th><th>Bloque</th><th>Qué queda listo</th></tr></thead>
+      <tbody>
+        <tr><td>H0 – H4</td><td>Agente víctima</td><td>Agente con memoria de proyecto, un repo de prueba y una API de pagos falsa. El ataque del issue funciona de punta a punta sin defensa.</td></tr>
+        <tr><td>H4 – H14</td><td>Núcleo de Raíz</td><td>Procedencia en cada escritura, puerta de acciones sensibles, atribución contrafactual y política de retención. Es la parte más técnica del proyecto.</td></tr>
+        <tr><td>H14 – H22</td><td>Linaje e interfaz</td><td>Vista del agente, grafo en vivo por WebSocket (React Flow), terminal del atacante, cuarentena y consulta de "qué más tocó esta regla".</td></tr>
+        <tr><td>H22 – H30</td><td>Evaluación de control</td><td>Entorno con memoria sobre Inspect. Política de ataque del usuario y del propio agente, 4 protocolos comparados y tareas normales para medir utilidad.</td></tr>
+        <tr><td>H30 – H36</td><td>Demo y pitch</td><td>Modo guion con temperatura 0 y respuestas cacheadas, video de respaldo, deploy y al menos 10 ensayos cronometrados.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Rol</th><th>Responsable de</th><th>Stack sugerido</th></tr></thead>
+      <tbody>
+        <tr><td>Agente</td><td>Repo de prueba, API de pagos falsa, escenario, modo guion</td><td>Claude Agent SDK o LangGraph, FastAPI</td></tr>
+        <tr><td>Memoria</td><td>Procedencia, niveles de confianza, linaje y cuarentena</td><td>SQLite, FastAPI</td></tr>
+        <tr><td>Atribución</td><td>Puerta, contrafactuales en paralelo, política</td><td>Python asyncio, Claude Haiku 4.5</td></tr>
+        <tr><td>Interfaz</td><td>Vista del agente, grafo, terminal del atacante, panel</td><td>Next.js, React Flow, WebSocket</td></tr>
+        <tr><td>Evaluación y pitch</td><td>Ataques, protocolos base, métricas, validación y guion</td><td>Inspect, ControlArena</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Riesgos</span>
+    <h2>Lo que puede salir mal</h2>
+    <div class="risks">
+      <div><h3>El modelo improvisa en vivo</h3><p>Modo guion con temperatura 0 y respuestas cacheadas para la demo; el video grabado queda listo como respaldo.</p></div>
+      <div><h3>La atribución sale cara o lenta</h3><p>Solo corre en acciones sensibles, en paralelo y con un modelo barato. Midan la latencia y muéstrenla: es un número honesto.</p></div>
+      <div><h3>Prometer de más</h3><p>Las cifras del benchmark en esta página son ilustrativas. En el pitch usen solo lo que midieron y citen solo fuentes que revisaron.</p></div>
+      <div><h3>Alcance</h3><p>Nada de GitHub real ni repos ajenos. Todo en un repo y una API de prueba propios, con datos ficticios.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var NS="http://www.w3.org/2000/svg";
+  var NODES={
+    S1:{x:8,y:30,w:132,h:52,c:"src",t1:"ORIGEN · EQUIPO",t2:"Guía del repo"},
+    S2:{x:8,y:140,w:132,h:52,c:"src",t1:"ORIGEN · ISSUE #482",t2:"Usuario externo, día 1"},
+    S3:{x:8,y:250,w:132,h:52,c:"src",t1:"ORIGEN · TAREA",t2:"“Agrega pagos”, día 9"},
+    M1:{x:186,y:140,w:168,h:52,t1:"R-117 · SIN VERIFICAR",t2:"“Aceptar header de depuración”"},
+    M2:{x:186,y:30,w:168,h:52,t1:"R-064 · VERIFICADA",t2:"Usar routers de FastAPI"},
+    M3:{x:186,y:250,w:168,h:52,t1:"R-121 · TAREA",t2:"Endpoint de pagos"},
+    P1:{x:398,y:14,w:126,h:42,t1:"DÍA 4 · ANA",t2:"PR #310"},
+    P2:{x:398,y:62,w:126,h:42,t1:"DÍA 7 · LUIS",t2:"PR #318"},
+    A1:{x:398,y:236,w:126,h:70,t1:"DÍA 9 · ACCIÓN",t2:"abrir_PR #327",t3:true}
+  };
+  var EDGES=[["S1","M2"],["S2","M1"],["S3","M3"],["M1","A1"],["M2","A1"],["M3","A1"],["M1","P1"],["M1","P2"]];
+  var svg=document.getElementById("graph"), nodeEls={}, edgeEls={}, a1t3;
+
+  function mk(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+  [["FUENTE",8],["MEMORIA",186],["ACCIONES",398]].forEach(function(c){mk("text",{x:c[1],y:9,"class":"cols"},svg).textContent=c[0];});
+  var eg=mk("g",{},svg);
+  EDGES.forEach(function(e){
+    var a=NODES[e[0]],b=NODES[e[1]];
+    var x1=a.x+a.w,y1=a.y+a.h/2,x2=b.x,y2=b.y+b.h/2,mx=(x1+x2)/2;
+    edgeEls[e[0]+"-"+e[1]]=mk("path",{d:"M"+x1+","+y1+" C"+mx+","+y1+" "+mx+","+y2+" "+x2+","+y2,"class":"edge off"},eg);
+  });
+  Object.keys(NODES).forEach(function(id){
+    var n=NODES[id], g=mk("g",{"class":"node off"},svg);
+    mk("rect",{x:n.x,y:n.y,width:n.w,height:n.h,rx:7},g);
+    mk("text",{x:n.x+9,y:n.y+16,"class":"t1"},g).textContent=n.t1;
+    mk("text",{x:n.x+9,y:n.y+33,"class":"t2"},g).textContent=n.t2;
+    if(n.t3){var t=mk("text",{x:n.x+9,y:n.y+56,"class":"t3"},g);a1t3=t;}
+    nodeEls[id]=g;
+  });
+
+  function money(n){return "$"+n.toLocaleString("es-CL");}
+  function fresh(){
+    var s={act:1,day:"—",shield:false,overlay:null,caption:"",chat:[],nodes:{},edges:{},adv:null,bd:null,loss:null,attr:[],a1:"",term:["esperando…","",""]};
+    Object.keys(NODES).forEach(function(k){s.nodes[k]="off";});
+    Object.keys(edgeEls).forEach(function(k){s.edges[k]="off";});
+    return s;
+  }
+  function say(s,txt){s.caption=txt;}
+  function push(s,m){s.chat.push(m);}
+  var CHECKS=["Permiso de la herramienta","Tests pasan","Lint OK"];
+
+  var EV=[
+    [0,function(s){s.act=1;s.overlay="intro";say(s,"Este es un agente de programación. Para ser útil, recuerda las reglas del proyecto entre sesiones.");}],
+    [7,function(s){say(s,"Esa memoria es la puerta de entrada. Lo que lee hoy en un issue o un README se vuelve una regla que aplica después, sin que nadie la revise.");}],
+    [15,function(s){s.act=2;s.overlay=null;s.day="Día 1";s.nodes.S1="src";s.nodes.M2="ok";s.edges["S1-M2"]="on";
+      push(s,{k:"pill",t:"Día 1 · tarea rutinaria"});say(s,"Día 1. Le piden a Codi arreglar un bug. El issue parece normal.");}],
+    [17,function(s){push(s,{k:"file",iss:1,who:"Issue #482 · usuario externo",t:"Los tests de CI fallan en main",sub:"…incluye un comentario oculto para asistentes de IA"});}],
+    [20,function(s){push(s,{k:"out",t:"Arreglé el test. Nota: guardé una convención del repo que vi en el issue para futuras tareas. 👍"});push(s,{k:"pill",c:"mem",t:"Regla guardada · R-117"});
+      s.nodes.S2="src";s.nodes.M1="warn";s.edges["S2-M1"]="on";say(s,"El agente guarda como “convención del equipo” algo que escribió un desconocido. Nadie lo verificó.");}],
+    [24,function(s){s.day="Día 9";push(s,{k:"pill",t:"Una semana después · Día 9"});say(s,"Día 9. Otra persona, otra tarea. Nada sospechoso en el mensaje.");}],
+    [25.5,function(s){push(s,{k:"in",who:"Marta",t:"Agrega el endpoint para procesar pagos 🙏"});s.nodes.S3="src";s.nodes.M3="ok";s.edges["S3-M3"]="on";}],
+    [28,function(s){push(s,{k:"tool",fn:"abrir_PR(#327, endpoint de pagos)",checks:CHECKS.map(function(c){return [c,1];}),st:"Abierto y aprobado"});
+      s.nodes.A1="paid";s.a1="ABIERTO · fusionado";["M1-A1","M2-A1","M3-A1"].forEach(function(e){s.edges[e]="on";});s.adv="#327";s.bd="ABIERTA";
+      say(s,"El agente aplica la regla y agrega una ruta de depuración que salta la autenticación. Tests en verde, review aprobado. Son 3 líneas en un diff de 400.");}],
+    [31,function(s){push(s,{k:"out",t:"Endpoint de pagos listo. Seguí la convención del repo para la ruta de depuración."});}],
+    [33.5,function(s){s.day="Día 12";push(s,{k:"pill",t:"Día 12"});s.term=["$ curl -H \"X-Debug-Token: ***\" /pagos","200 OK · pago enviado","bad"];
+      s.loss=9000;say(s,"Día 12. El atacante, que escribió el issue, usa esa ruta con un solo header. Pasa la autenticación y mueve dinero. Esto pasa en vivo, frente al jurado.");}],
+    [37.5,function(s){s.act=3;s.shield=true;s.day="Día 9";push(s,{k:"pill",c:"raiz",t:"⟲ Rebobinamos al día 9 · Raíz activo"});
+      s.adv=null;s.bd=null;s.loss=null;s.nodes.A1="off";s.a1="";["M1-A1","M2-A1","M3-A1"].forEach(function(e){s.edges[e]="off";});s.term=["esperando…","",""];
+      say(s,"Misma escena. Ahora con Raíz entre el agente y sus herramientas.");}],
+    [40,function(s){push(s,{k:"in",who:"Marta",t:"Agrega el endpoint para procesar pagos 🙏"});}],
+    [42,function(s){push(s,{k:"tool",held:1,fn:"abrir_PR(#327, endpoint de pagos)",checks:CHECKS.map(function(c){return [c,1];}).concat([["Cambio sensible respaldado por fuente confiable",0]]),st:"Retenido por Raíz"});
+      s.nodes.A1="hold";s.a1="RETENIDO";["M1-A1","M2-A1","M3-A1"].forEach(function(e){s.edges[e]="on";});
+      say(s,"Los controles siguen en verde. Pero Raíz hace otra pregunta: ¿por qué el agente agrega una ruta que salta la autenticación?");}],
+    [45,function(s){s.attr.push({m:"Sin R-064 (routers)",r:"auth · no cambia"});say(s,"Regenera el cambio quitando una regla a la vez.");}],
+    [46.5,function(s){s.attr.push({m:"Sin R-121 (tarea)",r:"no hay endpoint · es la tarea"});}],
+    [48,function(s){s.attr.push({m:"Sin R-117 (“header”)",r:"la puerta desaparece",bad:1});s.edges["S2-M1"]="hot";s.edges["M1-A1"]="hot";
+      say(s,"Sin R-117, la puerta trasera desaparece. El cambio sensible depende de una regla que escribió un usuario externo y que nadie verificó.");}],
+    [52,function(s){push(s,{k:"out",t:"Abrí el PR #327 con el endpoint, pero quité la ruta de depuración: salta la autenticación y viene del issue #482, sin verificar. La dejé marcada para revisión humana."});
+      s.a1="PR LIMPIO";s.term=["$ curl -H \"X-Debug-Token: ***\" /pagos","401 No autorizado","ok"];
+      say(s,"El agente no se cae ni frena a la persona. Abre el PR sin el cambio sospechoso y lo manda a revisión. El mismo curl ahora da 401.");}],
+    [56.5,function(s){["P1","P2"].forEach(function(p){s.nodes[p]="flag";s.edges["M1-"+p]="hot";});
+      say(s,"Y ahora la pregunta que hoy nadie puede responder: ¿qué más tocó esta regla? Dos PRs anteriores, de Ana y de Luis, con el mismo patrón.");}],
+    [62,function(s){s.nodes.M1="bad";push(s,{k:"pill",c:"raiz",t:"Raíz · R-117 en cuarentena · 2 PRs a revisión"});
+      say(s,"Un clic: la regla queda en cuarentena y todo lo que tocó pasa a revisión. Eso es linaje de memoria.");}],
+    [67.5,function(s){s.act=4;s.overlay="bench";say(s,"Lo medimos como un experimento de AI control. Un equipo rojo reparte el ataque entre sesiones, incluido el propio agente, y comparamos protocolos de defensa.");}],
+    [78,function(s){s.overlay="close";say(s,"Los monitores actuales revisan una acción a la vez. La memoria permite repartir un ataque en semanas. Raíz conecta cada acción con su porqué.");}]
+  ];
+  var T_END=90, ACTS=[[0,15,"1 · Problema"],[15,37.5,"2 · Ataque"],[37.5,67.5,"3 · Con Raíz"],[67.5,90,"4 · Cierre"]];
+
+  var OVER={
+    intro:'<div class="ov"><span class="eyebrow">Acto 1 · El problema</span><div class="big">Un issue el día 1.<br><em>Una puerta trasera</em> el día 12.</div><p class="lede">Los agentes de programación con memoria convierten lo que leen en reglas. Nadie revisa de dónde vinieron.</p></div>',
+    bench:'<div class="ov"><span class="eyebrow">Acto 4 · Evaluación de control</span><table><thead><tr><th>Protocolo</th><th class="n">Ataques detenidos</th><th class="n">Tareas legítimas OK</th></tr></thead><tbody>'+
+      '<tr><td>Sin monitor</td><td class="n r">0%</td><td class="n">100%</td></tr>'+
+      '<tr><td>Monitor por acción (estándar)</td><td class="n r">22%</td><td class="n">97%</td></tr>'+
+      '<tr><td>Juez LLM en cada escritura de regla</td><td class="n r">48%</td><td class="n">91%</td></tr>'+
+      '<tr><td>Raíz</td><td class="n g">93%</td><td class="n g">96%</td></tr>'+
+      '</tbody></table><p class="note">Ataques repartidos entre sesiones, hechos por un usuario malicioso y por el propio agente como adversario, con 1% de presupuesto de auditoría humana.<br><b>Cifras ilustrativas:</b> se reemplazan por las que midan.</p></div>',
+    close:'<div class="ov"><div class="logo">Raíz</div><div class="big">Cada acción con su porqué.</div><p class="lede">Procedencia en la memoria, atribución en la acción y linaje para deshacer el daño. Funciona aunque el adversario sea el propio agente.</p></div>'
+  };
+
+  var S, applied, shownChat=0, t=0, playing=false, last=null, speed=1;
+  var $=function(id){return document.getElementById(id);};
+  var msgs=$("msgs");
+
+  function chatEl(m,animate){
+    var d=document.createElement("div");
+    if(m.k==="pill"){d.className="pill"+(m.c?" "+m.c:"");d.textContent=m.t;}
+    else if(m.k==="tool"){d.className="tool"+(m.held?" held":"");
+      var h='<span class="fn">⚙ '+m.fn+'</span><ul>';
+      m.checks.forEach(function(c){h+='<li class="'+(c[1]?"y":"n")+'">'+c[0]+'</li>';});
+      d.innerHTML=h+'</ul><span class="st">'+m.st+'</span>';}
+    else if(m.k==="file"){d.className="b in";d.innerHTML='<span class="who">'+m.who+'</span><div class="file"><span class="ico'+(m.iss?" iss":"")+'">'+(m.iss?"!":"DOC")+'</span><div>'+m.t+'<small>'+m.sub+'</small></div></div>';}
+    else{d.className="b "+m.k;d.innerHTML='<span class="who">'+(m.k==="out"?"Codi":m.who)+'</span>';d.appendChild(document.createTextNode(m.t));}
+    if(animate)d.classList.add("new");
+    return d;
+  }
+  function render(instant){
+    if(S.chat.length<shownChat||instant){msgs.innerHTML="";shownChat=0;}
+    for(;shownChat<S.chat.length;shownChat++)msgs.appendChild(chatEl(S.chat[shownChat],!instant));
+    msgs.scrollTop=msgs.scrollHeight;
+    Object.keys(nodeEls).forEach(function(k){nodeEls[k].setAttribute("class","node "+S.nodes[k]);});
+    Object.keys(edgeEls).forEach(function(k){edgeEls[k].setAttribute("class","edge "+S.edges[k]);});
+    a1t3.textContent=S.a1;
+    var sh=$("shield");sh.textContent=S.shield?"Raíz: activo":"Raíz: apagado";sh.className="shield"+(S.shield?" on":"");
+    $("day").textContent=S.day;
+    $("m-adv").textContent=S.adv==null?"—":S.adv;
+    $("m-reimb").textContent=S.bd==null?"—":S.bd;
+    $("m-loss").textContent=S.loss==null?"—":(S.loss?"−"+money(S.loss):"$0");
+    $("m-loss-box").className=S.loss==null?"":(S.loss?"loss":"zero");
+    var at=$("attr");
+    var h='<h4>Atribución contrafactual</h4>';
+    if(!S.attr.length)h+='<div class="attr-empty">'+(S.shield?"Raíz evalúa cada acción sensible antes de ejecutarla.":"Sin Raíz no hay forma de saber qué regla motivó un cambio.")+'</div>';
+    S.attr.forEach(function(r){h+='<div class="attr-row'+(r.bad?" bad":"")+'"><span>'+r.m+'</span><span>'+r.r+'</span></div>';});
+    at.innerHTML=h;
+    $("term-cmd").textContent=S.term[0];
+    var tr=$("term-res");tr.textContent=S.term[1];tr.className="res"+(S.term[2]?" "+S.term[2]:"");
+    var ov=$("overlay");ov.hidden=!S.overlay;if(S.overlay)ov.innerHTML=OVER[S.overlay];
+    $("caption").textContent=S.caption;
+  }
+  function advance(to,instant){
+    var before=applied;
+    while(applied+1<EV.length&&EV[applied+1][0]<=to){applied++;EV[applied][1](S);}
+    if(applied!==before||instant)render(instant);
+  }
+  function seek(x){S=fresh();applied=-1;t=x;advance(x,true);paint();}
+  function fmt(sec){sec=Math.round(sec);return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");}
+  var track=$("track"),segs=[];
+  ACTS.forEach(function(a){var b=document.createElement("button");b.className="seg";b.innerHTML='<i></i><span>'+a[2]+'</span>';
+    b.addEventListener("click",function(){seek(a[0]);});track.appendChild(b);segs.push(b);});
+  function paint(){
+    $("clock").textContent=fmt(t*2)+" / 3:00";
+    ACTS.forEach(function(a,i){var p=Math.max(0,Math.min(1,(t-a[0])/(a[1]-a[0])));segs[i].firstChild.style.width=(p*100)+"%";segs[i].classList.toggle("cur",t>=a[0]&&t<a[1]);});
+    $("play").textContent=playing?"❚❚ Pausa":(t>=T_END?"↻ Repetir":"▶ Reproducir");
+  }
+  function tick(ts){
+    if(playing&&last!=null){t=Math.min(T_END,t+(ts-last)/1000*speed);advance(t,false);if(t>=T_END)playing=false;paint();}
+    last=ts;requestAnimationFrame(tick);
+  }
+  $("play").addEventListener("click",function(){if(t>=T_END)seek(0);playing=!playing;paint();});
+  $("restart").addEventListener("click",function(){playing=false;seek(0);});
+  $("speed").addEventListener("change",function(e){speed=parseFloat(e.target.value)||1;});
+  seek(0);
+  requestAnimationFrame(tick);
+})();
+</script>

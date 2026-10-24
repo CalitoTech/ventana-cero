@@ -1,0 +1,241 @@
+<title>Alcanzabilidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: brief técnico en una columna; qué es, la escalera de confianza, cómo se calcula (híbrido), ejemplo, honestidad y recorte. */
+:root{
+  --bg:#EEF1EF; --surface:#FBFCFB; --sunk:#E4E9E6; --ink:#141F1B; --muted:#5B6B65; --line:#CCD6D1;
+  --accent:#0F6A5B; --accent-soft:#D6EAE4; --accent-ink:#0A4A40;
+  --r0:#9AA7A1; --r1:#8FA58C; --r2:#B26A00; --r3:#1E7A5B; --r4:#2F7D4F;
+  --atk:#B4321F; --atk-bg:#F6E1DB; --mid:#B26A00;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --r0:#6B7A74; --r1:#7FA07B; --r2:#D7982F; --r3:#4FC3A8; --r4:#5CC38A;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --r0:#6B7A74; --r1:#7FA07B; --r2:#D7982F; --r3:#4FC3A8; --r4:#5CC38A;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:36px 72px;display:flex;flex-direction:column;gap:46px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.5vw,3.1rem);font-weight:800;letter-spacing:-.015em}
+h2{font-size:1.5rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:72ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.12rem;color:var(--muted);max-width:66ch}
+.badge{align-self:flex-start;font-family:var(--f-mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:99px}
+header{display:flex;flex-direction:column;gap:14px}
+section{display:flex;flex-direction:column;gap:18px}
+.note{font-size:13px;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--sunk);padding:1px 5px;border-radius:5px}
+b{font-weight:600}
+.one{font-family:var(--f-display);font-weight:700;font-size:1.25rem;line-height:1.3;background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:18px 22px}
+.one b{color:var(--accent-ink)}
+
+/* escalera */
+.ladder{display:flex;flex-direction:column;gap:8px}
+.rung{display:grid;grid-template-columns:30px 1fr auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left-width:5px;border-radius:10px;padding:14px 16px}
+.rung .lv{font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--muted)}
+.rung .b h3{font-size:.98rem}
+.rung .b p{font-size:13.5px;color:var(--muted);margin-top:2px}
+.rung .act{font-family:var(--f-mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap;text-align:center}
+@media (max-width:560px){.rung{grid-template-columns:30px 1fr}.rung .act{grid-column:2;justify-self:start;margin-top:4px}}
+.rung.n0{border-left-color:var(--r0)} .rung.n1{border-left-color:var(--r1)}
+.rung.n2{border-left-color:var(--r2)} .rung.n3{border-left-color:var(--r3)}
+.rung.n4{border-left-color:var(--r4);background:var(--accent-soft)}
+.act.ignore{color:var(--muted);background:var(--sunk)}
+.act.watch{color:var(--mid);background:var(--sunk)}
+.act.go{color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent)}
+
+/* diagrama */
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+
+/* dos columnas */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:660px){.two{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card h3{font-size:1rem}
+.card p{font-size:14px;color:var(--muted)}
+.card .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:660px){.split{grid-template-columns:1fr}}
+.col h3{font-size:.95rem;margin-bottom:8px}
+.col ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.col.llm{background:var(--accent-soft);border-radius:12px;padding:16px 18px}
+.col.det{background:var(--sunk);border-radius:12px;padding:16px 18px}
+
+/* codigo / ejemplo */
+pre.code{margin:0;background:var(--sunk);border-radius:10px;padding:16px 18px;overflow-x:auto;font:13px/1.6 var(--f-mono)}
+pre.code .c{color:var(--muted)} pre.code .s{color:var(--atk);font-weight:600} pre.code .k{color:var(--accent);font-weight:600}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-family:var(--f-mono);font-size:13px}
+.flow .b{padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.flow .b.src{border-color:var(--atk);color:var(--atk)}
+.flow .b.sink{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.flow .arw{color:var(--muted)}
+
+/* mvp */
+.mvp{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.mvp .row{display:grid;grid-template-columns:150px 1fr;gap:14px;font-size:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.mvp .row:last-child{border-bottom:0;padding-bottom:0}
+@media (max-width:520px){.mvp .row{grid-template-columns:1fr;gap:3px}}
+.mvp .row b{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+.warn{background:var(--atk-bg);border-left:4px solid var(--atk);border-radius:0 12px 12px 0;padding:18px 22px;display:flex;flex-direction:column;gap:8px}
+.warn h3{font-size:1rem;color:var(--atk)}
+.warn ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+
+.first{background:var(--accent-soft);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.first ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14.5px}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="badge">Ventana Cero · núcleo técnico</span>
+    <h1>Alcanzabilidad</h1>
+    <p class="lede">La pregunta que separa nuestro proyecto de un escáner: no "¿tengo la librería vulnerable?", sino "¿el código vulnerable es realmente alcanzable desde una entrada no confiable en mi app?".</p>
+    <p class="note">Este documento es para el equipo técnico. Define qué medimos, cómo lo medimos sin un doctorado en análisis estático, y qué construir primero.</p>
+  </header>
+
+  <section>
+    <span class="eyebrow">El concepto</span>
+    <div class="one">Un escáner te dice <b>"existe un CVE en un paquete que usas"</b>. Nosotros respondemos <b>"ese código se ejecuta con datos que controla un atacante, y lo probamos"</b>. Lo primero es ruido; lo segundo es accionable.</div>
+    <p>"Alcanzable" no es sí o no: es una escalera. Cada peldaño es más caro de calcular pero más confiable, y define qué hacemos con la alerta.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">El modelo</span>
+    <h2>La escalera de confianza</h2>
+    <div class="ladder">
+      <div class="rung n0"><span class="lv">0</span><div class="b"><h3>Dependencia presente</h3><p>Tienes el paquete y la versión afectada. Es lo que hace <code>npm audit</code>. Genera cientos de alertas.</p></div><span class="act ignore">Ruido</span></div>
+      <div class="rung n1"><span class="lv">1</span><div class="b"><h3>Símbolo referenciado</h3><p>Tu código menciona la función vulnerable en algún lado. Ya elimina las libs que tienes pero no usas de verdad.</p></div><span class="act watch">Vigilar</span></div>
+      <div class="rung n2"><span class="lv">2</span><div class="b"><h3>Alcanzable en el grafo</h3><p>Hay un camino de llamadas desde un punto de entrada de tu app hasta la función vulnerable.</p></div><span class="act watch">Preparar</span></div>
+      <div class="rung n3"><span class="lv">3</span><div class="b"><h3>Con taint (flujo de datos)</h3><p>Una entrada no confiable (parámetro HTTP, body, header) llega hasta el <b>parámetro peligroso</b> de esa función.</p></div><span class="act go">Mitigar</span></div>
+      <div class="rung n4"><span class="lv">4</span><div class="b"><h3>PoC confirmado</h3><p>Un PoC en el sandbox lo disparó de verdad. Certeza, no estimación.</p></div><span class="act go">Actuar solo</span></div>
+    </div>
+    <p class="note">La política del producto se cuelga de esta escalera: del peldaño 0 al 2, vigilar o preparar; del 3 en adelante, mitigar; en el 4, el sistema puede aplicar el parche virtual solo, porque hay prueba.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">El detalle que casi nadie resuelve</span>
+    <h2>Primero hay que saber qué función es la vulnerable</h2>
+    <p>Aquí está el problema escondido: <b>la mayoría de los avisos no dicen qué función es vulnerable.</b> Dicen "CVE en la librería X, versiones menores a 2.3". Sin saber el símbolo exacto, no puedes calcular alcanzabilidad.</p>
+    <p>La solución: los avisos casi siempre enlazan el <b>commit o PR que arregla el bug</b>. El diff de ese arreglo te dice qué función cambió y qué parámetro es el peligroso. De ahí sale el "símbolo vulnerable" y el "sink" que buscas en tu código.</p>
+    <div class="two">
+      <div class="card"><span class="k">Entrada</span><h3>Aviso + commit del fix</h3><p>OSV/GHSA te dan el enlace al arreglo. A veces el símbolo viene en los datos; cuando no, hay que derivarlo del diff.</p></div>
+      <div class="card"><span class="k">Salida</span><h3>Símbolo y parámetro peligroso</h3><p>Por ejemplo: la función <code>render()</code> de la lib, y que su primer argumento llega sin sanitizar al motor de plantillas.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Cómo lo calculamos</span>
+    <h2>Un híbrido, no un analizador perfecto</h2>
+    <p>Un motor general de grafo de llamadas por lenguaje es trabajo de meses, y en JS casi imposible por el dinamismo. No lo intentamos. Usamos tres pasos de costo creciente, y <b>la prueba dinámica es la que manda</b>.</p>
+    <div class="diagram">
+<pre class="mermaid">
+flowchart TB
+  A[Aviso + commit del fix] --> B[Derivar símbolo vulnerable<br/>y parámetro peligroso]
+  B --> C{¿El símbolo aparece<br/>en mi código?}
+  C -- no --> X[Peldaño 0-1 · despriorizar]
+  C -- sí --> D[Recortar: archivos que lo usan<br/>+ puntos de entrada/rutas]
+  D --> E[Razonar el camino de taint<br/>entrada no confiable → sink]
+  E --> F{¿Camino plausible?}
+  F -- no --> Y[Peldaño 2 · vigilar]
+  F -- sí --> G[Generar PoC]
+  G --> H[Ejecutar en sandbox aislado]
+  H -- dispara --> Z[Peldaño 4 · confirmado, actuar]
+  H -- no dispara --> Y
+</pre>
+    </div>
+    <div class="split">
+      <div class="col det">
+        <h3>Barato y determinista</h3>
+        <ul>
+          <li>Buscar el símbolo en el código (AST o grep estructural).</li>
+          <li>Recortar los archivos relevantes y los puntos de entrada.</li>
+          <li>Ejecutar el PoC y comparar: esto es la verdad.</li>
+        </ul>
+      </div>
+      <div class="col llm">
+        <h3>Donde entra el LLM</h3>
+        <ul>
+          <li>Derivar el símbolo y el parámetro desde el diff del fix.</li>
+          <li>Razonar si una entrada no confiable puede llegar al sink.</li>
+          <li>Proponer el PoC que lo confirma.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Regla de oro: el LLM <b>propone</b> (qué buscar, qué camino, qué PoC); el análisis estático recorta y el sandbox <b>confirma</b>. Nunca declaramos "alcanzable" por la opinión del modelo: lo declara el PoC que se dispara.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Ejemplo</span>
+    <h2>Un caso concreto, paso a paso</h2>
+    <p>Supongamos un aviso de ejecución remota en una librería de plantillas, en su función <code>render()</code>. Tu app tiene esto:</p>
+<pre class="code"><span class="c"># ruta de tu app</span>
+@app.get(<span class="s">"/preview"</span>)
+def preview(request):
+    plantilla = request.args[<span class="s">"tpl"</span>]      <span class="c"># ← fuente: entrada no confiable</span>
+    return lib.render(plantilla)         <span class="c"># ← sink: símbolo vulnerable</span></pre>
+    <div class="flow">
+      <span class="b src">request.args["tpl"]</span>
+      <span class="arw">──▶</span>
+      <span class="b">plantilla</span>
+      <span class="arw">──▶</span>
+      <span class="b sink">lib.render( · )</span>
+    </div>
+    <p>El dato del atacante viaja sin filtro desde la URL hasta el parámetro peligroso. Eso es peldaño 3. Luego el sistema genera un PoC que demuestra que entra código controlado al motor de plantillas y lo corre en el sandbox: si se dispara, peldaño 4, y se aplica el parche virtual (por ejemplo, una regla que bloquea esa ruta con ese patrón) mientras se prepara el PR.</p>
+    <p class="note">En la demo mostramos justo esto: la cadena iluminándose de la fuente al sink, el PoC confirmando y el parche virtual cerrando la ruta. El PoC es conceptual y corre solo contra el código propio en el sandbox.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Honestidad</span>
+    <h2>Lo que esto NO garantiza</h2>
+    <div class="warn">
+      <h3>"No alcanzable" significa despriorizar, no "seguro".</h3>
+      <ul>
+        <li>El análisis estático pierde caminos por reflexión, <code>eval</code>, inyección de dependencias o dispatch dinámico (sobre todo en JS). Puede haber falsos negativos.</li>
+        <li>Un PoC que no se disparó puede ser que no encontramos el gatillo, no que sea inexplotable.</li>
+        <li>Esto es priorización y prueba, no una garantía de solidez matemática. Dilo claro en el pitch: es honesto y evita que un juez te desarme.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Para la hackathon</span>
+    <h2>El recorte de alcanzabilidad</h2>
+    <div class="mvp">
+      <div class="row"><b>Ecosistema</b><span>Recomiendo <b>Python</b> (Flask/FastAPI): rutas claras, taint fácil de mostrar y buenas herramientas. PHP, el ejemplo original, tiene tooling más pobre; React/JS es el más difícil para el grafo, así que ahí habría que apoyarse casi todo en el PoC dinámico.</span></div>
+      <div class="row"><b>Clase de vuln</b><span>Una con fuente→sink clara: inyección (comandos, SSTI, deserialización, SSRF, path traversal). Evita ReDoS o bugs de memoria, que necesitan análisis más profundo.</span></div>
+      <div class="row"><b>Qué construir</b><span>Derivar símbolo del diff (LLM) → buscarlo en el código (AST) → recortar rutas → razonar taint (LLM) → PoC en sandbox. El sandbox y la verificación, deterministas.</span></div>
+      <div class="row"><b>Qué simular</b><span>Repo sembrado con la vuln, aviso enlatado con su commit de fix, 2-3 rutas. Todo reproducible para la demo.</span></div>
+      <div class="row"><b>Métrica</b><span>Sobre N casos sembrados (unos alcanzables, otros no): precisión y recall de la escalera, y cuántos confirma el PoC. Ese número es el aspecto técnico.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Arranque</span>
+    <h2>El primer entregable de esta pieza</h2>
+    <div class="first">
+      <p>Antes del grafo y el taint, lo más chico que prueba el concepto:</p>
+      <ol>
+        <li>Toma un aviso real con su commit de fix. Pásale el diff a un LLM y haz que extraiga el <b>símbolo vulnerable</b> y el <b>parámetro peligroso</b>.</li>
+        <li>En un repo sembrado, busca ese símbolo con un AST (o grep estructural). Si no aparece: peldaño 0-1, listo.</li>
+        <li>Si aparece, dale al LLM ese archivo más las rutas de entrada y pídele el <b>camino de taint</b> y un <b>PoC</b>.</li>
+        <li>Corre el PoC en un contenedor aislado sin red. Si se dispara: peldaño 4.</li>
+      </ol>
+      <p class="note">Con eso tienes la escalera funcionando de punta a punta sobre un caso, que es lo que hay que demostrar. Después lo endureces y agregas casos.</p>
+    </div>
+  </section>
+</div>

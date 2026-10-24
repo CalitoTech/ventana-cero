@@ -1,0 +1,212 @@
+<title>Roadmap Ventana Cero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: hoja de ruta en una columna; decisiones de arranque, esqueleto que camina, contrato de datos, fases, reparto, ruta crítica y cortes. */
+:root{
+  --bg:#EEF1EF; --surface:#FBFCFB; --sunk:#E4E9E6; --ink:#141F1B; --muted:#5B6B65; --line:#CCD6D1;
+  --accent:#0F6A5B; --accent-soft:#D6EAE4; --accent-ink:#0A4A40;
+  --atk:#B4321F; --atk-bg:#F6E1DB; --mid:#B26A00; --mid-bg:#F7EBD6;
+  --p0:#0F6A5B; --p1:#1E7A5B; --p2:#2F8F6E; --p3:#3E9E72; --p4:#5AA875;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --mid-bg:#352711;
+  --p0:#4FC3A8; --p1:#54B795; --p2:#5CAE86; --p3:#63A878; --p4:#6FA376; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --sunk:#1D2A26; --ink:#E5ECE8; --muted:#95A69F; --line:#2C3B36;
+  --accent:#4FC3A8; --accent-soft:#163A32; --accent-ink:#9FE6D5;
+  --atk:#F0795F; --atk-bg:#3A1C15; --mid:#E0A23C; --mid-bg:#352711;
+  --p0:#4FC3A8; --p1:#54B795; --p2:#5CAE86; --p3:#63A878; --p4:#6FA376; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:36px 72px;display:flex;flex-direction:column;gap:46px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2rem,5.5vw,3rem);font-weight:800;letter-spacing:-.015em}
+h2{font-size:1.5rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:72ch}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.12rem;color:var(--muted);max-width:66ch}
+.badge{align-self:flex-start;font-family:var(--f-mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:99px}
+header{display:flex;flex-direction:column;gap:14px}
+section{display:flex;flex-direction:column;gap:18px}
+.note{font-size:13px;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--sunk);padding:1px 5px;border-radius:5px}
+b{font-weight:600}
+.one{font-family:var(--f-display);font-weight:700;font-size:1.25rem;line-height:1.3;background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:18px 22px}
+.one b{color:var(--accent-ink)}
+
+/* checklist decisiones */
+.decide{display:flex;flex-direction:column;gap:10px}
+.drow{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+@media (max-width:560px){.drow{grid-template-columns:1fr;gap:3px}}
+.drow .q{font-weight:600;font-size:14.5px}
+.drow .a{font-size:14px;color:var(--muted)}
+.drow .a b{color:var(--accent-ink)}
+
+/* contrato */
+pre.code{margin:0;background:var(--sunk);border-radius:10px;padding:16px 18px;overflow-x:auto;font:12.5px/1.65 var(--f-mono)}
+pre.code .c{color:var(--muted)} pre.code .k{color:var(--accent);font-weight:600}
+
+/* fases timeline */
+.phases{display:flex;flex-direction:column;gap:0}
+.phase{display:grid;grid-template-columns:96px 1fr;gap:18px;padding:0 0 22px 0;position:relative}
+.phase::before{content:"";position:absolute;left:47px;top:8px;bottom:-4px;width:2px;background:var(--line)}
+.phase:last-child::before{display:none}
+.phase .when{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.phase .hr{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--muted)}
+.phase .dot{width:16px;height:16px;border-radius:50%;background:var(--accent);margin-left:32px;position:relative;z-index:1;border:3px solid var(--bg)}
+.phase .b{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:7px}
+.phase .b h3{font-size:1.02rem}
+.phase .b ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--muted)}
+.phase.key .b{border-color:var(--accent);background:var(--accent-soft)}
+.phase.key .b h3{color:var(--accent-ink)}
+@media (max-width:560px){.phase{grid-template-columns:60px 1fr;gap:12px}.phase::before{left:29px}.phase .dot{margin-left:14px}}
+
+/* roles */
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:660px){.roles{grid-template-columns:1fr}}
+.role{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.role .tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.role h3{font-size:1rem}
+.role p{font-size:13.5px;color:var(--muted)}
+.role .stack{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:2px}
+
+/* critica */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:660px){.two{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.card.hot{border-color:var(--atk)}
+.card .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.card.hot .k{color:var(--atk)}
+.card p{font-size:14px;color:var(--muted)}
+
+/* cortes */
+.cuts{display:flex;flex-direction:column;gap:10px}
+.cut{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 16px;font-size:14px}
+.cut .n{width:30px;height:30px;border-radius:8px;background:var(--mid-bg);color:var(--mid);display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:14px}
+.keep{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 20px;font-size:14.5px}
+.keep b{color:var(--accent-ink)}
+
+.first{background:var(--accent-soft);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.first ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:14.5px}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="badge">Ventana Cero · plan de construcción</span>
+    <h1>Hoja de ruta</h1>
+    <p class="lede">Cómo arrancar y en qué orden, para 5 personas y ~36 horas. La idea: tener la demo funcionando de punta a punta temprano, aunque sea cruda, y pulir después.</p>
+    <p class="note">Las horas son una guía; ajústenlas a su horario real. Lo que no es negociable es el orden: primero el esqueleto completo, después la calidad.</p>
+  </header>
+
+  <section>
+    <span class="eyebrow">El principio que evita el desastre</span>
+    <div class="one">No construyan pieza por pieza hasta dejarlas perfectas. Construyan un <b>esqueleto que camina</b>: el lazo entero funcionando sobre <b>un solo caso</b> en las primeras ~10 horas, aunque cada paso sea feo. Así la demo está asegurada desde temprano y el resto es mejora, no rezo.</div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Primero · los primeros 60 minutos</span>
+    <h2>Decidan esto antes de escribir código</h2>
+    <div class="decide">
+      <div class="drow"><span class="q">Ecosistema</span><span class="a"><b>Python (FastAPI/Flask).</b> Rutas claras y taint fácil de mostrar. El caso PHP se puede contar en el pitch, pero la demo técnica en Python sale mejor.</span></div>
+      <div class="drow"><span class="q">Clase de vuln</span><span class="a">Una con fuente→sink clara: inyección de plantilla, de comandos o deserialización insegura. <b>Elijan UNA.</b></span></div>
+      <div class="drow"><span class="q">El caso de la demo</span><span class="a">Un repo sembrado con esa vuln, un aviso enlatado con su commit de fix, y 2-3 rutas. Este es el caso que va a la demo; definan los datos exactos ahora.</span></div>
+      <div class="drow"><span class="q">Modelos</span><span class="a">Claude Haiku 4.5 para pasos baratos (extraer símbolo, clasificar); un modelo más fuerte solo para razonar taint y PoC. Saquen las API keys ya.</span></div>
+      <div class="drow"><span class="q">Repo y contrato</span><span class="a">Un repo mono, con el <b>contrato de datos</b> acordado (abajo) para poder trabajar en paralelo sin pisarse.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Lo que conecta a todos</span>
+    <h2>El contrato de datos</h2>
+    <p>Acuerden este objeto en la primera hora. Fluye por todo el lazo; cada persona lee unos campos y escribe otros. Con esto, cinco personas trabajan en paralelo sin bloquearse.</p>
+<pre class="code"><span class="k">Hallazgo</span> {
+  <span class="c"># 1 · detección (OSV)</span>
+  advisory_id, paquete, version, commit_fix
+  <span class="c"># 2 · derivar símbolo (LLM sobre el diff del fix)</span>
+  simbolo_vulnerable, parametro_peligroso
+  <span class="c"># 3 · alcanzabilidad</span>
+  nivel: 0..4            <span class="c"># la escalera de confianza</span>
+  camino_taint: [...]    <span class="c"># evidencia: fuente → sink</span>
+  <span class="c"># 4 · prueba</span>
+  poc, resultado_poc     <span class="c"># disparó | no disparó</span>
+  <span class="c"># 5 · mitigación</span>
+  parche_virtual, pr_parche_codigo
+  <span class="c"># 6 · decisión (motor de política)</span>
+  decision               <span class="c"># ignorar | vigilar | mitigar | actuar</span>
+}</pre>
+    <p class="note">Mientras el contrato esté fijo, cada quien puede empezar con datos falsos en sus campos y conectarlos de verdad después.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">El plan</span>
+    <h2>Las fases</h2>
+    <div class="phases">
+      <div class="phase"><div class="when"><span class="hr">H0–H2</span><span class="dot"></span></div><div class="b"><h3>Arranque</h3><ul><li>Cerrar las decisiones de arriba.</li><li>Repo, contrato de datos, caso sembrado y keys.</li><li>Cada quien levanta su esqueleto vacío que lee y escribe el Hallazgo.</li></ul></div></div>
+      <div class="phase key"><div class="when"><span class="hr">H2–H10</span><span class="dot"></span></div><div class="b"><h3>Esqueleto que camina</h3><ul><li>El lazo entero sobre UN caso, cada paso crudo: OSV → símbolo → alcanzabilidad simple → PoC en sandbox → parche virtual.</li><li>UI con datos falsos primero, luego conectada.</li><li>Meta: al final del día 1, la demo corre de principio a fin aunque sea fea.</li></ul></div></div>
+      <div class="phase"><div class="when"><span class="hr">H10–H20</span><span class="dot"></span></div><div class="b"><h3>Endurecer cada pieza</h3><ul><li>Taint mejor, PoC más robusto, motor de política real.</li><li>Parche de código como PR con test (si el tiempo da).</li><li>Segundo y tercer caso sembrado.</li></ul></div></div>
+      <div class="phase"><div class="when"><span class="hr">H20–H28</span><span class="dot"></span></div><div class="b"><h3>Demo pulida</h3><ul><li>Grafo de la cadena fuente→sink, los dos relojes, la terminal del atacante.</li><li>Eventos en vivo por WebSocket.</li><li>Modo guion determinista.</li></ul></div></div>
+      <div class="phase"><div class="when"><span class="hr">H28–H32</span><span class="dot"></span></div><div class="b"><h3>Evaluación</h3><ul><li>N casos (unos alcanzables, otros no): precisión/recall de la escalera, tiempo hasta mitigar, exploits bloqueados, falsos positivos.</li><li>Usar Cybench / Inspect Cyber si da.</li></ul></div></div>
+      <div class="phase"><div class="when"><span class="hr">H32–H36</span><span class="dot"></span></div><div class="b"><h3>Pitch y respaldo</h3><ul><li>Video grabado de la demo como respaldo.</li><li>Slides y al menos 10 ensayos cronometrados a 3 minutos.</li></ul></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quién hace qué</span>
+    <h2>Reparto para 5 personas</h2>
+    <p>En las primeras 2 horas todos convergen en el esqueleto y el contrato. Después, cada quien toma su carril.</p>
+    <div class="roles">
+      <div class="role"><span class="tag">Persona A</span><h3>Orquestación + detección</h3><p>El lazo que une los pasos, el caso sembrado, el aviso enlatado y el matching con OSV. Dueño del contrato de datos.</p><p class="stack">Python, OSV.dev, FastAPI</p></div>
+      <div class="role"><span class="tag">Persona B</span><h3>Alcanzabilidad</h3><p>Derivar símbolo del diff, buscarlo con AST, razonar el taint y construir la escalera de confianza.</p><p class="stack">Python AST, Claude Haiku/Sonnet</p></div>
+      <div class="role"><span class="tag">Persona C</span><h3>Prueba y sandbox</h3><p>El contenedor aislado sin red, la generación del PoC y la verificación (disparó / no). La pieza más riesgosa: empieza ya.</p><p class="stack">Docker, asyncio</p></div>
+      <div class="role"><span class="tag">Persona D</span><h3>Mitigación + política</h3><p>El parche virtual, el PR del parche de código, el motor de política y los eventos para la UI.</p><p class="stack">Python, WebSocket</p></div>
+      <div class="role"><span class="tag">Persona E</span><h3>UI, evaluación y pitch</h3><p>Dashboard con grafo y relojes, banco de pruebas con métricas, y las slides. Arranca con datos falsos desde el minuto uno.</p><p class="stack">Next.js, React Flow</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Dónde está el peligro</span>
+    <h2>Ruta crítica: qué empezar temprano</h2>
+    <div class="two">
+      <div class="card hot"><span class="k">Riesgo alto · empieza en H2</span><h3>Sandbox + PoC</h3><p>Aislar, correr código y confirmar es lo más propenso a comerse horas. No lo dejen para el final. Persona C arranca de inmediato.</p></div>
+      <div class="card hot"><span class="k">Riesgo medio · empieza en H2</span><h3>Razonamiento de taint</h3><p>Que el LLM trace fuente→sink de forma confiable toma iteración. Empieza con el caso de la demo y amplía.</p></div>
+      <div class="card"><span class="k">Riesgo bajo · en paralelo</span><h3>La UI</h3><p>Toma tiempo pero no sorprende. Arranca con datos falsos del contrato y conecta cuando los demás estén listos.</p></div>
+      <div class="card"><span class="k">Riesgo bajo · reusar</span><h3>Detección (OSV)</h3><p>Es consumir una API. Rápido. No gasten originalidad aquí.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Si van atrasados</span>
+    <h2>Líneas de corte, en este orden</h2>
+    <div class="cuts">
+      <div class="cut"><span class="n">1</span><span>Primero cae el <b>PR del parche de código</b>. Quédense con el parche virtual, que es el que gana la carrera.</span></div>
+      <div class="cut"><span class="n">2</span><span>Después, la <b>evaluación multi-caso</b>: bajen a 3 casos bien elegidos en vez de N.</span></div>
+      <div class="cut"><span class="n">3</span><span>Después, la <b>animación fina del grafo</b>: basta con que ilumine la cadena.</span></div>
+    </div>
+    <div class="keep">Nunca recorten esto: <b>un caso completo de punta a punta</b> (aviso → alcanzabilidad → PoC → parche virtual), <b>la demo de la carrera</b> y <b>el video de respaldo</b>. Eso es el proyecto.</div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Arranca ahora</span>
+    <h2>El primer entregable</h2>
+    <div class="first">
+      <p>La meta del día 1 no es que esté bonito, es que el lazo <b>camine</b>. En orden:</p>
+      <ol>
+        <li>Siembren el repo víctima con la vuln elegida y preparen el aviso con su commit de fix.</li>
+        <li>Matching con OSV: del manifiesto a "este paquete te afecta". (Persona A)</li>
+        <li>LLM extrae el símbolo vulnerable del diff; AST lo busca en el repo. (Persona B)</li>
+        <li>Sandbox corre un PoC conceptual y confirma. (Persona C)</li>
+        <li>Se genera y aplica un parche virtual crudo; la UI lo muestra con datos reales. (D y E)</li>
+      </ol>
+      <p class="note">Cuando eso funcione, aunque sea feo, ya tienen un proyecto. Todo lo demás es subirle la calidad.</p>
+    </div>
+  </section>
+</div>
