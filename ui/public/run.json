@@ -1,14 +1,14 @@
 {
   "proyecto": "Ventana Cero",
-  "generado": "2026-10-24 08:59:01",
-  "segundos_totales": 4.61,
+  "generado": "2026-10-24 09:37:57",
+  "segundos_totales": 5.9,
   "atacante_seg_supuesto": 14400,
   "resumen": {
-    "total": 8,
-    "accionables": 3,
+    "total": 9,
+    "accionables": 4,
     "ruido_descartado": 5,
     "por_decision": {
-      "actuar": 3,
+      "actuar": 4,
       "revisar": 1,
       "preparar": 2,
       "ignorar": 1,
@@ -16,6 +16,79 @@
     }
   },
   "hallazgos": [
+    {
+      "advisory_id": "CVE-2019-6690",
+      "paquete": "python-gnupg",
+      "version": "0.4.3",
+      "commit_fix": null,
+      "resumen": "Inyección de comando/opción en python-gnupg al cifrar con datos no confiables (CVE real)",
+      "simbolo_vulnerable": "python-gnupg.encrypt",
+      "parametro_peligroso": "data",
+      "nivel": 4,
+      "camino_taint": [
+        "fuente: params.get('data', ['{}'])[0]",
+        "var: data",
+        "sink: encrypt(...) en do_GET()"
+      ],
+      "evidencia": [
+        "python-gnupg==0.4.3 cae en el rango afectado de CVE-2019-6690",
+        "símbolo vulnerable derivado: python-gnupg.encrypt (param: data; heurística sobre el diff)",
+        "taint: una entrada no confiable alcanza el parámetro peligroso",
+        "PoC confirmado en el sandbox: ejecución reproducida",
+        "parche virtual verificado: el PoC ya no se dispara"
+      ],
+      "poc": {
+        "metodo": "GET",
+        "ruta": "/gpg",
+        "param": "data",
+        "valor": ";echo 42",
+        "espera_contiene": "42",
+        "descr": "comando encadenado ';echo 42': si la entrada llega al shell, responde 42",
+        "respuesta_codigo": 200,
+        "respuesta_muestra": "42"
+      },
+      "resultado_poc": "disparo",
+      "parche_virtual": {
+        "id": "vp-cve-2019-6690",
+        "tipo": "regla_borde",
+        "ruta": "/gpg",
+        "param": "data",
+        "patron": "[;&|`$]",
+        "descr": "bloquea data que coincide con [;&|`$] en /gpg",
+        "reversible": true
+      },
+      "parche_virtual_verificado": true,
+      "pr_parche_codigo": "CVE-2019-6690.patch",
+      "epss": 0.72,
+      "kev": false,
+      "prioridad": "crítica",
+      "decision": "actuar",
+      "nivel_texto": "PoC confirmado",
+      "clase": "inyeccion-comando",
+      "segundos_hasta_mitigar": 1.283,
+      "etapas": [
+        {
+          "etapa": "detectado",
+          "t": 0.0
+        },
+        {
+          "etapa": "símbolo derivado",
+          "t": 0.001
+        },
+        {
+          "etapa": "alcanzabilidad: nivel 3",
+          "t": 0.008
+        },
+        {
+          "etapa": "PoC: disparo",
+          "t": 0.636
+        },
+        {
+          "etapa": "parche virtual verificado",
+          "t": 1.282
+        }
+      ]
+    },
     {
       "advisory_id": "VC-2026-0001",
       "paquete": "tinytpl",
@@ -65,7 +138,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "SSTI",
-      "segundos_hasta_mitigar": 1.284,
+      "segundos_hasta_mitigar": 1.302,
       "etapas": [
         {
           "etapa": "detectado",
@@ -81,11 +154,11 @@
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.645
+          "t": 0.637
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.282
+          "t": 1.3
         }
       ]
     },
@@ -138,7 +211,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "path-traversal",
-      "segundos_hasta_mitigar": 1.326,
+      "segundos_hasta_mitigar": 1.272,
       "etapas": [
         {
           "etapa": "detectado",
@@ -150,15 +223,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.008
+          "t": 0.007
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.661
+          "t": 0.63
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.324
+          "t": 1.268
         }
       ]
     },
@@ -213,11 +286,11 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.007
+          "t": 0.008
         },
         {
           "etapa": "PoC: no_disparo",
-          "t": 0.645
+          "t": 0.667
         }
       ]
     },
@@ -259,7 +332,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 2",
-          "t": 0.008
+          "t": 0.007
         }
       ]
     },
@@ -339,11 +412,11 @@
         },
         {
           "etapa": "símbolo derivado",
-          "t": 0.001
+          "t": 0.0
         },
         {
           "etapa": "alcanzabilidad: nivel 0",
-          "t": 0.008
+          "t": 0.007
         }
       ]
     },
@@ -396,7 +469,7 @@
       "decision": "actuar",
       "nivel_texto": "PoC confirmado",
       "clase": "deserializacion-yaml",
-      "segundos_hasta_mitigar": 1.314,
+      "segundos_hasta_mitigar": 1.336,
       "etapas": [
         {
           "etapa": "detectado",
@@ -408,15 +481,15 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 3",
-          "t": 0.012
+          "t": 0.01
         },
         {
           "etapa": "PoC: disparo",
-          "t": 0.666
+          "t": 0.692
         },
         {
           "etapa": "parche virtual verificado",
-          "t": 1.313
+          "t": 1.334
         }
       ]
     },
@@ -458,7 +531,7 @@
         },
         {
           "etapa": "alcanzabilidad: nivel 1",
-          "t": 0.008
+          "t": 0.009
         }
       ]
     }

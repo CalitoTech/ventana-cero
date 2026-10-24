@@ -22,9 +22,9 @@ class TestLazo(unittest.TestCase):
             )
         cls.por_id = {h["advisory_id"]: h for h in cls.rep["hallazgos"]}
 
-    def test_detecta_ocho(self):
-        # 9 avisos; minicache ya está en una versión con el fix y no se reporta
-        self.assertEqual(len(self.rep["hallazgos"]), 8)
+    def test_detecta_nueve(self):
+        # 10 avisos; minicache ya está en una versión con el fix y no se reporta
+        self.assertEqual(len(self.rep["hallazgos"]), 9)
 
     def test_version_ya_parcheada_no_es_hallazgo(self):
         self.assertNotIn("VC-2026-0008", self.por_id)
@@ -82,12 +82,21 @@ class TestLazo(unittest.TestCase):
 
     def test_no_hay_falsos_positivos(self):
         accionables = [h for h in self.rep["hallazgos"] if h["decision"] in ("mitigar", "actuar")]
-        self.assertEqual(len(accionables), 3)
+        self.assertEqual(len(accionables), 4)
 
     def test_cve_real_de_pypi_se_confirma_y_mitiga(self):
         # CVE-2017-18342: yaml.load() de PyYAML < 5.1 construye objetos Python arbitrarios
         h = self.por_id["CVE-2017-18342"]
         self.assertEqual(h["paquete"], "pyyaml")
+        self.assertEqual(h["nivel"], 4)
+        self.assertEqual(h["resultado_poc"], "disparo")
+        self.assertTrue(h["parche_virtual_verificado"])
+
+    def test_cve_inyeccion_comando_se_confirma_y_mitiga(self):
+        # CVE-2019-6690: python-gnupg < 0.4.4 arma la línea de gpg sin escapar
+        h = self.por_id["CVE-2019-6690"]
+        self.assertEqual(h["paquete"], "python-gnupg")
+        self.assertEqual(h["simbolo_vulnerable"], "python-gnupg.encrypt")
         self.assertEqual(h["nivel"], 4)
         self.assertEqual(h["resultado_poc"], "disparo")
         self.assertTrue(h["parche_virtual_verificado"])

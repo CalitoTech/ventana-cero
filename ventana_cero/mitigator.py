@@ -21,6 +21,7 @@ PATRON_POR_CLASE = {
     "path-traversal": r"\.\.[\/]",
     "deserializacion": r"__(eval|reduce|class|import)__",
     "deserializacion-yaml": r"!!python/",
+    "inyeccion-comando": r"[;&|`$]",
 }
 
 

@@ -44,6 +44,9 @@ POCS_POR_CLASE = {
                              "valor": "!!python/object/apply:builtins.eval ['6*7']",
                              "espera_contiene": "42",
                              "descr": "etiqueta !!python/object/apply: si el loader la honra, responde 42"},
+    "inyeccion-comando": {"metodo": "GET", "ruta": "/gpg", "param": "data",
+                          "valor": ";echo 42", "espera_contiene": "42",
+                          "descr": "comando encadenado ';echo 42': si la entrada llega al shell, responde 42"},
 }
 
 

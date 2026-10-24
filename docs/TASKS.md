@@ -30,4 +30,5 @@ de la [hoja de ruta](roadmap.md). Marca con [x] al cerrar.
 
 ## Transversal
 - [x] Un caso con un CVE real de PyPI (CVE-2017-18342, PyYAML `yaml.load`).
+- [x] Segundo CVE real de PyPI, clase nueva (CVE-2019-6690, python-gnupg: inyección de comando).
 - [ ] Medir y publicar la latencia que agrega la atribución.
