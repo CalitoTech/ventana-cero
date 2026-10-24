@@ -13,24 +13,18 @@
   --line:#1F2D27; --line2:#2A3B34; --ink:#E9F1ED; --muted:#7B9289;
   --teal:#4FD6B6; --teal-dim:#113029; --teal-ink:#A6F0DF;
   --red:#FF6B4A; --red-dim:#361510; --red-ink:#FFB4A2;
-  --amber:#EEB54A; --amber-dim:#352811;
+  --amber:#EEB54A;
   --f-d:"Chakra Petch",system-ui,sans-serif; --f-m:"JetBrains Mono",ui-monospace,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{
-  background:var(--bg); color:var(--ink); font-family:var(--f-m); font-size:14px; line-height:1.5;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size:52px 52px; background-position:center;
-}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(1100px 600px at 50% -5%, rgba(79,214,182,.10), transparent 60%);}
-.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:22px 20px 80px;display:flex;flex-direction:column;gap:22px}
-
+body{background:var(--bg);color:var(--ink);font-family:var(--f-m);font-size:14px;line-height:1.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:52px 52px;background-position:center}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1100px 600px at 50% -5%,rgba(79,214,182,.10),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:22px 20px 80px;display:flex;flex-direction:column;gap:20px}
 .top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line2);background:rgba(13,20,18,.85);border-radius:14px;padding:14px 20px;backdrop-filter:blur(4px)}
-.brand .mk{font-family:var(--f-d);font-weight:700;font-size:22px;letter-spacing:1px;color:var(--ink)}
+.brand .mk{font-family:var(--f-d);font-weight:700;font-size:22px;letter-spacing:1px}
 .brand .mk b{color:var(--teal)}
 .brand .sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
 .live{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
@@ -38,62 +32,18 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .dot.on{background:var(--teal);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,214,182,.5)}70%{box-shadow:0 0 0 8px rgba(79,214,182,0)}100%{box-shadow:0 0 0 0 rgba(79,214,182,0)}}
 .clocks{margin-left:auto;display:flex;gap:10px}
-.clk{border:1px solid var(--line2);border-radius:10px;padding:7px 14px;min-width:120px}
+.clk{border:1px solid var(--line2);border-radius:10px;padding:7px 14px;min-width:116px}
 .clk .l{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .clk .v{font-family:var(--f-d);font-weight:700;font-size:22px;line-height:1.1}
 .clk.atk .v{color:var(--red)} .clk.def{border-color:var(--teal-dim)} .clk.def .v{color:var(--teal)}
-
-h1.lead{font-family:var(--f-d);font-weight:700;font-size:clamp(1.5rem,3.4vw,2.3rem);line-height:1.1;margin:4px 2px -2px;letter-spacing:.3px}
+h1.lead{font-family:var(--f-d);font-weight:700;font-size:clamp(1.4rem,3.2vw,2.1rem);line-height:1.1;margin:2px}
 .lead em{font-style:normal;color:var(--teal)}
-.hint{color:var(--muted);font-size:13px;margin:0 2px;max-width:70ch}
+.hint{color:var(--muted);font-size:13px;margin:0 2px;max-width:72ch}
 
-.stage{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:820px){.stage{grid-template-columns:1fr}}
-.card{border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .4s, box-shadow .4s}
-.card .hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.card .hd .t{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
-.chip{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
-.chip.vuln{color:var(--red)} .chip.prot{color:var(--teal)} .chip.idle{color:var(--muted)}
-
-#objetivo.breach{border-color:var(--red);box-shadow:0 0 0 1px var(--red), 0 0 40px -8px rgba(255,107,74,.5)}
-#objetivo.safe{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal), 0 0 40px -10px rgba(79,214,182,.4)}
-.server{display:flex;align-items:center;gap:16px}
-.server .glyph{width:66px;height:66px;border-radius:12px;border:1px solid var(--line2);display:grid;place-items:center;font-size:30px;flex:none;background:var(--sunk);transition:.4s}
-#objetivo.breach .glyph{border-color:var(--red);color:var(--red)}
-#objetivo.safe .glyph{border-color:var(--teal);color:var(--teal)}
-.server .meta b{font-family:var(--f-d);font-size:18px;display:block}
-.server .meta span{font-size:12px;color:var(--muted)}
-.banner{border-radius:10px;padding:10px 14px;font-size:12.5px;display:none}
-.banner.show{display:block}
-.banner.bad{background:var(--red-dim);border:1px solid var(--red);color:var(--red-ink)}
-.banner.good{background:var(--teal-dim);border:1px solid var(--teal);color:var(--teal-ink)}
-
-.term{background:var(--sunk);border:1px solid var(--line2);border-radius:10px;padding:12px 14px;font-size:12.5px;min-height:150px;display:flex;flex-direction:column;gap:5px;overflow:auto}
-.term .cmd{color:var(--ink)} .term .cmd .p{color:var(--teal)}
-.term .res{font-weight:500}
-.term .res.c200{color:var(--amber)} .term .res.c403{color:var(--teal)} .term .res.c0{color:var(--muted)}
-.term .loot{color:var(--red-ink);background:var(--red-dim);border-left:2px solid var(--red);padding:6px 10px;border-radius:0 6px 6px 0;white-space:pre-wrap;word-break:break-word}
-.term .ok{color:var(--teal-ink)}
-.term .ph{color:var(--muted)}
-
-.pipe{border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
-.pipe .hd{display:flex;align-items:center;justify-content:space-between}
-.pipe .hd .t{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
-.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.rung{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;opacity:.32;transition:.35s}
-.rung .n{font-family:var(--f-d);font-weight:700;font-size:16px}
-.rung .t{font-size:9.5px;color:var(--muted);margin-top:3px;line-height:1.2;letter-spacing:.3px}
-.rung.on{opacity:1;border-color:var(--teal-dim);background:#0c1b17}
-.rung.on.cur{border-color:var(--teal);box-shadow:0 0 22px -8px var(--teal)}
-.rung.on .n{color:var(--teal)}
-.pipe .detail{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px}
-.pipe .detail dt{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding-top:2px}
-.pipe .detail dd{margin:0}
-.pipe .detail code{color:var(--teal-ink)}
-.taint{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11.5px;margin-top:2px}
-.taint .b{padding:4px 9px;border-radius:6px;border:1px solid var(--line2);background:var(--sunk)}
-.taint .b.src{border-color:var(--red);color:var(--red-ink)} .taint .b.sink{border-color:var(--teal);color:var(--teal-ink)}
-.taint .a{color:var(--muted)}
+.scene{position:relative;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:#060A09}
+#cv{display:block;width:100%;height:auto}
+.statusline{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--f-d);font-weight:700;
+  font-size:clamp(1rem,2.4vw,1.6rem);letter-spacing:2px;text-transform:uppercase;pointer-events:none;transition:color .3s}
 
 .dock{border:1px solid var(--line2);background:rgba(13,20,18,.85);border-radius:14px;padding:16px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;backdrop-filter:blur(4px)}
 .dock .step{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-right:4px}
@@ -110,36 +60,45 @@ button.next{animation:beckon 1.6s infinite}
 .spin{width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--teal);border-radius:50%;animation:rot .7s linear infinite;display:inline-block}
 @keyframes rot{to{transform:rotate(360deg)}}
 
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap}
-.sec-h h2{font-family:var(--f-d);font-weight:700;font-size:1.2rem;margin:0}
+.evi{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:820px){.evi{grid-template-columns:1fr}}
+.card{border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.card .t{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
+.term{background:var(--sunk);border:1px solid var(--line2);border-radius:10px;padding:12px 14px;font-size:12.5px;min-height:132px;display:flex;flex-direction:column;gap:5px;overflow:auto}
+.term .cmd{color:var(--ink)} .term .cmd .p{color:var(--teal)}
+.term .res.c200{color:var(--amber)} .term .res.c403{color:var(--teal)} .term .res.c0{color:var(--muted)}
+.term .loot{color:var(--red-ink);background:var(--red-dim);border-left:2px solid var(--red);padding:6px 10px;border-radius:0 6px 6px 0;white-space:pre-wrap;word-break:break-word}
+.term .ok{color:var(--teal-ink)} .term .ph{color:var(--muted)}
+.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rung{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:9px 6px;text-align:center;opacity:.32;transition:.35s}
+.rung .n{font-family:var(--f-d);font-weight:700;font-size:15px}
+.rung .t2{font-size:8.5px;color:var(--muted);margin-top:2px;line-height:1.15}
+.rung.on{opacity:1;border-color:var(--teal-dim);background:#0c1b17} .rung.on .n{color:var(--teal)}
+.rung.on.cur{border-color:var(--teal);box-shadow:0 0 18px -7px var(--teal)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12px;margin-top:4px}
+.kv dt{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.kv dd{margin:0} .kv code{color:var(--teal-ink)}
+
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:6px;flex-wrap:wrap}
+.sec-h h2{font-family:var(--f-d);font-weight:700;font-size:1.15rem;margin:0}
 .sec-h .note{color:var(--muted);font-size:12px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:720px){.grid{grid-template-columns:1fr}}
-.find{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.find .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.find .id{font-size:11px;color:var(--muted)}
-.find .nm{font-family:var(--f-d);font-weight:600;font-size:15px;margin-top:2px}
+.find{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px}
+.find .id{font-size:11px;color:var(--muted)} .find .nm{font-family:var(--f-d);font-weight:600;font-size:14px;margin-top:2px}
 .badges{display:flex;gap:6px;flex-wrap:wrap}
 .b2{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
-.b2.actuar,.b2.mitigar{color:var(--teal)} .b2.revisar,.b2.preparar{color:var(--amber)} .b2.ignorar,.b2.vigilar{color:var(--muted)}
-.b2.kev{color:var(--red)} .b2.clase{color:var(--muted)}
+.b2.actuar,.b2.mitigar{color:var(--teal)} .b2.revisar,.b2.preparar{color:var(--amber)} .b2.ignorar,.b2.vigilar{color:var(--muted)} .b2.kev{color:var(--red)} .b2.clase{color:var(--muted)}
 .mini{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-.mini span{height:7px;border-radius:3px;background:var(--line);opacity:.5}
-.mini span.on{background:var(--teal);opacity:1}
+.mini span{height:7px;border-radius:3px;background:var(--line);opacity:.5} .mini span.on{background:var(--teal);opacity:1}
 .err{border:1px solid var(--red);background:var(--red-dim);color:var(--red-ink);border-radius:12px;padding:16px;font-size:13px}
-.foot{color:var(--muted);font-size:11.5px;text-align:center;margin-top:10px}
-.foot code{color:var(--teal-ink)}
+.foot{color:var(--muted);font-size:11.5px;text-align:center;margin-top:8px} .foot code{color:var(--teal-ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="brand">
-      <div>
-        <div class="mk">◢ VENTANA <b>CERO</b></div>
-        <div class="sub">consola de defensa · n-day</div>
-      </div>
-    </div>
+    <div class="brand"><div class="mk">◢ VENTANA <b>CERO</b></div><div class="sub">consola de defensa · n-day</div></div>
     <div class="live"><span class="dot" id="dot"></span><span id="livetxt">conectando…</span></div>
     <div class="clocks">
       <div class="clk atk"><div class="l">Atacante (IA)</div><div class="v" id="clk-atk">~4 h</div></div>
@@ -149,176 +108,236 @@ button.next{animation:beckon 1.6s infinite}
 
   <div>
     <h1 class="lead">El mismo ataque, dos finales. <em>En vivo, contra un servidor real.</em></h1>
-    <p class="hint">Lanza el ataque, actívame, y lanza el mismo ataque otra vez. No es una animación: es una petición HTTP real a una app que de verdad deja (o no) robar un archivo.</p>
+    <p class="hint">La ventana está abierta: el ataque entra y roba un archivo. Activa Ventana Cero y la ventana se cierra; el mismo ataque rebota. No es una animación de adorno: cada botón es una petición HTTP real y la escena refleja el resultado verdadero.</p>
   </div>
 
-  <div class="stage">
-    <div class="card" id="objetivo">
-      <div class="hd"><span class="t">Objetivo · app de ejemplo</span><span class="chip idle" id="obj-chip">esperando</span></div>
-      <div class="server">
-        <div class="glyph" id="obj-glyph">▣</div>
-        <div class="meta"><b>api-ejemplo</b><span id="obj-sub">un endpoint sirve archivos de su carpeta pública</span></div>
-      </div>
-      <div class="banner" id="obj-banner"></div>
-    </div>
-
-    <div class="card">
-      <div class="hd"><span class="t">Atacante</span><span class="chip idle" id="atk-chip">inactivo</span></div>
-      <div class="term" id="term"><span class="ph">// la terminal del atacante aparecerá aquí</span></div>
-    </div>
-  </div>
-
-  <div class="pipe" id="pipe">
-    <div class="hd"><span class="t">Ventana Cero · lazo de defensa</span><span class="chip idle" id="pipe-chip">en reposo</span></div>
-    <div class="ladder" id="ladder"></div>
-    <dl class="detail" id="pipe-detail" style="display:none"></dl>
+  <div class="scene">
+    <canvas id="cv" width="1200" height="520"></canvas>
+    <div class="statusline" id="status" style="color:var(--muted)">LISTO</div>
   </div>
 
   <div class="dock" id="dock"></div>
 
+  <div class="evi">
+    <div class="card">
+      <span class="t">Evidencia · terminal del atacante (HTTP real)</span>
+      <div class="term" id="term"><span class="ph">// aquí aparece la petición y la respuesta reales</span></div>
+    </div>
+    <div class="card">
+      <span class="t">Ventana Cero · escalera de confianza</span>
+      <div class="ladder" id="ladder"></div>
+      <dl class="kv" id="kv" style="display:none"></dl>
+    </div>
+  </div>
+
   <div class="sec-h">
     <h2>El panorama completo</h2>
-    <span class="note">todas las dependencias analizadas · ordenadas por prioridad</span>
+    <span class="note">todas las dependencias analizadas · por prioridad</span>
     <button class="ghost" id="btn-full"><span class="k">POST</span> Correr análisis completo</button>
   </div>
   <div class="grid" id="panorama"></div>
 
-  <p class="foot">Panel servido por <code>python -m ventana_cero.server</code>. Cada botón es HTTP real contra la app víctima y el lazo. Repo: <code>github.com/CalitoTech/ventana-cero</code></p>
+  <p class="foot">Servido por <code>python -m ventana_cero.server</code> · cada botón es HTTP real contra la app víctima y el lazo · <code>github.com/CalitoTech/ventana-cero</code></p>
 </div>
 
 <script>
-const NIV = ["dependencia","símbolo ref.","alcanzable","con taint","PoC confirmado"];
-let LIVE=false, PROT=false, ATACADO=false, RUN=null, BUSY=false;
-
+const NIV=["dependencia","símbolo ref.","alcanzable","con taint","PoC confirmado"];
+let LIVE=false,PROT=false,ATACADO=false,RUN=null,BUSY=false;
 const $=id=>document.getElementById(id);
-async function api(path, method="GET"){
-  const r = await fetch(path, {method});
-  try { return await r.json(); } catch(e){ throw new Error("HTTP "+r.status); }
-}
-function fmtDur(s){ if(s==null) return "—"; if(s<90) return (+s).toFixed(1)+" s"; if(s<5400) return Math.round(s/60)+" min"; return (s/3600).toFixed(1)+" h"; }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function esc(s){ return (s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function esc(s){return(s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function fmtDur(s){if(s==null)return"—";if(s<90)return(+s).toFixed(1)+" s";if(s<5400)return Math.round(s/60)+" min";return(s/3600).toFixed(1)+" h"}
+async function api(path,method="GET"){const r=await fetch(path,{method});try{return await r.json()}catch(e){throw new Error("HTTP "+r.status)}}
 
-function ladder(upto){
-  $("ladder").innerHTML = NIV.map((t,i)=>{
-    const on=i<=upto?"on":"", cur=i===upto?"cur":"";
-    return `<div class="rung ${on} ${cur}"><div class="n">${i}</div><div class="t">${t}</div></div>`;
-  }).join("");
+/* ====================== ESCENA 2D (canvas) ====================== */
+const cv=$("cv"), ctx=cv.getContext("2d");
+const W=1200,H=520;
+const ATK={x:150,y:260}, WALLX=600, WINY0=175, WINY1=345, SRV={x:1040,y:260};
+const C={bg:"#060A09",line:"#1F2D27",wall:"#0E1613",teal:"#4FD6B6",tealDim:"#17342C",red:"#FF6B4A",redDim:"#3A1712",amber:"#EEB54A",ink:"#E9F1ED",muted:"#6E867C"};
+const S={close:0,sealing:false,server:"idle",shake:0,flash:0,t:0,packets:[],parts:[],scan:0};
+
+function dpr(){return Math.min(window.devicePixelRatio||1,2)}
+function resize(){
+  const cssW=cv.clientWidth||cv.parentElement.clientWidth;
+  const cssH=cssW*H/W; cv.style.height=cssH+"px";
+  const d=dpr(); cv.width=Math.round(cssW*d); cv.height=Math.round(cssH*d);
 }
-function setObj(mode){
-  const c=$("objetivo"), chip=$("obj-chip"), g=$("obj-glyph"), ban=$("obj-banner");
-  c.classList.remove("breach","safe"); chip.className="chip";
-  if(mode==="breach"){ c.classList.add("breach"); chip.classList.add("vuln"); chip.textContent="vulnerado"; g.textContent="✖";
-    ban.className="banner bad show"; ban.innerHTML="⚠ <b>DATOS ROBADOS</b> — el atacante leyó un archivo fuera de la carpeta pública."; }
-  else if(mode==="safe"){ c.classList.add("safe"); chip.classList.add("prot"); chip.textContent="protegido"; g.textContent="▣";
-    ban.className="banner good show"; ban.innerHTML="✓ <b>ATAQUE BLOQUEADO</b> — y el tráfico legítimo sigue pasando."; }
-  else { chip.classList.add("idle"); chip.textContent="esperando"; g.textContent="▣"; ban.className="banner"; }
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+
+function drawAttacker(){
+  ctx.save();ctx.translate(ATK.x,ATK.y);
+  ctx.fillStyle="#140d0c";ctx.strokeStyle=C.red;ctx.lineWidth=2;rr(-70,-56,140,112,14);ctx.fill();ctx.stroke();
+  ctx.fillStyle=C.red;ctx.font="700 46px 'Chakra Petch',sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("</>",0,-6);
+  ctx.fillStyle=C.muted;ctx.font="600 15px 'JetBrains Mono',monospace";ctx.fillText("ATACANTE",0,40);
+  ctx.restore();
 }
-function termAttack(res, bloqueado){
-  const a=res.ataque, leg=res.legitimo;
-  const cc = a.codigo===403?"c403":(a.codigo===200?"c200":"c0");
-  const loot = bloqueado
-    ? `<div class="res ${cc}">&larr; ${a.codigo} Forbidden · bloqueado por Ventana Cero</div>`
-    : `<div class="res ${cc}">&larr; ${a.codigo} OK · respuesta del servidor:</div><div class="loot">${esc(a.cuerpo)}</div>`;
-  $("term").innerHTML =
-    `<div class="cmd"><span class="p">atacante@kali</span>:~$ ${esc(a.curl.replace('curl ',''))}</div>`+
-    loot+
+function drawServer(){
+  const st=S.server;const glow=st==="breach"?C.red:(st==="safe"?C.teal:C.line);
+  ctx.save();ctx.translate(SRV.x,SRV.y);
+  if(st!=="idle"){ctx.shadowColor=glow;ctx.shadowBlur=28}
+  ctx.fillStyle="#0c1512";ctx.strokeStyle=glow;ctx.lineWidth=2;rr(-78,-72,156,144,14);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.strokeStyle=st==="idle"?C.line:glow;ctx.globalAlpha=.6;
+  for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-60,-30+i*34);ctx.lineTo(60,-30+i*34);ctx.stroke()}
+  ctx.globalAlpha=1;
+  // archivo secreto
+  ctx.fillStyle=st==="breach"?C.redDim:"#0a130f";ctx.strokeStyle=st==="breach"?C.red:C.tealDim;rr(-20,24,40,30,5);ctx.fill();ctx.stroke();
+  ctx.fillStyle=st==="breach"?C.red:C.muted;ctx.font="700 16px 'Chakra Petch'";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("🔒",0,40);
+  ctx.fillStyle=C.muted;ctx.font="600 15px 'JetBrains Mono'";ctx.fillText("api-ejemplo",0,96);
+  ctx.restore();
+}
+function drawWall(){
+  ctx.fillStyle=C.wall;ctx.fillRect(WALLX-26,0,52,H);
+  ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.strokeRect(WALLX-26,0,52,H);
+  // marco de la ventana
+  ctx.strokeStyle=S.close>.5?C.teal:C.muted;ctx.lineWidth=3;rr(WALLX-30,WINY0-6,60,(WINY1-WINY0)+12,8);ctx.stroke();
+  // panes que cierran desde arriba y abajo
+  const gap=WINY1-WINY0, ph=(gap/2)*S.close;
+  if(S.close>0){
+    ctx.save();ctx.shadowColor=C.teal;ctx.shadowBlur=16*S.close;
+    ctx.fillStyle="rgba(79,214,182,"+(0.14+0.16*S.close)+")";ctx.strokeStyle=C.teal;ctx.lineWidth=2;
+    rr(WALLX-24,WINY0,48,ph,4);ctx.fill();ctx.stroke();
+    rr(WALLX-24,WINY1-ph,48,ph,4);ctx.fill();ctx.stroke();
+    ctx.restore();
+    // rejilla del escudo cuando está cerrada
+    if(S.close>=.98){ctx.strokeStyle="rgba(79,214,182,.45)";ctx.lineWidth=1;
+      for(let y=WINY0+8;y<WINY1;y+=12){ctx.beginPath();ctx.moveTo(WALLX-22,y);ctx.lineTo(WALLX+22,y);ctx.stroke()}
+      ctx.fillStyle=C.teal;ctx.font="700 22px 'Chakra Petch'";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("✓",WALLX,(WINY0+WINY1)/2);
+    }
+  }
+  // etiqueta
+  ctx.fillStyle=S.close>.5?C.teal:C.muted;ctx.font="600 13px 'JetBrains Mono'";ctx.textAlign="center";
+  ctx.fillText(S.close>.5?"VENTANA CERRADA":"VENTANA ABIERTA",WALLX,WINY1+34);
+}
+function spawnAttack(){S.packets.push({x:ATK.x+70,y:ATK.y,vx:420,vy:0,kind:"atk",trail:[],prev:ATK.x+70,hit:false})}
+function spawnLegit(){S.packets.push({x:ATK.x+70,y:ATK.y+70,vx:460,vy:0,kind:"legit",trail:[],prev:ATK.x+70})}
+function spawnLoot(){S.packets.push({x:SRV.x-78,y:SRV.y,vx:-520,vy:0,kind:"loot",trail:[]})}
+function burst(x,y,col){for(let i=0;i<22;i++){const a=Math.random()*6.28,s=60+Math.random()*220;S.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,col})}}
+function drawPacket(p){
+  const col=p.kind==="legit"?C.teal:(p.kind==="loot"?C.red:C.red);
+  p.trail.forEach((t,i)=>{const a=i/p.trail.length*0.5;ctx.globalAlpha=a;ctx.fillStyle=col;ctx.beginPath();ctx.arc(t.x,t.y,p.kind==="legit"?4:6,0,6.28);ctx.fill()});
+  ctx.globalAlpha=1;ctx.shadowColor=col;ctx.shadowBlur=18;ctx.fillStyle=col;
+  if(p.kind==="loot"){ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle=C.red;rr(-11,-8,22,16,3);ctx.fill();ctx.restore();}
+  else{ctx.beginPath();ctx.arc(p.x,p.y,p.kind==="legit"?6:8,0,6.28);ctx.fill();}
+  ctx.shadowBlur=0;ctx.globalAlpha=1;
+}
+function update(dt){
+  S.t+=dt;
+  if(S.sealing){S.close=Math.min(1,S.close+dt/1.6)}
+  if(S.flash>0)S.flash=Math.max(0,S.flash-dt*2);
+  if(S.shake>0)S.shake=Math.max(0,S.shake-dt*40);
+  S.packets.forEach(p=>{
+    p.prev=p.x;p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.trail){p.trail.push({x:p.x,y:p.y});if(p.trail.length>10)p.trail.shift()}
+    if(p.kind==="atk"&&!p.hit&&p.prev<WALLX&&p.x>=WALLX){
+      if(S.close>.5){p.hit=true;p.dead=true;burst(WALLX,p.y,C.teal);setStatus("BLOQUEADO",C.teal);S.flash=0;spawnLegit();}
+    }
+    if(p.kind==="atk"&&!p.dead&&p.x>=SRV.x-80){p.dead=true;S.server="breach";S.shake=10;S.flash=1;burst(SRV.x-70,p.y,C.red);setStatus("DATOS ROBADOS",C.red);spawnLoot();}
+    if(p.kind==="loot"&&p.x<=ATK.x+70){p.dead=true}
+    if(p.kind==="legit"&&p.x>=SRV.x-80){p.dead=true;burst(SRV.x-70,p.y,C.teal)}
+    if(p.x<-40||p.x>W+40)p.dead=true;
+  });
+  S.packets=S.packets.filter(p=>!p.dead);
+  S.parts.forEach(q=>{q.life-=dt*1.4;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.94;q.vy*=.94});
+  S.parts=S.parts.filter(q=>q.life>0);
+}
+function draw(){
+  const d=dpr();ctx.setTransform(cv.width/W,0,0,cv.width/W,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(S.shake>0)ctx.translate((Math.random()-.5)*S.shake,(Math.random()-.5)*S.shake);
+  if(S.flash>0){ctx.fillStyle="rgba(255,107,74,"+(S.flash*0.14)+")";ctx.fillRect(0,0,W,H)}
+  // linea base de conexion
+  ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(ATK.x+70,ATK.y);ctx.lineTo(SRV.x-80,SRV.y);ctx.stroke();ctx.setLineDash([]);
+  drawWall();drawAttacker();drawServer();
+  S.parts.forEach(q=>{ctx.globalAlpha=Math.max(0,q.life);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y,3,0,6.28);ctx.fill()});ctx.globalAlpha=1;
+  S.packets.forEach(drawPacket);
+  ctx.restore();
+}
+let last=0;
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();requestAnimationFrame(loop)}
+function setStatus(txt,col){const e=$("status");e.textContent=txt;e.style.color=col}
+
+/* ====================== LADDER / evidencia ====================== */
+function ladder(upto){$("ladder").innerHTML=NIV.map((t,i)=>{const on=i<=upto?"on":"",cur=i===upto?"cur":"";return`<div class="rung ${on} ${cur}"><div class="n">${i}</div><div class="t2">${t}</div></div>`}).join("")}
+function termAttack(res,bloqueado){
+  const a=res.ataque,leg=res.legitimo;const cc=a.codigo===403?"c403":(a.codigo===200?"c200":"c0");
+  const loot=bloqueado?`<div class="res ${cc}">&larr; ${a.codigo} Forbidden · bloqueado por Ventana Cero</div>`
+    :`<div class="res ${cc}">&larr; ${a.codigo} OK · respuesta del servidor:</div><div class="loot">${esc(a.cuerpo)}</div>`;
+  $("term").innerHTML=`<div class="cmd"><span class="p">atacante@kali</span>:~$ ${esc(a.curl.replace('curl ',''))}</div>`+loot+
     `<div class="cmd" style="margin-top:8px"><span class="p">usuario@normal</span>:~$ GET ${esc(leg.ruta)}?${esc(leg.param)}=${esc(leg.valor)}</div>`+
     `<div class="res ${leg.codigo===200?'c200':'c0'}">&larr; ${leg.codigo} · <span class="ok">${esc(leg.cuerpo)}</span></div>`;
-  $("atk-chip").className="chip "+(bloqueado?"prot":"vuln"); $("atk-chip").textContent=bloqueado?"repelido":"exitoso";
 }
-
-async function atacar(){
-  if(BUSY||!LIVE) return; BUSY=true; render();
-  try{
-    const res = await api("/api/demo/atacar","POST");
-    const bloqueado = res.ataque.codigo===403 || !res.robado;
-    termAttack(res, PROT && bloqueado);
-    if(PROT){ setObj("safe"); } else { setObj(res.robado?"breach":"idle"); ATACADO=true; }
-  }catch(e){ $("term").innerHTML=`<div class="res c0">error: ${esc(e.message)}</div>`; }
-  BUSY=false; render();
-}
-async function proteger(){
-  if(BUSY||!LIVE||PROT) return; BUSY=true; render();
-  $("pipe-chip").className="chip prot"; $("pipe-chip").textContent="analizando…";
-  try{
-    let step=0; const anim=setInterval(()=>{ ladder(Math.min(step++,3)); }, 260);
-    const res = await api("/api/demo/proteger","POST");
-    clearInterval(anim);
-    const h = res.hallazgo || {};
-    const top = (h.nivel==null?4:h.nivel);
-    for(let i=0;i<=top;i++){ ladder(i); await sleep(200); }
-    PROT=true;
-    $("clk-def").textContent = fmtDur(h.segundos_hasta_mitigar);
-    $("pipe-chip").className="chip prot"; $("pipe-chip").textContent="parche aplicado";
-    pintarDetalle(h);
-    setObj("safe");
-    $("obj-sub").textContent="parche virtual activo · listo para el siguiente ataque";
-  }catch(e){ $("pipe-chip").className="chip vuln"; $("pipe-chip").textContent="error"; }
-  BUSY=false; render();
-}
-function pintarDetalle(h){
-  const d=$("pipe-detail"); d.style.display="grid";
-  const arr=h.camino_taint||[];
-  const taint=arr.map((p,i)=>`<span class="b ${i===0?'src':(i===arr.length-1?'sink':'')}">${esc(p)}</span>`).join('<span class="a">▶</span>');
-  d.innerHTML =
-    `<dt>Símbolo</dt><dd><code>${esc(h.simbolo_vulnerable||'—')}</code></dd>`+
-    `<dt>PoC</dt><dd>${esc(h.resultado_poc||'—')} · en jaula aislada</dd>`+
-    (taint?`<dt>Taint</dt><dd><div class="taint">${taint}</div></dd>`:'')+
+function pintarKv(h){const d=$("kv");d.style.display="grid";const arr=h.camino_taint||[];
+  d.innerHTML=`<dt>Símbolo</dt><dd><code>${esc(h.simbolo_vulnerable||'—')}</code></dd><dt>PoC</dt><dd>${esc(h.resultado_poc||'—')} · jaula aislada</dd>`+
+    (arr.length?`<dt>Taint</dt><dd>${arr.map(esc).join(' → ')}</dd>`:'')+
     `<dt>Parche</dt><dd>${h.parche_virtual?esc(h.parche_virtual.descr):'—'} ${h.parche_virtual_verificado?'· <span style="color:var(--teal)">✓ verificado</span>':''}</dd>`;
 }
-async function reiniciar(){
-  if(BUSY||!LIVE) return; BUSY=true; render();
-  try{ await api("/api/demo/reset","POST"); }catch(e){}
-  PROT=false; ATACADO=false; setObj("idle"); ladder(-1); $("pipe-detail").style.display="none";
-  $("pipe-chip").className="chip idle"; $("pipe-chip").textContent="en reposo";
-  $("clk-def").textContent="—"; $("obj-sub").textContent="un endpoint sirve archivos de su carpeta pública";
-  $("term").innerHTML='<span class="ph">// la terminal del atacante aparecerá aquí</span>';
-  $("atk-chip").className="chip idle"; $("atk-chip").textContent="inactivo";
-  BUSY=false; render();
-}
-async function correrFull(){
-  const b=$("btn-full"); b.disabled=true; b.innerHTML='<span class="spin"></span> analizando…';
-  try{ RUN = await api("/api/run","POST"); renderPanorama(); if(RUN.atacante_seg_supuesto) $("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto); }
-  catch(e){ $("panorama").innerHTML=`<div class="err">${esc(e.message)}</div>`; }
-  b.disabled=false; b.innerHTML='<span class="k">POST</span> Correr análisis completo';
-}
 
-function renderPanorama(){
-  if(!RUN || !RUN.hallazgos){ return; }
-  $("panorama").innerHTML = RUN.hallazgos.map(h=>{
-    const mini = NIV.map((_,i)=>`<span class="${i<=h.nivel?'on':''}"></span>`).join("");
-    const kev = h.kev?'<span class="b2 kev">KEV</span>':'';
-    const clase = h.clase?`<span class="b2 clase">${esc(h.clase)}</span>`:'';
-    return `<div class="find"><div class="top"><div><div class="id">${esc(h.advisory_id)} · ${esc(h.paquete)}==${esc(h.version)}</div><div class="nm">${esc(h.resumen)}</div></div></div>
-      <div class="mini">${mini}</div>
-      <div class="badges">${kev}${clase}<span class="b2 ${h.decision}">${esc(h.decision)}</span></div></div>`;
-  }).join("");
+/* ====================== acciones ====================== */
+async function atacar(){
+  if(BUSY||!LIVE)return;BUSY=true;render();
+  setStatus(PROT?"ATAQUE ENTRANTE…":"ATAQUE ENTRANTE…",PROT?C.teal:C.red);
+  try{
+    const res=await api("/api/demo/atacar","POST");
+    const bloqueado=res.ataque.codigo===403||!res.robado;
+    spawnAttack();
+    await sleep(PROT?900:1200);          // deja correr la animación
+    termAttack(res,PROT&&bloqueado);
+    if(!PROT)ATACADO=true;
+  }catch(e){setStatus("ERROR",C.muted)}
+  BUSY=false;render();
 }
+async function proteger(){
+  if(BUSY||!LIVE||PROT)return;BUSY=true;render();
+  setStatus("SELLANDO LA VENTANA…",C.teal);S.sealing=true;
+  let step=0;const anim=setInterval(()=>ladder(Math.min(step++,3)),240);
+  try{
+    const res=await api("/api/demo/proteger","POST");
+    clearInterval(anim);
+    const h=res.hallazgo||{};const top=h.nivel==null?4:h.nivel;
+    for(let i=0;i<=top;i++){ladder(i);await sleep(180)}
+    S.close=1;S.sealing=false;S.server="safe";PROT=true;
+    $("clk-def").textContent=fmtDur(h.segundos_hasta_mitigar);
+    pintarKv(h);setStatus("VENTANA CERRADA · PROTEGIDO",C.teal);
+  }catch(e){clearInterval(anim);S.sealing=false;setStatus("ERROR",C.muted)}
+  BUSY=false;render();
+}
+async function reiniciar(){
+  if(BUSY||!LIVE)return;BUSY=true;render();
+  try{await api("/api/demo/reset","POST")}catch(e){}
+  PROT=false;ATACADO=false;S.close=0;S.sealing=false;S.server="idle";S.packets=[];S.parts=[];
+  ladder(-1);$("kv").style.display="none";$("clk-def").textContent="—";setStatus("LISTO",C.muted);
+  $("term").innerHTML='<span class="ph">// aquí aparece la petición y la respuesta reales</span>';
+  BUSY=false;render();
+}
+async function correrFull(){const b=$("btn-full");b.disabled=true;b.innerHTML='<span class="spin"></span> analizando…';
+  try{RUN=await api("/api/run","POST");renderPanorama();if(RUN.atacante_seg_supuesto)$("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto)}
+  catch(e){$("panorama").innerHTML=`<div class="err">${esc(e.message)}</div>`}
+  b.disabled=false;b.innerHTML='<span class="k">POST</span> Correr análisis completo'}
+function renderPanorama(){if(!RUN||!RUN.hallazgos)return;$("panorama").innerHTML=RUN.hallazgos.map(h=>{
+  const mini=NIV.map((_,i)=>`<span class="${i<=h.nivel?'on':''}"></span>`).join("");
+  const kev=h.kev?'<span class="b2 kev">KEV</span>':'';const clase=h.clase?`<span class="b2 clase">${esc(h.clase)}</span>`:'';
+  return`<div class="find"><div class="id">${esc(h.advisory_id)} · ${esc(h.paquete)}==${esc(h.version)}</div><div class="nm">${esc(h.resumen)}</div>
+    <div class="mini">${mini}</div><div class="badges">${kev}${clase}<span class="b2 ${h.decision}">${esc(h.decision)}</span></div></div>`}).join("")}
 
 function render(){
-  const next = (!ATACADO && !PROT) ? "atacar" : (!PROT ? "proteger" : "reatacar");
-  $("dock").innerHTML = "";
-  const s=document.createElement("span"); s.className="step"; s.textContent="demo guiada ›"; $("dock").appendChild(s);
-  const mk=(label,cls,k,onclick,isNext,disabled)=>{
-    const b=document.createElement("button"); b.className=cls+(isNext&&!disabled?" next":"");
-    b.disabled=BUSY||!LIVE||disabled; b.innerHTML=(k?`<span class="k">${k}</span>`:"")+label; b.onclick=onclick;
-    $("dock").appendChild(b);
-  };
+  const next=(!ATACADO&&!PROT)?"atacar":(!PROT?"proteger":"reatacar");
+  $("dock").innerHTML="";const s=document.createElement("span");s.className="step";s.textContent="demo guiada ›";$("dock").appendChild(s);
+  const mk=(label,cls,k,onclick,isNext,disabled)=>{const b=document.createElement("button");b.className=cls+(isNext&&!disabled?" next":"");b.disabled=BUSY||!LIVE||disabled;b.innerHTML=(k?`<span class="k">${k}</span>`:"")+label;b.onclick=onclick;$("dock").appendChild(b)};
   mk("Lanzar ataque","attack","1",atacar,next==="atacar",false);
   mk("Activar Ventana Cero","primary","2",proteger,next==="proteger",PROT);
   mk("Repetir ataque","attack","3",atacar,next==="reatacar",!PROT);
   mk("Reiniciar","ghost","",reiniciar,false,false);
-  if(BUSY){ const sp=document.createElement("span"); sp.className="spin"; $("dock").appendChild(sp); }
+  if(BUSY){const sp=document.createElement("span");sp.className="spin";$("dock").appendChild(sp)}
 }
-
 async function boot(){
-  ladder(-1); setObj("idle"); render();
-  $("btn-full").onclick = correrFull;
-  try{ const st = await api("/api/status"); LIVE = !!st.en_vivo; }catch(e){ LIVE=false; }
-  $("dot").className="dot"+(LIVE?" on":""); $("livetxt").textContent = LIVE?"servidor en vivo":"modo estático";
-  try{ RUN = await fetch("run.json").then(r=>r.json()); renderPanorama(); if(RUN.atacante_seg_supuesto) $("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto); }catch(e){}
-  if(!LIVE){ $("dock").innerHTML='<div class="err">Para la demo interactiva corre <code>python -m ventana_cero.server</code> y abre http://localhost:8000</div>'; }
+  resize();window.addEventListener("resize",resize);requestAnimationFrame(loop);
+  ladder(-1);render();$("btn-full").onclick=correrFull;
+  try{const st=await api("/api/status");LIVE=!!st.en_vivo}catch(e){LIVE=false}
+  $("dot").className="dot"+(LIVE?" on":"");$("livetxt").textContent=LIVE?"servidor en vivo":"modo estático";
+  try{RUN=await fetch("run.json").then(r=>r.json());renderPanorama();if(RUN.atacante_seg_supuesto)$("clk-atk").textContent=fmtDur(RUN.atacante_seg_supuesto)}catch(e){}
+  if(!LIVE)$("dock").innerHTML='<div class="err">Para la demo interactiva corre <code>python -m ventana_cero.server</code> y abre http://localhost:8000</div>';
   render();
 }
 boot();
