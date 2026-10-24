@@ -83,7 +83,8 @@ cd ventana-cero
 
 python -m ventana_cero                 # corre el lazo; imprime el resultado
 python -m http.server -d ui/public     # abre http://localhost:8000 y dale "Reproducir"
-python -m unittest discover -s tests   # 9 tests en verde
+python -m ventana_cero.demo            # demo en vivo: curl 200 → Ventana Cero → curl 403
+python -m unittest discover -s tests   # tests en verde
 python eval/run_eval.py                # las métricas
 ```
 

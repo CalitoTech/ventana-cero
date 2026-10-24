@@ -1,4 +1,6 @@
-.PHONY: run ui test eval all
+.PHONY: run ui demo test eval all
+demo:       ## demo en vivo: mismo ataque, 200 sin Ventana Cero y 403 con ella (puerto 8001)
+	python -m ventana_cero.demo
 run:        ## corre el lazo de punta a punta
 	python -m ventana_cero
 ui:         ## sirve el panel de la demo

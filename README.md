@@ -66,10 +66,13 @@ python -m ventana_cero
 # 2. ver el panel de la demo
 python -m http.server -d ui/public      # abrir http://localhost:8000
 
-# 3. pruebas
+# 3. demo en vivo: mismo ataque, 200 sin Ventana Cero y 403 con ella (app en :8001)
+python -m ventana_cero.demo             # --sin-pausa para correrla de corrido
+
+# 4. pruebas
 python -m unittest discover -s tests
 
-# 4. evaluación (métricas)
+# 5. evaluación (métricas)
 python eval/run_eval.py
 ```
 
