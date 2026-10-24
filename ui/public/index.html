@@ -64,6 +64,10 @@ button:focus-visible{outline:1px solid var(--sig);outline-offset:3px}
 .win .c .pr{font-family:var(--f-m);font-size:11px;color:var(--faint);margin-top:3px}
 .win .c.agg{border-color:var(--faint)}
 .win .c.agg .d{color:var(--ink)}
+/* discipline: declined cases, each with the reason the loop stopped */
+.win .c .dec{font-family:var(--f-m);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:9px}
+.win .c .why{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.45}
+.win .c .lvtxt{font-family:var(--f-m);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-top:5px}
 
 /* timeline: cells like the ARC task boards */
 .tl{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;position:relative;padding-top:10px}
@@ -196,6 +200,26 @@ function windowStrip(d){
   return `<div class="win">${cells}${agg}</div>`;
 }
 
+// why the loop declined to act on a finding — derived from its own fields
+function porQue(h){
+  if(h.resultado_poc==="no_disparo") return "había taint estático, pero el PoC no lo confirmó: sin prueba no se mitiga";
+  if(h.nivel===0) return "el símbolo vulnerable no aparece en tu código";
+  if(h.nivel===1) return "el símbolo se referencia pero nunca se invoca";
+  if(h.nivel===2) return "se llama sin entrada no confiable (dato constante o saneado antes del sink)";
+  return esc(h.nivel_texto);
+}
+
+// the declined cases, each with the concrete reason: the triage isn't theater
+function disciplineStrip(d){
+  const no=d.hallazgos.filter(h=>!["actuar","mitigar"].includes(h.decision));
+  if(!no.length) return "";
+  return `<div class="win">` + no.map(h=>`<div class="c">
+    <div class="dec ${h.decision}">${esc(h.decision).toUpperCase()}</div>
+    <div class="id">${esc(h.advisory_id)} · ${esc(h.paquete)}==${esc(h.version)}</div>
+    <div class="lvtxt">nivel ${h.nivel} · ${esc(h.nivel_texto)}</div>
+    <div class="why">${porQue(h)}</div></div>`).join("") + `</div>`;
+}
+
 function timeline(h){
   const et = h.etapas||[];
   return `<div class="tl" id="tl" style="--n:${et.length}"><div class="fill" id="fill"></div>
@@ -291,7 +315,10 @@ function render(d){
     </div>
   </div>
 
-  <div class="sec"><b>04</b> El triage · ${r.total||d.hallazgos.length} avisos</div>
+  <div class="sec"><b>04</b> La disciplina · lo que NO tocamos y por qué</div>
+  ${disciplineStrip(d)}
+
+  <div class="sec"><b>05</b> El triage · ${r.total||d.hallazgos.length} avisos</div>
   ${triage(d)}`;
   resetTimeline(true);
 }
