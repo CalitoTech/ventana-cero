@@ -45,6 +45,7 @@ def _heuristica_simbolo(fix_diff: str) -> tuple[str | None, str | None]:
 def derivar_simbolo(h: Hallazgo, aviso: dict) -> Hallazgo:
     fix_diff = aviso.get("fix_diff", "")
     func = param = None
+    fuente = None
 
     if llm.disponible() and fix_diff:
         prompt = (
@@ -57,21 +58,24 @@ def derivar_simbolo(h: Hallazgo, aviso: dict) -> Hallazgo:
             try:
                 j = json.loads(re.search(r"\{.*\}", resp, re.S).group(0))
                 func, param = j.get("funcion"), j.get("parametro")
+                fuente = "propuesto por el LLM" if func else None
             except Exception:
                 func = param = None
 
     if not func and fix_diff:
         func, param = _heuristica_simbolo(fix_diff)
+        fuente = "heurística sobre el diff" if func else None
 
     if not func:
         gt = aviso.get("ground_truth_symbol", "")
         func = gt.split(".")[-1] if gt else None
         param = param or aviso.get("ground_truth_param")
+        fuente = "ground truth del aviso"
 
     if func:
         h.simbolo_vulnerable = f"{h.paquete}.{func}"
         h.parametro_peligroso = param
-        h.evidencia.append(f"símbolo vulnerable derivado: {h.simbolo_vulnerable} (param: {param})")
+        h.evidencia.append(f"símbolo vulnerable derivado: {h.simbolo_vulnerable} (param: {param}; {fuente})")
     return h
 
 

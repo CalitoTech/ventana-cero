@@ -1,0 +1,7 @@
+{
+  "05783ebae0b7a9fd": "```json\n{\"funcion\": \"render\", \"parametro\": \"plantilla\"}\n```",
+  "66cd7b87876d8663": "```json\n{\n  \"funcion\": \"read\",\n  \"parametro\": \"nombre\"\n}\n```",
+  "cf65dc6c5dcef6c0": "```json\n{\n  \"funcion\": \"loads\",\n  \"parametro\": \"data\"\n}\n```",
+  "f859ea7aa80d6b91": "```json\n{\n  \"funcion\": \"render_line\",\n  \"parametro\": \"plantilla\"\n}\n```",
+  "faf0abdd6f9f196c": "```json\n{\n  \"funcion\": \"open_member\",\n  \"parametro\": \"nombre\"\n}\n```"
+}

@@ -89,7 +89,9 @@ python eval/run_eval.py                # las métricas
 ```
 
 El LLM es **opcional**: sin `ANTHROPIC_API_KEY` todo corre con heurísticas, offline
-y determinista (ideal para la demo). Con la clave, mejora derivar el símbolo y el PoC.
+y determinista. Las respuestas del LLM se guardan en `fixtures/llm-cache.json`, así
+que la demo reproduce lo que propuso el modelo sin red ni clave (y sin gastar
+créditos). Con la clave, los avisos nuevos se consultan una vez y quedan en caché.
 
 ## 7. Dónde está cada cosa
 
