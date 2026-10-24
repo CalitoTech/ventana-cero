@@ -55,6 +55,16 @@ button:focus-visible{outline:1px solid var(--sig);outline-offset:3px}
 .ratio .big em{font-style:normal;color:var(--sig);font-weight:400}
 .ratio span{color:var(--muted);font-family:var(--f-m);font-size:12px}
 
+/* window metric: measured advisory -> verified mitigation, per case */
+.win{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
+.win .c{padding:16px 18px;border:1px solid var(--line);background:var(--panel)}
+.win .c .d{font-weight:200;font-size:1.9rem;letter-spacing:-.03em;color:var(--sig)}
+.win .c .d small{font-size:.42em;letter-spacing:0;color:var(--muted);margin-left:3px}
+.win .c .id{font-family:var(--f-m);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:6px;overflow-wrap:anywhere}
+.win .c .pr{font-family:var(--f-m);font-size:11px;color:var(--faint);margin-top:3px}
+.win .c.agg{border-color:var(--faint)}
+.win .c.agg .d{color:var(--ink)}
+
 /* timeline: cells like the ARC task boards */
 .tl{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;position:relative;padding-top:10px}
 .tl .fill{position:absolute;top:0;left:0;height:3px;background:var(--sig);width:0}
@@ -170,6 +180,22 @@ function ladder(nivel, upto){
   ).join("") + `</div>`;
 }
 
+function median(a){const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2;}
+
+// measured window (advisory -> verified mitigation) for every actionable case
+function windowStrip(d){
+  const act=d.hallazgos.filter(h=>h.segundos_hasta_mitigar!=null);
+  if(!act.length) return "";
+  const med=median(act.map(h=>h.segundos_hasta_mitigar));
+  const cells=act.map(h=>`<div class="c"><div class="d">${durHTML(h.segundos_hasta_mitigar)}</div>
+    <div class="id">${esc(h.advisory_id)}</div>
+    ${h.pr_parche_codigo?`<div class="pr">+ ${esc(h.pr_parche_codigo)}</div>`:""}</div>`).join("");
+  const agg=`<div class="c agg"><div class="d">${durHTML(med)}</div>
+    <div class="id">mediana · ${act.length} casos</div>
+    <div class="pr">lazo ${d.segundos_totales}s total</div></div>`;
+  return `<div class="win">${cells}${agg}</div>`;
+}
+
 function timeline(h){
   const et = h.etapas||[];
   return `<div class="tl" id="tl" style="--n:${et.length}"><div class="fill" id="fill"></div>
@@ -237,10 +263,13 @@ function render(d){
   <div class="ratio"><div class="big">${x?`<em>${x.toLocaleString("es")}×</em> antes que el atacante`:""}</div>
     <span>${r.accionables||0} accionables · ${r.ruido_descartado||0} descartados como ruido</span></div>
 
-  <div class="sec"><b>01</b> La carrera</div>
+  <div class="sec"><b>01</b> La ventana · medida de aviso a mitigación verificada</div>
+  ${windowStrip(d)}
+
+  <div class="sec"><b>02</b> La carrera</div>
   ${timeline(HERO)}
 
-  <div class="sec"><b>02</b> La prueba</div>
+  <div class="sec"><b>03</b> La prueba</div>
   <div class="case">
     <div class="col">
       <div class="cell">
@@ -262,7 +291,7 @@ function render(d){
     </div>
   </div>
 
-  <div class="sec"><b>03</b> El triage · ${r.total||d.hallazgos.length} avisos</div>
+  <div class="sec"><b>04</b> El triage · ${r.total||d.hallazgos.length} avisos</div>
   ${triage(d)}`;
   resetTimeline(true);
 }
