@@ -3,9 +3,11 @@
 Levanta la app víctima en un subproceso local y dispara un PoC HTTP. Si el PoC
 confirma ejecución de código, el Hallazgo sube a nivel 4.
 
-Aislamiento: en el esqueleto usamos un subproceso escuchando solo en 127.0.0.1.
-En producción esto va en un CONTENEDOR AISLADO SIN SALIDA A RED (documentado en
-docs/producto.md). El PoC corre solo contra el código propio.
+Aislamiento: la app corre dentro de la jaula (ventana_cero/jaula.py): audit hooks
+que bloquean red saliente, procesos hijos y archivos fuera del repo, más un
+timeout duro (y límite de memoria en POSIX). Es aislamiento por política, no de
+kernel; en producción va un CONTENEDOR SIN RED (docs/producto.md). Los intentos
+bloqueados se devuelven en poc["bloqueos"] como evidencia.
 """
 from __future__ import annotations
 
@@ -13,13 +15,18 @@ import os
 import socket
 import subprocess
 import sys
+import tempfile
+import threading
 import time
 import urllib.request
 import urllib.error
 from contextlib import closing
 
-from . import llm
+from . import jaula, llm
 from .hallazgo import Hallazgo
+
+RAIZ_PAQUETE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TIMEOUT_S = float(os.environ.get("VC_SANDBOX_TIMEOUT", "15"))
 
 # PoC canónico por clase de vulnerabilidad. Para SSTI, el canario aritmético
 # {{7*6}} -> "42" demuestra evaluación de la plantilla del atacante (benigno).
@@ -75,10 +82,15 @@ def ejecutar(h: Hallazgo, dir_repo: str, clase: str | None = "SSTI",
     env = dict(os.environ, VC_PORT=str(puerto))
     if guard:
         env["VC_GUARD"] = guard
+    env["PYTHONPATH"] = RAIZ_PAQUETE + os.pathsep + env.get("PYTHONPATH", "")
+    errlog = tempfile.TemporaryFile(mode="w+", encoding="utf-8", errors="replace")
     proc = subprocess.Popen(
-        [sys.executable, os.path.join(dir_repo, "app.py")],
-        env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        [sys.executable, "-m", "ventana_cero.jaula", os.path.join(dir_repo, "app.py")],
+        env=env, stdout=subprocess.DEVNULL, stderr=errlog,
     )
+    # timeout duro: pase lo que pase, el proceso muere al vencer el plazo
+    reloj = threading.Timer(TIMEOUT_S, proc.kill)
+    reloj.start()
     try:
         if not _esperar(puerto):
             return "no_disparo", poc
@@ -97,8 +109,14 @@ def ejecutar(h: Hallazgo, dir_repo: str, clase: str | None = "SSTI",
         poc["respuesta_muestra"] = cuerpo[:80]
         return ("disparo" if disparo else "no_disparo"), poc
     finally:
+        reloj.cancel()
         proc.terminate()
         try:
             proc.wait(timeout=3)
         except Exception:
             proc.kill()
+        errlog.seek(0)
+        bloqueos = [ln.strip() for ln in errlog if ln.startswith(jaula.PREFIJO)]
+        errlog.close()
+        if bloqueos:
+            poc["bloqueos"] = bloqueos
